@@ -1383,3 +1383,144 @@ async fn htmx_post_delete_returns_empty_body() {
         "HTMX delete should return empty body to remove the element"
     );
 }
+
+// --- Aria-live announcement tests ---
+
+#[tokio::test]
+async fn htmx_post_todo_includes_announce_trigger() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "announce_add@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    let response = client
+        .post(format!("{}/todos", &app.address))
+        .header("HX-Request", "true")
+        .form(&[("title", "Announced todo")])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status().as_u16(), 200);
+
+    let hx_trigger = response
+        .headers()
+        .get("hx-trigger")
+        .expect("HTMX add response should include HX-Trigger header")
+        .to_str()
+        .unwrap();
+
+    assert!(
+        hx_trigger.contains("announce"),
+        "HX-Trigger should contain an 'announce' event, got: {hx_trigger}"
+    );
+    assert!(
+        hx_trigger.contains("added"),
+        "Announcement should mention the todo was added, got: {hx_trigger}"
+    );
+}
+
+#[tokio::test]
+async fn htmx_post_toggle_includes_announce_trigger() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "announce_toggle@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Announce toggle")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    let response = client
+        .post(format!("{}/todos/{}/toggle", &app.address, todo_id))
+        .header("HX-Request", "true")
+        .send()
+        .await
+        .expect("Failed to toggle todo");
+
+    assert_eq!(response.status().as_u16(), 200);
+
+    let hx_trigger = response
+        .headers()
+        .get("hx-trigger")
+        .expect("HTMX toggle response should include HX-Trigger header")
+        .to_str()
+        .unwrap();
+
+    assert!(
+        hx_trigger.contains("announce"),
+        "HX-Trigger should contain an 'announce' event, got: {hx_trigger}"
+    );
+    assert!(
+        hx_trigger.contains("completed"),
+        "Announcement should mention completed state, got: {hx_trigger}"
+    );
+}
+
+#[tokio::test]
+async fn htmx_post_delete_includes_announce_trigger() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "announce_delete@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Announce delete")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id_from_delete(&body);
+
+    let response = client
+        .post(format!("{}/todos/{}/delete", &app.address, todo_id))
+        .header("HX-Request", "true")
+        .send()
+        .await
+        .expect("Failed to delete todo");
+
+    assert_eq!(response.status().as_u16(), 200);
+
+    let hx_trigger = response
+        .headers()
+        .get("hx-trigger")
+        .expect("HTMX delete response should include HX-Trigger header")
+        .to_str()
+        .unwrap();
+
+    assert!(
+        hx_trigger.contains("announce"),
+        "HX-Trigger should contain an 'announce' event, got: {hx_trigger}"
+    );
+    assert!(
+        hx_trigger.contains("deleted"),
+        "Announcement should mention deletion, got: {hx_trigger}"
+    );
+}

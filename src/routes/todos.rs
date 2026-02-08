@@ -17,6 +17,20 @@ fn is_htmx_request(headers: &HeaderMap) -> bool {
     headers.contains_key("hx-request")
 }
 
+/// Build an HTMX response with an HX-Trigger header that fires an "announce" event
+/// for screen reader live regions.
+fn htmx_response_with_announce(body: Html<String>, message: &str) -> Response {
+    let trigger_json = format!(r#"{{"announce":"{}"}}"#, message);
+    (
+        [(
+            axum::http::header::HeaderName::from_static("hx-trigger"),
+            axum::http::HeaderValue::from_str(&trigger_json).unwrap(),
+        )],
+        body,
+    )
+        .into_response()
+}
+
 /// View model for a single todo item in the template.
 pub struct TodoItemView {
     pub id: String,
@@ -92,7 +106,7 @@ pub async fn post_todo(
                     todo: TodoItemView::from(&item),
                 };
                 let body = template.render().map_err(TodosError::Render)?;
-                Ok(Html(body).into_response())
+                Ok(htmx_response_with_announce(Html(body), "Todo added"))
             } else {
                 Ok(Redirect::to("/todos").into_response())
             }
@@ -139,11 +153,16 @@ pub async fn post_toggle_todo(
     match toggle_todo_completion(&pool, &todo_item_id, &user_id).await {
         Ok(toggled) => {
             if htmx {
+                let announce = if toggled.is_completed() {
+                    "Todo completed"
+                } else {
+                    "Todo marked pending"
+                };
                 let template = TodoItemTemplate {
                     todo: TodoItemView::from(&toggled),
                 };
                 let body = template.render().map_err(TodosError::Render)?;
-                Ok(Html(body).into_response())
+                Ok(htmx_response_with_announce(Html(body), announce))
             } else {
                 Ok(Redirect::to("/todos").into_response())
             }
@@ -174,7 +193,10 @@ pub async fn post_delete_todo(
     match delete_todo(&pool, &todo_item_id, &user_id).await {
         Ok(()) => {
             if htmx {
-                Ok(Html(String::new()).into_response())
+                Ok(htmx_response_with_announce(
+                    Html(String::new()),
+                    "Todo deleted",
+                ))
             } else {
                 Ok(Redirect::to("/todos").into_response())
             }

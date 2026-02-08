@@ -22,6 +22,14 @@
     </footer>
     <div aria-live="polite" aria-atomic="true" id="live-region" class="visually-hidden"></div>
     <script src="/static/js/htmx.min.js"></script>
+    <script>
+    document.body.addEventListener("announce", function(e) {
+        var region = document.getElementById("live-region");
+        if (region && e.detail && e.detail.value) {
+            region.textContent = e.detail.value;
+        }
+    });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
