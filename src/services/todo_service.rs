@@ -132,3 +132,47 @@ pub async fn delete_todo(
     tracing::info!("Todo deleted");
     Ok(())
 }
+
+#[derive(Debug, thiserror::Error)]
+pub enum UpdateTitleError {
+    #[error("Todo not found")]
+    NotFound,
+    #[error("Not authorized to edit this todo")]
+    Unauthorized,
+    #[error("Invalid title: {0}")]
+    InvalidTitle(#[from] TodoTitleError),
+    #[error(transparent)]
+    Unexpected(anyhow::Error),
+}
+
+#[tracing::instrument(
+    name = "update_todo_title",
+    skip(pool, new_title),
+    fields(todo_id = %todo_id.as_uuid(), user_id = %user_id.as_uuid())
+)]
+pub async fn update_todo_title(
+    pool: &PgPool,
+    todo_id: &TodoItemId,
+    user_id: &UserId,
+    new_title: String,
+) -> Result<(), UpdateTitleError> {
+    let item = todo_repository::find_todo_by_id(pool, todo_id)
+        .await
+        .map_err(|e| UpdateTitleError::Unexpected(anyhow::anyhow!("Database error: {e}")))?
+        .ok_or(UpdateTitleError::NotFound)?;
+
+    if item.user_id() != user_id {
+        return Err(UpdateTitleError::Unauthorized);
+    }
+
+    let validated = TodoTitle::parse(new_title)?;
+
+    todo_repository::update_todo_title(pool, todo_id, validated.as_str())
+        .await
+        .map_err(|e| {
+            UpdateTitleError::Unexpected(anyhow::anyhow!("Failed to update title: {e}"))
+        })?;
+
+    tracing::info!("Todo title updated");
+    Ok(())
+}

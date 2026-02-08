@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Todo -- Todo List{% endblock %}
+
+{% block nav %}
+<form method="post" action="/logout" class="nav-logout">
+    <button type="submit" class="nav-logout__button">Sign out</button>
+</form>
+{% endblock %}
+
+{% block content %}
+<div class="auth-form">
+    <h1>Edit Todo</h1>
+    {% if let Some(error) = error_message %}
+    <div class="auth-form__message auth-form__message--error" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+    <form method="post" action="/todos/{{ todo_id }}/edit" class="auth-form__fields" novalidate>
+        <div class="auth-form__group">
+            <label for="title">Title</label>
+            <input
+                type="text"
+                id="title"
+                name="title"
+                value="{{ current_title }}"
+                maxlength="300"
+                required
+                autofocus
+                {% if let Some(err) = error_message %}aria-describedby="title-error" aria-invalid="true"{% endif %}
+            >
+            {% if let Some(err) = error_message %}
+            <p class="auth-form__error" id="title-error">{{ err }}</p>
+            {% endif %}
+        </div>
+        <div class="auth-form__actions">
+            <button type="submit" class="auth-form__submit">Save</button>
+            <a href="/todos" class="auth-form__cancel">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

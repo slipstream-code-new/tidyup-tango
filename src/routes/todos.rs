@@ -9,8 +9,8 @@ use uuid::Uuid;
 use super::auth::AuthenticatedUser;
 use crate::domain::{TodoItem, TodoItemId};
 use crate::services::todo_service::{
-    add_todo, delete_todo, get_todos, toggle_todo_completion, AddTodoError, DeleteTodoError,
-    ToggleTodoError,
+    add_todo, delete_todo, get_todos, toggle_todo_completion, update_todo_title, AddTodoError,
+    DeleteTodoError, ToggleTodoError, UpdateTitleError,
 };
 
 /// View model for a single todo item in the template.
@@ -141,6 +141,91 @@ pub async fn post_delete_todo(
         )
             .into_response()),
         Err(DeleteTodoError::Unexpected(err)) => Err(TodosError::Unexpected(err)),
+    }
+}
+
+#[derive(Template)]
+#[template(path = "edit_todo.html")]
+pub struct EditTodoTemplate {
+    pub todo_id: String,
+    pub current_title: String,
+    pub error_message: Option<String>,
+}
+
+pub async fn get_edit_todo(
+    AuthenticatedUser(user_id): AuthenticatedUser,
+    State(pool): State<PgPool>,
+    Path(todo_id): Path<Uuid>,
+) -> Result<Response, TodosError> {
+    let todo_item_id = TodoItemId::from_uuid(todo_id);
+
+    let item = crate::infrastructure::todo_repository::find_todo_by_id(&pool, &todo_item_id)
+        .await
+        .map_err(|e| TodosError::Unexpected(anyhow::anyhow!("Database error: {e}")))?;
+
+    match item {
+        Some(todo) if todo.user_id() == &user_id => {
+            let template = EditTodoTemplate {
+                todo_id: todo_id.to_string(),
+                current_title: todo.title().as_str().to_string(),
+                error_message: None,
+            };
+            Ok(Html(template.render()?).into_response())
+        }
+        Some(_) => Ok((
+            StatusCode::FORBIDDEN,
+            Html("<h1>Not authorized</h1>".to_string()),
+        )
+            .into_response()),
+        None => Ok((
+            StatusCode::NOT_FOUND,
+            Html("<h1>Todo not found</h1>".to_string()),
+        )
+            .into_response()),
+    }
+}
+
+#[derive(serde::Deserialize)]
+pub struct EditTodoForm {
+    pub title: String,
+}
+
+pub async fn post_edit_todo(
+    AuthenticatedUser(user_id): AuthenticatedUser,
+    State(pool): State<PgPool>,
+    Path(todo_id): Path<Uuid>,
+    Form(form): Form<EditTodoForm>,
+) -> Result<Response, TodosError> {
+    let todo_item_id = TodoItemId::from_uuid(todo_id);
+
+    match update_todo_title(&pool, &todo_item_id, &user_id, form.title.clone()).await {
+        Ok(()) => Ok(Redirect::to("/todos").into_response()),
+        Err(UpdateTitleError::NotFound) => Ok((
+            StatusCode::NOT_FOUND,
+            Html("<h1>Todo not found</h1>".to_string()),
+        )
+            .into_response()),
+        Err(UpdateTitleError::Unauthorized) => Ok((
+            StatusCode::FORBIDDEN,
+            Html("<h1>Not authorized</h1>".to_string()),
+        )
+            .into_response()),
+        Err(UpdateTitleError::InvalidTitle(title_err)) => {
+            let user_facing = match title_err {
+                crate::domain::TodoTitleError::Empty => "Title cannot be empty".to_string(),
+                crate::domain::TodoTitleError::TooLong { max, .. } => {
+                    format!("That title is too long (max {max} characters)")
+                }
+            };
+            let template = EditTodoTemplate {
+                todo_id: todo_id.to_string(),
+                current_title: form.title,
+                error_message: Some(user_facing),
+            };
+            let body = template.render().map_err(TodosError::Render)?;
+            Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(body)).into_response())
+        }
+        Err(UpdateTitleError::Unexpected(err)) => Err(TodosError::Unexpected(err)),
     }
 }
 

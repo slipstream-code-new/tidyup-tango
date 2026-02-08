@@ -118,3 +118,18 @@ pub async fn update_todo_completion(
     .await?;
     Ok(())
 }
+
+pub async fn update_todo_title(
+    pool: &PgPool,
+    todo_id: &TodoItemId,
+    title: &str,
+) -> Result<(), sqlx::Error> {
+    sqlx::query!(
+        r#"UPDATE todos SET title = $1 WHERE id = $2"#,
+        title,
+        todo_id.as_uuid(),
+    )
+    .execute(pool)
+    .await?;
+    Ok(())
+}

@@ -10,8 +10,8 @@ use tower_sessions_sqlx_store::PostgresStore;
 
 use crate::configuration::Settings;
 use crate::routes::{
-    get_login, get_register, get_todos_page, health_check, index, post_delete_todo, post_login,
-    post_logout, post_register, post_todo, post_toggle_todo,
+    get_edit_todo, get_login, get_register, get_todos_page, health_check, index, post_delete_todo,
+    post_edit_todo, post_login, post_logout, post_register, post_todo, post_toggle_todo,
 };
 
 pub struct Application {
@@ -63,6 +63,10 @@ impl Application {
             .route("/todos", axum::routing::get(get_todos_page).post(post_todo))
             .route("/todos/{id}/toggle", axum::routing::post(post_toggle_todo))
             .route("/todos/{id}/delete", axum::routing::post(post_delete_todo))
+            .route(
+                "/todos/{id}/edit",
+                axum::routing::get(get_edit_todo).post(post_edit_todo),
+            )
             .route("/health_check", axum::routing::get(health_check))
             .nest_service("/static", ServeDir::new("static"))
             .layer(session_layer)

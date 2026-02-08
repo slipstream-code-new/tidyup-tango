@@ -572,3 +572,209 @@ async fn toggle_button_has_accessible_label() {
         "aria-label should include the todo title for context"
     );
 }
+
+// --- Delete tests ---
+
+/// Extract a todo ID from the delete form action URL.
+fn extract_todo_id_from_delete(body: &str) -> String {
+    // Find "/delete" first, then work backwards to extract the UUID
+    let suffix = "/delete";
+    let delete_pos = body.find(suffix).expect("No /delete action found in body");
+    // The URL is like /todos/<uuid>/delete, so find the last /todos/ before /delete
+    let before_delete = &body[..delete_pos];
+    let prefix = "/todos/";
+    let prefix_pos = before_delete
+        .rfind(prefix)
+        .expect("No /todos/ prefix before /delete");
+    let id_start = prefix_pos + prefix.len();
+    body[id_start..delete_pos].to_string()
+}
+
+#[tokio::test]
+async fn post_delete_removes_todo_and_redirects() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "delete@example.com", "securepassword123").await;
+
+    // Add a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Delete me")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Get the page to extract the todo ID
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Delete me"),
+        "Todo should be present before deletion"
+    );
+    let todo_id = extract_todo_id_from_delete(&body);
+
+    // Delete it
+    let response = client
+        .post(format!("{}/todos/{}/delete", &app.address, todo_id))
+        .send()
+        .await
+        .expect("Failed to delete todo");
+
+    assert_eq!(response.status().as_u16(), 303, "Delete should redirect");
+
+    let location = response
+        .headers()
+        .get("location")
+        .expect("Missing Location header")
+        .to_str()
+        .unwrap();
+    assert_eq!(location, "/todos", "Should redirect back to /todos");
+
+    // Verify it's gone
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+
+    assert!(
+        !body.contains("Delete me"),
+        "Todo should no longer appear after deletion"
+    );
+    assert!(
+        body.contains("No todos yet."),
+        "Should show empty state after deleting the only todo"
+    );
+}
+
+#[tokio::test]
+async fn post_delete_returns_404_for_nonexistent_todo() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "del404@example.com", "securepassword123").await;
+
+    let fake_id = uuid::Uuid::new_v4();
+    let response = client
+        .post(format!("{}/todos/{}/delete", &app.address, fake_id))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        404,
+        "Nonexistent todo should return 404"
+    );
+}
+
+#[tokio::test]
+async fn post_delete_returns_403_for_another_users_todo() {
+    let app = spawn_app().await;
+
+    // User A adds a todo
+    let client_a =
+        register_and_login(&app.address, "delowner@example.com", "securepassword123").await;
+    client_a
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Do not delete")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Extract the todo ID from user A's page
+    let response = client_a
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id_from_delete(&body);
+
+    // User B tries to delete user A's todo
+    let client_b =
+        register_and_login(&app.address, "delintruder@example.com", "securepassword123").await;
+
+    let response = client_b
+        .post(format!("{}/todos/{}/delete", &app.address, todo_id))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        403,
+        "Should not be able to delete another user's todo"
+    );
+
+    // Verify user A's todo still exists
+    let response = client_a
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Do not delete"),
+        "User A's todo should still exist after unauthorized delete attempt"
+    );
+}
+
+#[tokio::test]
+async fn post_delete_redirects_to_login_when_unauthenticated() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
+
+    let fake_id = uuid::Uuid::new_v4();
+    let response = client
+        .post(format!("{}/todos/{}/delete", &app.address, fake_id))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        303,
+        "Unauthenticated delete should redirect"
+    );
+
+    let location = response
+        .headers()
+        .get("location")
+        .expect("Missing Location header")
+        .to_str()
+        .unwrap();
+    assert_eq!(location, "/login");
+}
+
+#[tokio::test]
+async fn delete_button_has_accessible_label() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "dela11y@example.com", "securepassword123").await;
+
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "A11y delete")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+
+    // The delete button should have an accessible label including the todo title
+    assert!(
+        body.contains("Delete &quot;A11y delete&quot;"),
+        "Delete button should have an aria-label with the todo title"
+    );
+}
