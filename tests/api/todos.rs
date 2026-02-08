@@ -778,3 +778,370 @@ async fn delete_button_has_accessible_label() {
         "Delete button should have an aria-label with the todo title"
     );
 }
+
+// --- Edit tests ---
+
+#[tokio::test]
+async fn get_edit_shows_form_with_current_title() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "edit@example.com", "securepassword123").await;
+
+    // Add a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Edit me")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Get the page to extract the todo ID
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // GET the edit page
+    let response = client
+        .get(format!("{}/todos/{}/edit", &app.address, todo_id))
+        .send()
+        .await
+        .expect("Failed to get edit page");
+
+    assert_eq!(response.status().as_u16(), 200);
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Edit Todo"),
+        "Edit page should have a heading"
+    );
+    assert!(
+        body.contains("Edit me"),
+        "Edit form should show the current title"
+    );
+    assert!(
+        body.contains(&format!("/todos/{}/edit", todo_id)),
+        "Form action should point to the edit endpoint"
+    );
+}
+
+#[tokio::test]
+async fn post_edit_updates_title_and_redirects() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "editpost@example.com", "securepassword123").await;
+
+    // Add a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Old title")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Extract the todo ID
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // Edit the title
+    let response = client
+        .post(format!("{}/todos/{}/edit", &app.address, todo_id))
+        .form(&[("title", "New title")])
+        .send()
+        .await
+        .expect("Failed to edit todo");
+
+    assert_eq!(response.status().as_u16(), 303, "Edit should redirect");
+
+    let location = response
+        .headers()
+        .get("location")
+        .expect("Missing Location header")
+        .to_str()
+        .unwrap();
+    assert_eq!(location, "/todos", "Should redirect back to /todos");
+
+    // Verify the title was updated
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+
+    assert!(
+        body.contains("New title"),
+        "Updated title should be visible"
+    );
+    assert!(
+        !body.contains("Old title"),
+        "Old title should no longer appear"
+    );
+}
+
+#[tokio::test]
+async fn post_edit_with_empty_title_returns_422() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "editempty@example.com", "securepassword123").await;
+
+    // Add a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Non-empty title")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Extract the todo ID
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // Try to edit with an empty title
+    let response = client
+        .post(format!("{}/todos/{}/edit", &app.address, todo_id))
+        .form(&[("title", "")])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        422,
+        "Empty title should return 422"
+    );
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("cannot be empty"),
+        "Should show empty title error message"
+    );
+}
+
+#[tokio::test]
+async fn post_edit_with_too_long_title_returns_422() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "editlong@example.com", "securepassword123").await;
+
+    // Add a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Short title")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Extract the todo ID
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // Try to edit with a too-long title
+    let long_title = "a".repeat(301);
+    let response = client
+        .post(format!("{}/todos/{}/edit", &app.address, todo_id))
+        .form(&[("title", long_title.as_str())])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        422,
+        "Too-long title should return 422"
+    );
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("too long"),
+        "Should show title-too-long error message"
+    );
+}
+
+#[tokio::test]
+async fn post_edit_returns_404_for_nonexistent_todo() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "edit404@example.com", "securepassword123").await;
+
+    let fake_id = uuid::Uuid::new_v4();
+    let response = client
+        .post(format!("{}/todos/{}/edit", &app.address, fake_id))
+        .form(&[("title", "Does not matter")])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        404,
+        "Nonexistent todo should return 404"
+    );
+}
+
+#[tokio::test]
+async fn post_edit_returns_403_for_another_users_todo() {
+    let app = spawn_app().await;
+
+    // User A adds a todo
+    let client_a =
+        register_and_login(&app.address, "editowner@example.com", "securepassword123").await;
+    client_a
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "My private todo")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Extract the todo ID from user A's page
+    let response = client_a
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // User B tries to edit user A's todo
+    let client_b = register_and_login(
+        &app.address,
+        "editintruder@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    let response = client_b
+        .post(format!("{}/todos/{}/edit", &app.address, todo_id))
+        .form(&[("title", "Hacked title")])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        403,
+        "Should not be able to edit another user's todo"
+    );
+
+    // Verify user A's todo still has the original title
+    let response = client_a
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("My private todo"),
+        "User A's todo should still have the original title"
+    );
+    assert!(
+        !body.contains("Hacked title"),
+        "Unauthorized edit should not have changed the title"
+    );
+}
+
+#[tokio::test]
+async fn get_edit_redirects_to_login_when_unauthenticated() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
+
+    let fake_id = uuid::Uuid::new_v4();
+    let response = client
+        .get(format!("{}/todos/{}/edit", &app.address, fake_id))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        303,
+        "Unauthenticated GET edit should redirect"
+    );
+
+    let location = response
+        .headers()
+        .get("location")
+        .expect("Missing Location header")
+        .to_str()
+        .unwrap();
+    assert_eq!(location, "/login");
+}
+
+#[tokio::test]
+async fn post_edit_redirects_to_login_when_unauthenticated() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
+
+    let fake_id = uuid::Uuid::new_v4();
+    let response = client
+        .post(format!("{}/todos/{}/edit", &app.address, fake_id))
+        .form(&[("title", "Sneaky edit")])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        303,
+        "Unauthenticated POST edit should redirect"
+    );
+
+    let location = response
+        .headers()
+        .get("location")
+        .expect("Missing Location header")
+        .to_str()
+        .unwrap();
+    assert_eq!(location, "/login");
+}
+
+#[tokio::test]
+async fn edit_link_has_accessible_label() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "edita11y@example.com", "securepassword123").await;
+
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "A11y edit")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+
+    // The edit link should have an accessible label including the todo title
+    assert!(
+        body.contains("Edit &quot;A11y edit&quot;"),
+        "Edit link should have an aria-label with the todo title"
+    );
+}
