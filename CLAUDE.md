@@ -20,18 +20,35 @@ Your responsibilities:
 - **Stay out of the way**: Do not inject your own opinions into technical, design, or
   product decisions. Those belong to the team. You are a facilitator, not a participant.
 
-## Launching Teammates
+## Launching Teammates (Driver-Reviewer Model)
 
-When launching teammates, always use:
-- `subagent_type: "general-purpose"` — teammates need full tool access
+Each task has exactly **one Driver** and **eight Reviewers**. The Driver is the only
+agent who may modify files. Reviewers participate via read-only access and messaging.
+
+### Driver
+- Spawned with `subagent_type: "general-purpose"` — full tool access (Edit, Write, Bash)
+- Only **one Driver at a time**. The coordinator must shut down the current Driver
+  before spawning a new one or re-designating the role.
+- The Driver rotates by task based on the expertise needed.
+
+### Reviewers
+- Spawned with `subagent_type: "general-purpose"` — but their spawn prompt must
+  **explicitly instruct them NOT to use Edit, Write, or Bash tools that modify files**.
+  Reviewers operate in read-only mode and communicate suggestions via messages only.
+- Each Reviewer focuses on their area of expertise (a11y, UX, design, domain, etc.)
+  and provides feedback to the Driver through messages.
+
+### Common Launch Instructions
 - Include the teammate's `.team/` profile content in the prompt so the agent embodies
-  that persona
+  that persona.
 - Instruct each teammate to **read `PROJECT.md` and `TEAM_AGREEMENTS.md`** at the start
   of their session before doing any work. Teammates do not automatically see these files,
   so the spawn prompt must explicitly tell them to read and follow both documents.
   `PROJECT.md` contains the project owner's constraints; `TEAM_AGREEMENTS.md` contains
   the team's coding conventions, architectural decisions, definition of done, and working
   agreements.
+- Clearly indicate in each teammate's spawn prompt whether they are the **Driver** or
+  a **Reviewer** for the current task.
 
 ## Teammate Permissions
 
@@ -49,6 +66,18 @@ teammates spawned while in that mode.
 **After** all teammates have been spawned and confirmed working, ask the project owner
 to press **Shift+Tab** to enter delegate mode. This prevents the lead from accidentally
 writing code or making decisions that belong to the team.
+
+## Coordinator Verification Duties
+
+### Clean Working Tree
+Before and after each task, the coordinator must run `git status` to verify a clean
+working tree. No task begins with uncommitted changes, and no task ends until all
+changes are committed and pushed.
+
+### Consensus Gating
+A task is not complete until **all 9 team members** (Driver + 8 Reviewers) have
+reviewed the work and reached consensus. The coordinator must collect explicit
+consent from each agent before marking a task as completed.
 
 ## Team Roster
 

@@ -29,35 +29,45 @@
   "I'd prefer Y because Z."
 - We ask questions rather than make assumptions -- especially across disciplines.
 
-### Mob/Ensemble Programming
-- **All production code is written by the mob.** No solo commits to production code.
-- **Roles rotate every 10-15 minutes**: Driver (types), Navigator (directs at intent
-  level), Mob (contributes ideas, catches issues, thinks ahead).
+### Driver-Reviewer Mob Model
+- **Full 9-person mob is always active.** All team members participate in every task.
+- **One Driver, eight Reviewers**: The Driver is the sole agent who may modify files
+  (using Edit, Write, and Bash tools). All other agents operate as Reviewers -- they
+  read code, review changes, and communicate feedback via messages only.
+- **Non-driver agents MUST NOT use Edit, Write, or Bash tools that modify files.**
+  Violation is treated as a process failure.
+- **Driver rotates by task**: The Driver is chosen based on the expertise needed for
+  each task. The coordinator designates the Driver when assigning work.
+- **Reviewers focus on their specialty**: Each Reviewer contributes from their area of
+  expertise (a11y, UX, design, domain modeling, Rust patterns, HTMX, CSS, product,
+  TDD discipline) and sends suggestions to the Driver via messages.
+- **All suggestions flow through messages**: Reviewers describe intent and concerns,
+  not keystrokes. The Driver translates feedback into code changes.
 - **Everyone participates**: Designers, PM, accessibility specialist, domain architect --
-  everyone is in the mob. Different eyes catch different things.
-- **The navigator describes intent, not keystrokes.** "Let's add a handler for the
-  completion endpoint" not "type `async fn`..."
-- **Respect the driver.** The driver translates intent into code. Give them space to
-  think. Don't dictate syntax.
+  every perspective matters. Different eyes catch different things.
 - **It's okay to say "I don't understand."** The mob is a learning environment.
-- **Take breaks.** Mobbing is intense. Short breaks every 45-60 minutes.
 
 ### Feature Workflow
-Each feature follows this lightweight process in the mob:
+Each feature follows this process with the full 9-person mob:
 
-1. **Discovery (5 min)**: Who is the user? What is the problem? What does "working"
+1. **Discovery**: Who is the user? What is the problem? What does "working"
    look like? Identify edge cases (empty state, error state, 1000 items, special
    characters). Marty leads.
-2. **Type sketch (5 min)**: What domain types and states are involved? Quick sketch of
+2. **Type sketch**: What domain types and states are involved? Quick sketch of
    enums, newtypes, and workflows. Scott leads.
-3. **Design intent (5 min)**: What is the visual hierarchy? What states need designing
+3. **Design intent**: What is the visual hierarchy? What states need designing
    (empty, loading, error, success)? Steve Schoger describes layout, spacing, and
    typography in concrete terms.
 4. **TDD cycle**: Red-Green-Refactor. The compiler is our first test. Take the smallest
-   step possible. Kent facilitates.
-5. **Continuous review**: Accessibility checked by Heydon, usability checked by Steve
-   Krug, design checked by Steve Schoger, hypermedia patterns checked by Carson -- all
-   in real time, not as a separate phase.
+   step possible. The Driver writes code; Reviewers provide feedback via messages.
+   Kent facilitates TDD discipline.
+5. **Continuous review**: Reviewers actively review each change as it happens --
+   accessibility checked by Heydon, usability checked by Steve Krug, design checked
+   by Steve Schoger, hypermedia patterns checked by Carson, domain modeling checked
+   by Scott, Rust patterns checked by Luca, product fit checked by Marty.
+6. **Consensus gate**: After each atomic green step, all 9 agents confirm the change
+   is correct before the Driver proceeds to the next step. The coordinator collects
+   consensus before marking any task complete.
 
 ### Decision Cadence
 - Day-to-day coding decisions (naming, small refactors, local patterns) are made
@@ -116,6 +126,7 @@ A feature is **done** when ALL of the following are true:
 ### Process
 - [ ] The mob has continuously reviewed code, design, usability, and accessibility
       during development
+- [ ] All 9 team members have reviewed and consent to the completed work
 - [ ] Labels and copy follow the Copy Standards (see Section 3)
 
 ---
@@ -461,23 +472,28 @@ Every commit must pass (in order):
 3. `cargo test` (unit + integration)
 4. `cargo audit` (dependency vulnerabilities)
 
-### Commit Discipline
+### Atomic Green Step Pipeline
 
-*Adopted after repeated incidents of unpushed commits and code written on top of
-unverified work. These rules are non-negotiable.*
+*Every change follows this pipeline. No shortcuts, no skipped steps.*
 
-1. **Commit at every green step.** When `cargo fmt --check`, `cargo clippy -- -D warnings`,
-   and `cargo test` all pass, commit immediately. Do not accumulate uncommitted work.
-2. **Push immediately after every commit.** Run `git push` right after `git commit`.
-   Then run `gh run list --limit 1` and verify the CI run completes green before writing
-   any new code.
-3. **Never start new work on top of unpushed commits.** If the branch is ahead of origin,
-   push first. If someone else has unpushed commits, wait for them to push.
-4. **If CI fails, fix it before writing new code.** A red CI is the team's top priority.
-   No new features, no new tests, no refactoring until CI is green again.
-5. **One person drives at a time.** Only one agent should be modifying files at any given
-   moment. Concurrent file modifications cause merge conflicts and stale state. The driver
-   writes, commits, and pushes; then the next driver takes over.
+1. **Write code** — the smallest meaningful change.
+2. **`cargo fmt --check`** — fix formatting if needed.
+3. **`cargo clippy -- -D warnings`** — fix warnings if needed.
+4. **`cargo test`** — fix failures if needed.
+5. **`git commit` + `git push`** — commit and push immediately.
+6. **`gh run list --limit 1`** — wait for CI to complete green before writing any new code.
+7. **All 9 agents review and reach consensus** — Driver and Reviewers confirm the change
+   is correct before proceeding.
+8. **Only then begin the next change.**
+
+Additional rules:
+- **Never start new work on top of unpushed commits.** If the branch is ahead of origin,
+  push first.
+- **If CI fails, fix it before writing new code.** A red CI is the team's top priority.
+  No new features, no new tests, no refactoring until CI is green again.
+- **One Driver at a time.** Only the designated Driver may modify files. Non-driver agents
+  MUST NOT use Edit, Write, or Bash tools that modify files. Violation is treated as a
+  process failure.
 
 ### Dependency Management
 

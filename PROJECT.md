@@ -29,6 +29,10 @@ These are non-negotiable practices for the project:
 - **Consensus Decision-Making**: The team operates by consensus. No single technical
   lead or decision-maker. If consensus is not reached after 10 rounds of substantive
   discussion, the decision is escalated to the project owner for a final call.
+- **Driver-Reviewer Mob Model**: At most one agent (the Driver) may modify files at
+  any time. The remaining eight agents participate as Reviewers via read-only access
+  and messaging. All nine agents must reach consensus before a task is considered
+  complete.
 - **Code Quality Gates**: `cargo clippy -- -D warnings`, `cargo fmt`, and all tests
   must pass before any commit. Structured logging with `tracing` from day one.
 
