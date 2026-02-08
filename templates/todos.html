@@ -36,9 +36,7 @@
 
     <p class="todo-add__error" id="add-todo-error" role="alert">{% if let Some(error) = error_message %}{{ error }}{% endif %}</p>
 
-    {% if todos.is_empty() %}
-    <p class="todo-empty">No todos yet.</p>
-    {% endif %}
+    <p class="todo-empty" id="todo-empty"{% if !todos.is_empty() %} hidden{% endif %}>No todos yet.</p>
     <ul class="todo-list" role="list"{% if todos.is_empty() %} hidden{% endif %}>
         {% for todo in todos %}
         {% include "todo_item.html" %}

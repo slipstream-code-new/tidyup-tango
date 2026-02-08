@@ -103,10 +103,19 @@ async fn get_todos_shows_empty_state_for_new_user() {
         "Missing descriptive page title"
     );
 
-    // Empty state
+    // Empty state -- visible (no hidden attribute) when there are no todos
     assert!(
         body.contains("No todos yet."),
         "Should show empty state message"
+    );
+    assert!(
+        body.contains("id=\"todo-empty\""),
+        "Empty state should have a stable ID for JS toggling"
+    );
+    // The empty-state element should NOT have hidden attribute when there are no todos
+    assert!(
+        !body.contains("id=\"todo-empty\" hidden"),
+        "Empty state should be visible (not hidden) when there are no todos"
     );
 
     // Add form is present
@@ -226,10 +235,14 @@ async fn get_todos_shows_added_items() {
     );
     assert!(body.contains("<li"), "Each todo should be a <li> list item");
 
-    // No empty state message
+    // Empty state message is hidden when items exist
     assert!(
-        !body.contains("No todos yet."),
-        "Should not show empty state when todos exist"
+        body.contains("id=\"todo-empty\""),
+        "Empty state element should always be in the DOM"
+    );
+    assert!(
+        body.contains("id=\"todo-empty\" hidden"),
+        "Empty state should be hidden when todos exist"
     );
 }
 
