@@ -66,7 +66,7 @@ call `error.to_string()` on a domain error.
 | `PasswordError::TooShort` | "Your password needs at least 8 characters" |
 | `PasswordError::TooLong` | "That password is too long" |
 | `RegistrationError::DuplicateEmail` | "Unable to create account. If you already have an account, try signing in." |
-| `AuthError::InvalidCredentials` | "That email or password didn't work. Try again." |
+| `AuthenticationError::InvalidCredentials` | "That email or password didn't work. Try again." |
 | `TodoTitleError::Empty` | (silently ignored per US-5 -- empty submissions are not errors) |
 | `TodoTitleError::TooLong` | "That title is too long (max 300 characters)" |
 
