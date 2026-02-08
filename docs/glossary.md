@@ -18,7 +18,7 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Password | (not stored as domain type) | -- | Hashed with Argon2 at the boundary; the domain never sees raw passwords |
 | Todo item | `TodoItem` (enum) | `domain` | Sum type: `Pending` or `Completed` variant. No boolean flags. |
 | Todo item ID | `TodoItemId(Uuid)` | `domain` | Newtype wrapper; uniquely identifies a todo item |
-| Todo title | `TodoTitle` | `domain` | Non-empty, max 200 chars (per US-5), trimmed; constructed via `TodoTitle::parse()` |
+| Todo title | `TodoTitle` | `domain` | Non-empty, max 300 chars (per US-5), trimmed; constructed via `TodoTitle::parse()` |
 | Pending todo | `TodoItem::Pending { ... }` | `domain` | A todo that has not been completed; has title and created_at |
 | Completed todo | `TodoItem::Completed { ... }` | `domain` | A todo that has been completed; has title, created_at, and completed_at |
 
