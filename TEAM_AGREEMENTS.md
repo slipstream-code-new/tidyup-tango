@@ -461,6 +461,24 @@ Every commit must pass (in order):
 3. `cargo test` (unit + integration)
 4. `cargo audit` (dependency vulnerabilities)
 
+### Commit Discipline
+
+*Adopted after repeated incidents of unpushed commits and code written on top of
+unverified work. These rules are non-negotiable.*
+
+1. **Commit at every green step.** When `cargo fmt --check`, `cargo clippy -- -D warnings`,
+   and `cargo test` all pass, commit immediately. Do not accumulate uncommitted work.
+2. **Push immediately after every commit.** Run `git push` right after `git commit`.
+   Then run `gh run list --limit 1` and verify the CI run completes green before writing
+   any new code.
+3. **Never start new work on top of unpushed commits.** If the branch is ahead of origin,
+   push first. If someone else has unpushed commits, wait for them to push.
+4. **If CI fails, fix it before writing new code.** A red CI is the team's top priority.
+   No new features, no new tests, no refactoring until CI is green again.
+5. **One person drives at a time.** Only one agent should be modifying files at any given
+   moment. Concurrent file modifications cause merge conflicts and stale state. The driver
+   writes, commits, and pushes; then the next driver takes over.
+
 ### Dependency Management
 
 Before adding a new crate:
