@@ -75,6 +75,44 @@ impl TodoItem {
     pub fn is_completed(&self) -> bool {
         matches!(self, Self::Completed { .. })
     }
+
+    /// Transition a Pending item to Completed. No-op if already completed.
+    pub fn complete(self) -> Self {
+        match self {
+            Self::Pending {
+                id,
+                user_id,
+                title,
+                created_at,
+            } => Self::Completed {
+                id,
+                user_id,
+                title,
+                created_at,
+                completed_at: Utc::now(),
+            },
+            completed @ Self::Completed { .. } => completed,
+        }
+    }
+
+    /// Transition a Completed item back to Pending. No-op if already pending.
+    pub fn uncomplete(self) -> Self {
+        match self {
+            Self::Completed {
+                id,
+                user_id,
+                title,
+                created_at,
+                ..
+            } => Self::Pending {
+                id,
+                user_id,
+                title,
+                created_at,
+            },
+            pending @ Self::Pending { .. } => pending,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -98,5 +136,63 @@ mod tests {
         let item = TodoItem::new_pending(user_id, title);
 
         let _uuid = item.id().as_uuid();
+    }
+
+    #[test]
+    fn complete_transitions_pending_to_completed() {
+        let user_id = UserId::new();
+        let title = TodoTitle::parse("Test".to_string()).unwrap();
+        let item = TodoItem::new_pending(user_id, title);
+
+        assert!(!item.is_completed());
+        let completed = item.complete();
+        assert!(completed.is_completed());
+        assert_eq!(completed.title().as_str(), "Test");
+    }
+
+    #[test]
+    fn complete_is_noop_on_completed_item() {
+        let user_id = UserId::new();
+        let title = TodoTitle::parse("Test".to_string()).unwrap();
+        let item = TodoItem::new_pending(user_id, title).complete();
+
+        assert!(item.is_completed());
+        let still_completed = item.complete();
+        assert!(still_completed.is_completed());
+    }
+
+    #[test]
+    fn uncomplete_transitions_completed_to_pending() {
+        let user_id = UserId::new();
+        let title = TodoTitle::parse("Test".to_string()).unwrap();
+        let item = TodoItem::new_pending(user_id, title).complete();
+
+        assert!(item.is_completed());
+        let pending = item.uncomplete();
+        assert!(!pending.is_completed());
+        assert_eq!(pending.title().as_str(), "Test");
+    }
+
+    #[test]
+    fn uncomplete_is_noop_on_pending_item() {
+        let user_id = UserId::new();
+        let title = TodoTitle::parse("Test".to_string()).unwrap();
+        let item = TodoItem::new_pending(user_id, title);
+
+        assert!(!item.is_completed());
+        let still_pending = item.uncomplete();
+        assert!(!still_pending.is_completed());
+    }
+
+    #[test]
+    fn complete_preserves_id_and_user_id() {
+        let user_id = UserId::new();
+        let title = TodoTitle::parse("Test".to_string()).unwrap();
+        let item = TodoItem::new_pending(user_id.clone(), title);
+        let item_id = item.id().clone();
+
+        let completed = item.complete();
+        assert_eq!(completed.id(), &item_id);
+        assert_eq!(completed.user_id(), &user_id);
     }
 }

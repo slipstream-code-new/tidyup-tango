@@ -1,17 +1,19 @@
 use askama::Template;
-use axum::extract::State;
+use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::{Html, IntoResponse, Redirect, Response};
 use axum::Form;
 use sqlx::PgPool;
+use uuid::Uuid;
 
 use super::auth::AuthenticatedUser;
-use crate::domain::TodoItem;
-use crate::services::todo_service::{add_todo, get_todos, AddTodoError};
+use crate::domain::{TodoItem, TodoItemId};
+use crate::services::todo_service::{
+    add_todo, get_todos, toggle_todo_completion, AddTodoError, ToggleTodoError,
+};
 
 /// View model for a single todo item in the template.
 pub struct TodoItemView {
-    #[allow(dead_code)] // Used in complete/delete actions (Task #8, #9)
     pub id: String,
     pub title: String,
     pub is_completed: bool,
@@ -92,6 +94,29 @@ pub async fn post_todo(
             Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(body)).into_response())
         }
         Err(AddTodoError::Unexpected(err)) => Err(TodosError::Unexpected(err)),
+    }
+}
+
+pub async fn post_toggle_todo(
+    AuthenticatedUser(user_id): AuthenticatedUser,
+    State(pool): State<PgPool>,
+    Path(todo_id): Path<Uuid>,
+) -> Result<Response, TodosError> {
+    let todo_item_id = TodoItemId::from_uuid(todo_id);
+
+    match toggle_todo_completion(&pool, &todo_item_id, &user_id).await {
+        Ok(_) => Ok(Redirect::to("/todos").into_response()),
+        Err(ToggleTodoError::NotFound) => Ok((
+            StatusCode::NOT_FOUND,
+            Html("<h1>Todo not found</h1>".to_string()),
+        )
+            .into_response()),
+        Err(ToggleTodoError::Unauthorized) => Ok((
+            StatusCode::FORBIDDEN,
+            Html("<h1>Not authorized</h1>".to_string()),
+        )
+            .into_response()),
+        Err(ToggleTodoError::Unexpected(err)) => Err(TodosError::Unexpected(err)),
     }
 }
 

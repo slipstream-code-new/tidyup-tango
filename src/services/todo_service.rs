@@ -1,6 +1,6 @@
 use sqlx::PgPool;
 
-use crate::domain::{TodoItem, TodoTitle, TodoTitleError, UserId};
+use crate::domain::{TodoItem, TodoItemId, TodoTitle, TodoTitleError, UserId};
 use crate::infrastructure::todo_repository;
 
 #[derive(Debug, thiserror::Error)]
@@ -43,4 +43,55 @@ pub async fn get_todos(pool: &PgPool, user_id: &UserId) -> Result<Vec<TodoItem>,
         .map_err(|e| anyhow::anyhow!("Failed to fetch todos: {e}"))?;
 
     Ok(todos)
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum ToggleTodoError {
+    #[error("Todo not found")]
+    NotFound,
+    #[error("Not authorized to modify this todo")]
+    Unauthorized,
+    #[error(transparent)]
+    Unexpected(#[from] anyhow::Error),
+}
+
+#[tracing::instrument(
+    name = "toggle_todo_completion",
+    skip(pool),
+    fields(todo_id = %todo_id.as_uuid(), user_id = %user_id.as_uuid())
+)]
+pub async fn toggle_todo_completion(
+    pool: &PgPool,
+    todo_id: &TodoItemId,
+    user_id: &UserId,
+) -> Result<TodoItem, ToggleTodoError> {
+    let item = todo_repository::find_todo_by_id(pool, todo_id)
+        .await
+        .map_err(|e| ToggleTodoError::Unexpected(anyhow::anyhow!("Database error: {e}")))?
+        .ok_or(ToggleTodoError::NotFound)?;
+
+    if item.user_id() != user_id {
+        return Err(ToggleTodoError::Unauthorized);
+    }
+
+    let toggled = if item.is_completed() {
+        tracing::info!("Uncompleting todo");
+        item.uncomplete()
+    } else {
+        tracing::info!("Completing todo");
+        item.complete()
+    };
+
+    let completed_at = match &toggled {
+        TodoItem::Completed { completed_at, .. } => Some(*completed_at),
+        TodoItem::Pending { .. } => None,
+    };
+
+    todo_repository::update_todo_completion(pool, todo_id, completed_at)
+        .await
+        .map_err(|e| {
+            ToggleTodoError::Unexpected(anyhow::anyhow!("Failed to update completion: {e}"))
+        })?;
+
+    Ok(toggled)
 }

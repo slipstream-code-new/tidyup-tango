@@ -78,3 +78,36 @@ pub async fn find_todos_by_user(
 
     Ok(records.into_iter().map(|r| r.to_domain()).collect())
 }
+
+pub async fn find_todo_by_id(
+    pool: &PgPool,
+    todo_id: &TodoItemId,
+) -> Result<Option<TodoItem>, sqlx::Error> {
+    let record = sqlx::query_as!(
+        TodoRecord,
+        r#"SELECT id, user_id, title,
+           completed_at as "completed_at: DateTime<Utc>",
+           created_at as "created_at: DateTime<Utc>"
+           FROM todos WHERE id = $1"#,
+        todo_id.as_uuid(),
+    )
+    .fetch_optional(pool)
+    .await?;
+
+    Ok(record.map(|r| r.to_domain()))
+}
+
+pub async fn update_todo_completion(
+    pool: &PgPool,
+    todo_id: &TodoItemId,
+    completed_at: Option<DateTime<Utc>>,
+) -> Result<(), sqlx::Error> {
+    sqlx::query!(
+        r#"UPDATE todos SET completed_at = $1 :: timestamptz WHERE id = $2"#,
+        completed_at as Option<DateTime<Utc>>,
+        todo_id.as_uuid(),
+    )
+    .execute(pool)
+    .await?;
+    Ok(())
+}

@@ -1,5 +1,18 @@
 use crate::helpers::spawn_app;
 
+/// Extract the first todo ID from the page body by finding the toggle form action URL.
+fn extract_todo_id(body: &str) -> String {
+    // The toggle form action is like: /todos/<uuid>/toggle
+    let prefix = "/todos/";
+    let suffix = "/toggle";
+    let start = body.find(prefix).expect("No toggle form found in body") + prefix.len();
+    let remaining = &body[start..];
+    let end = remaining
+        .find(suffix)
+        .expect("No /toggle suffix found in body");
+    remaining[..end].to_string()
+}
+
 /// Helper: creates a reqwest client with cookie store and no redirect following.
 fn authenticated_client() -> reqwest::Client {
     reqwest::Client::builder()
@@ -332,5 +345,230 @@ async fn users_cannot_see_each_others_todos() {
     assert!(
         body.contains("No todos yet."),
         "User B should see empty state"
+    );
+}
+
+// --- Toggle (complete/uncomplete) tests ---
+
+#[tokio::test]
+async fn post_toggle_completes_a_pending_todo() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "toggle@example.com", "securepassword123").await;
+
+    // Add a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Toggle me")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Get the page to extract the todo ID
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // The item should be pending (not completed)
+    assert!(
+        !body.contains("todo-item--completed"),
+        "Item should start as pending"
+    );
+
+    // Toggle it to completed
+    let response = client
+        .post(format!("{}/todos/{}/toggle", &app.address, todo_id))
+        .send()
+        .await
+        .expect("Failed to toggle todo");
+
+    assert_eq!(response.status().as_u16(), 303, "Toggle should redirect");
+
+    // Verify it's now completed
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+
+    assert!(
+        body.contains("todo-item--completed"),
+        "Item should be completed after toggle"
+    );
+}
+
+#[tokio::test]
+async fn post_toggle_uncompletes_a_completed_todo() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "untoggle@example.com", "securepassword123").await;
+
+    // Add and complete a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Untoggle me")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // Complete it
+    client
+        .post(format!("{}/todos/{}/toggle", &app.address, todo_id))
+        .send()
+        .await
+        .expect("Failed to complete todo");
+
+    // Now uncomplete it
+    let response = client
+        .post(format!("{}/todos/{}/toggle", &app.address, todo_id))
+        .send()
+        .await
+        .expect("Failed to uncomplete todo");
+
+    assert_eq!(response.status().as_u16(), 303);
+
+    // Verify it's pending again
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+
+    assert!(
+        !body.contains("todo-item--completed"),
+        "Item should be pending after double toggle"
+    );
+}
+
+#[tokio::test]
+async fn post_toggle_returns_404_for_nonexistent_todo() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "notfound@example.com", "securepassword123").await;
+
+    let fake_id = uuid::Uuid::new_v4();
+    let response = client
+        .post(format!("{}/todos/{}/toggle", &app.address, fake_id))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        404,
+        "Nonexistent todo should return 404"
+    );
+}
+
+#[tokio::test]
+async fn post_toggle_returns_403_for_another_users_todo() {
+    let app = spawn_app().await;
+
+    // User A adds a todo
+    let client_a = register_and_login(&app.address, "owner@example.com", "securepassword123").await;
+    client_a
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Private todo")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Extract the todo ID from user A's page
+    let response = client_a
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // User B tries to toggle user A's todo
+    let client_b =
+        register_and_login(&app.address, "intruder@example.com", "securepassword123").await;
+
+    let response = client_b
+        .post(format!("{}/todos/{}/toggle", &app.address, todo_id))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        403,
+        "Should not be able to toggle another user's todo"
+    );
+}
+
+#[tokio::test]
+async fn post_toggle_redirects_to_login_when_unauthenticated() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
+
+    let fake_id = uuid::Uuid::new_v4();
+    let response = client
+        .post(format!("{}/todos/{}/toggle", &app.address, fake_id))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        303,
+        "Unauthenticated toggle should redirect"
+    );
+
+    let location = response
+        .headers()
+        .get("location")
+        .expect("Missing Location header")
+        .to_str()
+        .unwrap();
+    assert_eq!(location, "/login");
+}
+
+#[tokio::test]
+async fn toggle_button_has_accessible_label() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "a11y@example.com", "securepassword123").await;
+
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Check a11y")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+
+    // The toggle button should have an accessible label describing the action
+    assert!(
+        body.contains("aria-label="),
+        "Toggle button should have an aria-label"
+    );
+    assert!(
+        body.contains("Check a11y"),
+        "aria-label should include the todo title for context"
     );
 }
