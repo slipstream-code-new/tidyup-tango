@@ -209,7 +209,7 @@
     --color-bg:            var(--color-gray-50);   /* page background */
     --color-bg-raised:     white;                  /* cards, raised surfaces */
     --color-fg:            var(--color-gray-800);  /* primary text */
-    --color-fg-muted:      var(--color-gray-500);  /* secondary text (~4.6:1 vs white) */
+    --color-fg-muted:      var(--color-gray-500);  /* secondary text (~4.6:1 vs white -- AA compliant for normal text, but tight. Use --color-fg for body text, this for supporting/secondary text only) */
     --color-fg-subtle:     var(--color-gray-400);  /* placeholders, hint text (3:1 -- NOT for body text) */
     --color-border:        var(--color-gray-200);  /* default borders */
     --color-border-strong: var(--color-gray-300);  /* emphasized borders, input focus */
@@ -265,13 +265,17 @@
     --radius-full: 9999px;   /* pills, avatars */
 
     /* ---- Transition Durations ----
-     * All transitions MUST be wrapped in
-     * @media (prefers-reduced-motion: no-preference).
+     * Motion-safe by default: tokens are 0s unless the user has no
+     * motion preference. This means developers can use transition
+     * tokens without needing to remember the media query wrapper --
+     * the tokens themselves are inert when reduced motion is active.
+     * The reset layer catch-all (prefers-reduced-motion: reduce) is
+     * a secondary safety net.
      * Easing: ease (not ease-in-out).
      */
-    --transition-fast:   100ms;  /* micro-interactions: hover, focus */
-    --transition-normal: 200ms;  /* standard: expand, slide */
-    --transition-slow:   300ms;  /* larger: modal, page */
+    --transition-fast:   0s;
+    --transition-normal: 0s;
+    --transition-slow:   0s;
 
     /* ---- Focus Ring ----
      * Reusable focus ring properties for consistent :focus-visible styles.
@@ -280,6 +284,15 @@
     --focus-ring-color:  var(--color-primary);
     --focus-ring-offset: 2px;
     --focus-ring-width:  2px;
+  }
+
+  /* Activate transition durations only when user has no motion preference */
+  @media (prefers-reduced-motion: no-preference) {
+    :root {
+      --transition-fast:   100ms;  /* micro-interactions: hover, focus */
+      --transition-normal: 200ms;  /* standard: expand, slide */
+      --transition-slow:   300ms;  /* larger: modal, page */
+    }
   }
 }
 
@@ -527,5 +540,43 @@
     clip-path: inset(50%);
     white-space: nowrap;
     border: 0;
+  }
+
+  /* Skip link -- visually hidden until focused, then revealed.
+   * Keyboard users tab to this first and see it appear at the
+   * top of the page. Uses the base template's skip link:
+   * <a href="#main-content" class="skip-link">Skip to main content</a> */
+  .skip-link {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+
+    &:focus {
+      position: fixed;
+      inset-block-start: var(--space-sm);
+      inset-inline-start: var(--space-sm);
+      z-index: 9999;
+      inline-size: auto;
+      block-size: auto;
+      padding: var(--space-sm) var(--space-md);
+      margin: 0;
+      overflow: visible;
+      clip: auto;
+      clip-path: none;
+      white-space: normal;
+      background-color: var(--color-bg-raised);
+      color: var(--color-fg);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-medium);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+    }
   }
 }
