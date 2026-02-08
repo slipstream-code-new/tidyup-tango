@@ -524,6 +524,65 @@
   .htmx-request.htmx-indicator {
     opacity: 1;
   }
+
+  /* ---- Auth Form ----
+   * Used for registration, login, and similar auth-related forms.
+   * Centered, constrained-width form with vertical field stacking. */
+  .auth-form {
+    max-inline-size: 24rem;
+    margin-inline: auto;
+    padding-block-start: var(--space-2xl);
+  }
+
+  .auth-form h1 {
+    margin-block-end: var(--space-lg);
+  }
+
+  .auth-form__fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .auth-form__group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  /* Error state on inputs -- uses :has() for parent-based styling.
+   * When an input has aria-invalid, the parent group gets a danger border. */
+  .auth-form__group:has([aria-invalid="true"]) input {
+    border-color: var(--color-danger);
+  }
+
+  .auth-form__error {
+    color: var(--color-danger);
+    font-size: var(--font-size-sm);
+  }
+
+  .auth-form__message {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    margin-block-end: var(--space-lg);
+  }
+
+  .auth-form__message--error {
+    background-color: var(--color-danger-light);
+    color: var(--color-danger);
+  }
+
+  .auth-form__submit {
+    inline-size: 100%;
+  }
+
+  .auth-form__footer {
+    margin-block-start: var(--space-lg);
+    text-align: center;
+    font-size: var(--font-size-sm);
+    color: var(--color-fg-muted);
+  }
 }
 
 /* ==========================================================================

@@ -7,7 +7,7 @@ use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 
 use crate::configuration::Settings;
-use crate::routes::{health_check, index};
+use crate::routes::{get_register, health_check, index};
 
 pub struct Application {
     listener: TcpListener,
@@ -20,6 +20,8 @@ impl Application {
             .max_connections(5)
             .connect_with(settings.database.connect_options())
             .await?;
+
+        sqlx::migrate!("./migrations").run(&pool).await?;
 
         let address = format!(
             "{}:{}",
@@ -41,6 +43,7 @@ impl Application {
 
         Router::new()
             .route("/", axum::routing::get(index))
+            .route("/register", axum::routing::get(get_register))
             .route("/health_check", axum::routing::get(health_check))
             .nest_service("/static", ServeDir::new("static"))
             .layer(TraceLayer::new_for_http())
