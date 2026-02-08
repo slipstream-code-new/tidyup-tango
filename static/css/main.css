@@ -708,6 +708,19 @@
     border-color: var(--color-primary);
   }
 
+  /* Checkmark indicator using a rotated border trick */
+  .todo-item__toggle input[type="checkbox"]:checked::after {
+    content: "";
+    display: block;
+    inline-size: 0.35rem;
+    block-size: 0.65rem;
+    margin-inline-start: 0.35rem;
+    margin-block-start: 0.05rem;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
   .todo-item__title {
     flex: 1;
     min-inline-size: 0;
