@@ -93,10 +93,19 @@ async fn get_login_returns_200_with_login_form() {
         "Missing register link href"
     );
 
-    // No error states on initial load
+    // Error container always in DOM (for aria-describedby) but empty on initial load
     assert!(
-        !body.contains("role=\"alert\""),
-        "Should not show error alert on initial load"
+        body.contains("role=\"alert\""),
+        "Error element with role=\"alert\" should always be in the DOM"
+    );
+    assert!(
+        !body.contains("aria-invalid=\"true\""),
+        "Should not have aria-invalid on initial load"
+    );
+    // The error element should be empty (no error text)
+    assert!(
+        !body.contains("didn&#39;t work"),
+        "Should not show error message text on initial load"
     );
 }
 

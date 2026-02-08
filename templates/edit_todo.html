@@ -11,11 +11,7 @@
 {% block content %}
 <div class="auth-form">
     <h1>Edit Todo</h1>
-    {% if let Some(error) = error_message %}
-    <div class="auth-form__message auth-form__message--error" role="alert">
-        {{ error }}
-    </div>
-    {% endif %}
+    <div class="auth-form__message auth-form__message--error" role="alert">{% if let Some(error) = error_message %}{{ error }}{% endif %}</div>
     <form method="post" action="/todos/{{ todo_id }}/edit" class="auth-form__fields" novalidate>
         <div class="auth-form__group">
             <label for="title">Title</label>
@@ -27,11 +23,10 @@
                 maxlength="300"
                 required
                 autofocus
-                {% if let Some(err) = error_message %}aria-describedby="title-error" aria-invalid="true"{% endif %}
+                aria-describedby="title-error"
+                {% if error_message.is_some() %}aria-invalid="true"{% endif %}
             >
-            {% if let Some(err) = error_message %}
-            <p class="auth-form__error" id="title-error">{{ err }}</p>
-            {% endif %}
+            <p class="auth-form__error" id="title-error" role="alert">{% if let Some(err) = error_message %}{{ err }}{% endif %}</p>
         </div>
         <div class="auth-form__actions">
             <button type="submit" class="auth-form__submit">Save</button>

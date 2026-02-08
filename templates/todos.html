@@ -22,16 +22,14 @@
                 placeholder="What do you need to do?"
                 maxlength="300"
                 autocomplete="off"
+                aria-describedby="add-todo-error"
+                {% if error_message.is_some() %}aria-invalid="true"{% endif %}
             >
         </div>
         <button type="submit" class="todo-add__submit">Add todo</button>
     </form>
 
-    {% if let Some(error) = error_message %}
-    <div class="todo-add__error" role="alert">
-        {{ error }}
-    </div>
-    {% endif %}
+    <p class="todo-add__error" id="add-todo-error" role="alert">{% if let Some(error) = error_message %}{{ error }}{% endif %}</p>
 
     {% if todos.is_empty() %}
     <p class="todo-empty">No todos yet.</p>

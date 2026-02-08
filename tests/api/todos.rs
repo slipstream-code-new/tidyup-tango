@@ -119,6 +119,24 @@ async fn get_todos_shows_empty_state_for_new_user() {
         "Missing placeholder text"
     );
 
+    // Error container always in DOM (for a11y) but empty on initial load
+    assert!(
+        body.contains("id=\"add-todo-error\""),
+        "Add-todo error element should always be in the DOM with a stable ID"
+    );
+    assert!(
+        body.contains("role=\"alert\""),
+        "Add-todo error element should have role=\"alert\""
+    );
+    assert!(
+        body.contains("aria-describedby=\"add-todo-error\""),
+        "Title input should have aria-describedby referencing the error element"
+    );
+    assert!(
+        !body.contains("aria-invalid=\"true\""),
+        "Should not have aria-invalid on initial load"
+    );
+
     // Logout button is present
     assert!(
         body.contains("Sign out"),
@@ -864,6 +882,20 @@ async fn get_edit_shows_form_with_current_title() {
         body.contains(&format!("/todos/{}/edit", todo_id)),
         "Form action should point to the edit endpoint"
     );
+
+    // A11y: error elements always in DOM
+    assert!(
+        body.contains("id=\"title-error\""),
+        "Title error element should always be in the DOM"
+    );
+    assert!(
+        body.contains("aria-describedby=\"title-error\""),
+        "Title input should always have aria-describedby referencing title-error"
+    );
+    assert!(
+        !body.contains("aria-invalid=\"true\""),
+        "Should not have aria-invalid on initial edit load (no errors)"
+    );
 }
 
 #[tokio::test]
@@ -966,6 +998,19 @@ async fn post_edit_with_empty_title_returns_422() {
     assert!(
         body.contains("cannot be empty"),
         "Should show empty title error message"
+    );
+    // A11y: error state should set aria-invalid and have role="alert" on error element
+    assert!(
+        body.contains("aria-invalid=\"true\""),
+        "Title input should have aria-invalid=\"true\" when there is a validation error"
+    );
+    assert!(
+        body.contains("id=\"title-error\""),
+        "Title error element should be present with id"
+    );
+    assert!(
+        body.contains("role=\"alert\""),
+        "Title error element should have role=\"alert\""
     );
 }
 
