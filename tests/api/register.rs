@@ -72,3 +72,230 @@ async fn get_register_returns_200_with_registration_form() {
         "Should not show error messages on initial load"
     );
 }
+
+#[tokio::test]
+async fn post_register_with_valid_data_redirects() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
+
+    let response = client
+        .post(format!("{}/register", &app.address))
+        .form(&[
+            ("email", "test@example.com"),
+            ("password", "securepassword123"),
+            ("password_confirmation", "securepassword123"),
+        ])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        303,
+        "Expected 303 See Other redirect after successful registration"
+    );
+}
+
+#[tokio::test]
+async fn post_register_persists_user_in_database() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
+
+    client
+        .post(format!("{}/register", &app.address))
+        .form(&[
+            ("email", "persist@example.com"),
+            ("password", "securepassword123"),
+            ("password_confirmation", "securepassword123"),
+        ])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    let saved = sqlx::query!(
+        "SELECT email, password_hash FROM users WHERE email = $1",
+        "persist@example.com"
+    )
+    .fetch_one(&app.pool)
+    .await
+    .expect("Failed to fetch saved user");
+
+    assert_eq!(saved.email, "persist@example.com");
+    assert!(
+        saved.password_hash.starts_with("$argon2"),
+        "Password should be hashed with Argon2"
+    );
+}
+
+#[tokio::test]
+async fn post_register_returns_422_when_email_is_empty() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::new();
+    let response = client
+        .post(format!("{}/register", &app.address))
+        .form(&[
+            ("email", ""),
+            ("password", "securepassword123"),
+            ("password_confirmation", "securepassword123"),
+        ])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status().as_u16(), 422);
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Enter your email address"),
+        "Should show email error message"
+    );
+}
+
+#[tokio::test]
+async fn post_register_returns_422_when_email_is_invalid() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::new();
+    let response = client
+        .post(format!("{}/register", &app.address))
+        .form(&[
+            ("email", "notanemail"),
+            ("password", "securepassword123"),
+            ("password_confirmation", "securepassword123"),
+        ])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status().as_u16(), 422);
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("name@example.com"),
+        "Should show email format hint"
+    );
+}
+
+#[tokio::test]
+async fn post_register_returns_422_when_password_too_short() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::new();
+    let response = client
+        .post(format!("{}/register", &app.address))
+        .form(&[
+            ("email", "test@example.com"),
+            ("password", "short"),
+            ("password_confirmation", "short"),
+        ])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status().as_u16(), 422);
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("at least 8 characters"),
+        "Should show password length error"
+    );
+}
+
+#[tokio::test]
+async fn post_register_returns_422_when_passwords_dont_match() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::new();
+    let response = client
+        .post(format!("{}/register", &app.address))
+        .form(&[
+            ("email", "test@example.com"),
+            ("password", "securepassword123"),
+            ("password_confirmation", "differentpassword"),
+        ])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status().as_u16(), 422);
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Passwords do not match"),
+        "Should show password mismatch error"
+    );
+}
+
+#[tokio::test]
+async fn post_register_returns_422_for_duplicate_email_without_leaking_info() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
+
+    // Register the first user
+    client
+        .post(format!("{}/register", &app.address))
+        .form(&[
+            ("email", "duplicate@example.com"),
+            ("password", "securepassword123"),
+            ("password_confirmation", "securepassword123"),
+        ])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    // Try to register with the same email
+    let response = client
+        .post(format!("{}/register", &app.address))
+        .form(&[
+            ("email", "duplicate@example.com"),
+            ("password", "anotherpassword123"),
+            ("password_confirmation", "anotherpassword123"),
+        ])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status().as_u16(), 422);
+    let body = response.text().await.unwrap();
+    // Must NOT reveal that the email exists (account enumeration prevention)
+    assert!(
+        !body.contains("already exists"),
+        "Should not reveal email existence"
+    );
+    assert!(
+        body.contains("signing in"),
+        "Should suggest signing in as an alternative"
+    );
+}
+
+#[tokio::test]
+async fn post_register_preserves_email_on_validation_error() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::new();
+    let response = client
+        .post(format!("{}/register", &app.address))
+        .form(&[
+            ("email", "test@example.com"),
+            ("password", "short"),
+            ("password_confirmation", "short"),
+        ])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("test@example.com"),
+        "Email should be preserved in the form on error"
+    );
+}
