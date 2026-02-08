@@ -29,6 +29,7 @@
               pkgs.openssl
               pkgs.sqlx-cli
               pkgs.docker-compose
+              pkgs.nodejs_22
             ];
           };
         }
