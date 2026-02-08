@@ -334,6 +334,10 @@ async fn password_toggle_script_is_served() {
         body.contains("aria-label"),
         "Script should set aria-label for accessibility"
     );
+    assert!(
+        body.contains("password_confirmation"),
+        "Script should create a hidden input for password_confirmation"
+    );
 }
 
 #[tokio::test]
