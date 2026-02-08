@@ -2,11 +2,18 @@
 
 {% block title %}Todo List{% endblock %}
 
+{% block nav %}
+<a href="/register">Create account</a>
+<a href="/login">Sign in</a>
+{% endblock %}
+
 {% block content %}
-<h1>Welcome</h1>
-<p>Keep track of what you need to do.</p>
-<nav aria-label="Get started">
-    <a href="/register" class="btn btn--primary">Create account</a>
-    <a href="/login" class="btn btn--secondary">Sign in</a>
-</nav>
+<div class="landing-hero">
+    <h1>Welcome</h1>
+    <p>Keep track of what you need to do.</p>
+    <div class="landing-hero__actions">
+        <a href="/register" class="landing-hero__cta">Create account</a>
+        <p class="landing-hero__alt">Already have an account? <a href="/login">Sign in</a></p>
+    </div>
+</div>
 {% endblock %}

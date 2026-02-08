@@ -900,6 +900,62 @@
     color: var(--color-fg);
   }
 
+  /* ---- Landing Hero ----
+   * Centered landing page content for unauthenticated visitors.
+   * Matches auth-form width (24rem) for visual consistency. */
+  .landing-hero {
+    max-inline-size: 24rem;
+    margin-inline: auto;
+    padding-block-start: var(--space-3xl);
+    text-align: center;
+  }
+
+  .landing-hero h1 {
+    margin-block-end: var(--space-sm);
+  }
+
+  .landing-hero p {
+    color: var(--color-fg-muted);
+    margin-block-end: var(--space-xl);
+  }
+
+  .landing-hero__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .landing-hero__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 100%;
+    padding-block: var(--space-sm);
+    padding-inline: var(--space-xl);
+    background-color: var(--color-primary);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: var(--font-medium);
+  }
+
+  .landing-hero__cta:hover {
+    background-color: var(--color-primary-dark);
+    color: white;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .landing-hero__cta {
+      transition: background-color var(--transition-fast) ease;
+    }
+  }
+
+  .landing-hero__alt {
+    font-size: var(--font-size-sm);
+    color: var(--color-fg-muted);
+  }
+
   /* ---- Empty State ---- */
   .todo-empty {
     color: var(--color-fg-muted);
