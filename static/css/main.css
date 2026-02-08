@@ -1,0 +1,531 @@
+/*
+ * Todo List Application -- Main Stylesheet
+ *
+ * CSS Architecture: Cascade Layers
+ * ---------------------------------
+ * Layers control specificity order regardless of source order.
+ * Earlier layers have lower priority; later layers win ties.
+ *
+ * @layer reset     -- Normalize browser defaults
+ * @layer tokens    -- Design tokens (CSS custom properties on :root)
+ * @layer base      -- Element-level styles (body, headings, links, forms)
+ * @layer layout    -- Page-level layout (CSS Grid, containers)
+ * @layer components -- Component-specific styles (added per feature)
+ * @layer utilities -- Helper classes (visually-hidden, etc.)
+ */
+
+@layer reset, tokens, base, layout, components, utilities;
+
+/* ==========================================================================
+   RESET LAYER
+   Modern CSS reset. Removes browser inconsistencies while preserving
+   useful defaults. Based on Andy Bell's modern reset.
+   ========================================================================== */
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+  }
+
+  body {
+    min-block-size: 100vh;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+
+  a {
+    color: inherit;
+    text-decoration-skip-ink: auto;
+  }
+
+  ul[role="list"],
+  ol[role="list"] {
+    list-style: none;
+  }
+
+  /* Remove default button styles */
+  button {
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+
+  /* Remove animations and transitions for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   TOKENS LAYER
+   Design tokens as CSS custom properties on :root.
+
+   Token system:
+   - Spacing:    4px base unit, named --space-xs through --space-3xl
+   - Colors:     oklch color space for perceptual uniformity
+   - Typography: System font stack, fluid type scale with clamp()
+   - Shadows:    Three levels (sm, md, lg)
+   - Radii:      Three sizes (sm, md, lg)
+   - Transitions: Duration values for consistent animation timing
+
+   All component styles reference tokens -- no hardcoded values.
+   Token changes go through the mob with Steve Schoger's approval.
+   ========================================================================== */
+
+@layer tokens {
+  :root {
+    /* ---- Spacing Scale ----
+     * 4px base unit. Numbered primitives map to multiples of 4px.
+     * Semantic aliases below provide meaningful names for common uses.
+     * Scale: 4, 8, 12, 16, 24, 32, 48, 64, 96
+     */
+    --space-1:  0.25rem;  /* 4px */
+    --space-2:  0.5rem;   /* 8px */
+    --space-3:  0.75rem;  /* 12px */
+    --space-4:  1rem;     /* 16px */
+    --space-6:  1.5rem;   /* 24px */
+    --space-8:  2rem;     /* 32px */
+    --space-12: 3rem;     /* 48px */
+    --space-16: 4rem;     /* 64px */
+    --space-24: 6rem;     /* 96px */
+
+    /* Semantic spacing aliases */
+    --space-xs:  var(--space-1);   /* 4px */
+    --space-sm:  var(--space-2);   /* 8px */
+    --space-md:  var(--space-4);   /* 16px */
+    --space-lg:  var(--space-6);   /* 24px */
+    --space-xl:  var(--space-8);   /* 32px */
+    --space-2xl: var(--space-12);  /* 48px */
+    --space-3xl: var(--space-16);  /* 64px */
+
+    /* ---- Color Palette ----
+     * oklch color space for perceptual uniformity.
+     * Most UI is grayscale; color is for emphasis and interaction.
+     * "The grays do the heavy lifting, primary blue is supporting cast."
+     *
+     * oklch(Lightness Chroma Hue)
+     * - Lightness: 0 (black) to 1 (white)
+     * - Chroma: 0 (gray) to ~0.4 (most saturated)
+     * - Hue: 0-360 degrees
+     */
+
+    /* Neutral grays -- zero chroma for true neutrals
+     *
+     * Contrast ratios vs white (#fff):
+     *   gray-50 to gray-300: decorative/border use only, NOT for text
+     *   gray-400 (~0.71): ~3:1  -- large text/UI components minimum
+     *   gray-500 (~0.55): ~4.6:1 -- normal text AA (borderline)
+     *   gray-600 (~0.45): ~7:1  -- normal text AA, comfortable
+     *   gray-700+:         ~10:1+ -- high contrast
+     *
+     * For text on light backgrounds, use gray-500 or darker for AA. */
+    --color-gray-50:  oklch(0.985 0 0); /* near-white backgrounds */
+    --color-gray-100: oklch(0.97 0 0);  /* subtle backgrounds, hover states */
+    --color-gray-200: oklch(0.925 0 0); /* borders, dividers */
+    --color-gray-300: oklch(0.87 0 0);  /* disabled text, emphasized borders */
+    --color-gray-400: oklch(0.71 0 0);  /* muted text (large only), icons */
+    --color-gray-500: oklch(0.55 0 0);  /* secondary text */
+    --color-gray-600: oklch(0.45 0 0);  /* body text */
+    --color-gray-700: oklch(0.37 0 0);  /* strong text */
+    --color-gray-800: oklch(0.27 0 0);  /* headings */
+    --color-gray-900: oklch(0.18 0 0);  /* near-black, high emphasis */
+
+    /* Primary -- blue for interactive elements.
+     * One blue. Used for links, buttons, focus rings. That's it.
+     * Hue 240, moderate chroma for a professional look. */
+    --color-primary-light: oklch(0.75 0.1 240);  /* hover states, light badges */
+    --color-primary:       oklch(0.55 0.18 240);  /* buttons, links, active states */
+    --color-primary-dark:  oklch(0.42 0.18 240);  /* pressed states, dark accents */
+
+    /* Semantic colors
+     * IMPORTANT: Color must never be the sole indicator of state.
+     * Every use of danger/success/warning must be paired with a
+     * secondary visual cue: icon, text label, strikethrough, border
+     * style change, etc. This is a WCAG requirement and team agreement. */
+    --color-danger:        oklch(0.55 0.2 25);   /* destructive actions, errors */
+    --color-danger-light:  oklch(0.92 0.04 25);  /* danger backgrounds */
+    --color-success:       oklch(0.6 0.17 145);  /* completed states */
+    --color-success-light: oklch(0.92 0.04 145); /* success backgrounds */
+    --color-warning:       oklch(0.75 0.15 75);  /* warnings */
+    --color-warning-light: oklch(0.93 0.04 75);  /* warning backgrounds */
+
+    /* Foreground / background semantic tokens */
+    --color-bg:            var(--color-gray-50);   /* page background */
+    --color-bg-raised:     white;                  /* cards, raised surfaces */
+    --color-fg:            var(--color-gray-800);  /* primary text */
+    --color-fg-muted:      var(--color-gray-500);  /* secondary text (~4.6:1 vs white) */
+    --color-fg-subtle:     var(--color-gray-400);  /* placeholders, hint text (3:1 -- NOT for body text) */
+    --color-border:        var(--color-gray-200);  /* default borders */
+    --color-border-strong: var(--color-gray-300);  /* emphasized borders, input focus */
+
+    /* ---- Typography ----
+     * System font stack -- no web font downloads, instant rendering.
+     * Fluid type scale using clamp() for smooth scaling between
+     * viewport sizes. Min at ~320px, max at ~1200px.
+     */
+    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+
+    --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro",
+      Menlo, Consolas, "DejaVu Sans Mono", monospace;
+
+    /* Fluid type scale
+     * clamp(min, preferred, max)
+     * Preferred uses viewport units for smooth scaling */
+    --font-size-xs:   clamp(0.6875rem, 0.65rem + 0.1vw, 0.75rem);     /* ~11-12px, fine print */
+    --font-size-sm:   clamp(0.8125rem, 0.78rem + 0.1vw, 0.875rem);    /* ~13-14px, captions */
+    --font-size-base: clamp(0.9375rem, 0.9rem + 0.12vw, 1rem);        /* ~15-16px, body text */
+    --font-size-lg:   clamp(1.0625rem, 1rem + 0.15vw, 1.125rem);      /* ~17-18px, subheadings */
+    --font-size-xl:   clamp(1.1875rem, 1.1rem + 0.2vw, 1.3125rem);    /* ~19-21px, section headings */
+    --font-size-2xl:  clamp(1.4375rem, 1.3rem + 0.3vw, 1.625rem);     /* ~23-26px, page headings */
+    --font-size-3xl:  clamp(1.75rem, 1.6rem + 0.4vw, 2.125rem);       /* ~28-34px, hero/display */
+
+    /* Line heights */
+    --leading-tight:   1.25;   /* headings */
+    --leading-snug:    1.375;  /* subheadings, large text */
+    --leading-normal:  1.5;    /* body text */
+    --leading-relaxed: 1.625;  /* small text that needs more air */
+
+    /* Font weights */
+    --font-normal:    400;
+    --font-medium:    500;
+    --font-semibold:  600;
+    --font-bold:      700;
+
+    /* ---- Shadows ----
+     * Three levels. Shadows use oklch for consistency with the color system.
+     * Never combine shadows and borders on the same element (per team agreement).
+     */
+    --shadow-sm:  0 1px 2px oklch(0.18 0 0 / 0.05);
+    --shadow-md:  0 4px 6px -1px oklch(0.18 0 0 / 0.07),
+                  0 2px 4px -2px oklch(0.18 0 0 / 0.05);
+    --shadow-lg:  0 10px 15px -3px oklch(0.18 0 0 / 0.08),
+                  0 4px 6px -4px oklch(0.18 0 0 / 0.04);
+
+    /* ---- Border Radius ---- */
+    --radius-sm:   0.25rem;  /* 4px -- badges, tags */
+    --radius-md:   0.5rem;   /* 8px -- buttons, inputs, cards */
+    --radius-lg:   0.75rem;  /* 12px -- larger containers, modals */
+    --radius-full: 9999px;   /* pills, avatars */
+
+    /* ---- Transition Durations ----
+     * All transitions MUST be wrapped in
+     * @media (prefers-reduced-motion: no-preference).
+     * Easing: ease (not ease-in-out).
+     */
+    --transition-fast:   100ms;  /* micro-interactions: hover, focus */
+    --transition-normal: 200ms;  /* standard: expand, slide */
+    --transition-slow:   300ms;  /* larger: modal, page */
+
+    /* ---- Focus Ring ----
+     * Reusable focus ring properties for consistent :focus-visible styles.
+     * 3:1+ contrast against background (blue on white/light gray).
+     */
+    --focus-ring-color:  var(--color-primary);
+    --focus-ring-offset: 2px;
+    --focus-ring-width:  2px;
+  }
+}
+
+/* ==========================================================================
+   BASE LAYER
+   Element-level styles applied directly to HTML elements.
+   No classes -- this establishes the typographic and interactive baseline.
+   ========================================================================== */
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-normal);
+    line-height: var(--leading-normal);
+    color: var(--color-fg);
+    background-color: var(--color-bg);
+  }
+
+  /* Headings -- tighter line-height, bolder weight, type scale */
+  h1 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-bold);
+    line-height: var(--leading-tight);
+  }
+
+  h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-bold);
+    line-height: var(--leading-tight);
+  }
+
+  h3 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-semibold);
+    line-height: var(--leading-snug);
+  }
+
+  h4 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-semibold);
+    line-height: var(--leading-snug);
+  }
+
+  h5,
+  h6 {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-medium);
+    line-height: var(--leading-snug);
+  }
+
+  /* Links */
+  a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+
+    &:hover {
+      color: var(--color-primary-dark);
+    }
+  }
+
+  /* Focus-visible styles for all interactive elements.
+   * Uses outline for keyboard focus, visible only on keyboard navigation.
+   * Double-ring technique: white inner ring (box-shadow) + colored outer ring
+   * (outline) ensures visibility on both light and dark backgrounds.
+   * 3:1+ contrast ratio maintained in all contexts. */
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+    box-shadow: 0 0 0 var(--focus-ring-offset) white;
+  }
+
+  /* Buttons -- base styles, ready for component overrides */
+  button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding-block: var(--space-sm);
+    padding-inline: var(--space-md);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-medium);
+    line-height: var(--leading-tight);
+    border-radius: var(--radius-md);
+    background-color: var(--color-primary);
+    color: white;
+
+    &:hover {
+      background-color: var(--color-primary-dark);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    button,
+    [type="button"],
+    [type="submit"],
+    [type="reset"] {
+      transition: background-color var(--transition-fast) ease;
+    }
+  }
+
+  /* Form inputs */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+  textarea,
+  select {
+    display: block;
+    inline-size: 100%;
+    padding-block: var(--space-sm);
+    padding-inline: var(--space-3);
+    font-size: var(--font-size-base);
+    line-height: var(--leading-normal);
+    color: var(--color-fg);
+    background-color: var(--color-bg-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    &::placeholder {
+      color: var(--color-fg-subtle);
+    }
+  }
+
+  /* Labels */
+  label {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-fg);
+  }
+
+  /* Fieldset */
+  fieldset {
+    border: none;
+  }
+
+  /* Code */
+  code,
+  pre {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+  }
+
+  /* Windows High Contrast Mode support.
+   * In forced-colors mode, the browser overrides most colors.
+   * We ensure borders, outlines, and structural indicators remain
+   * visible since they become the primary way to distinguish elements. */
+  @media (forced-colors: active) {
+    button,
+    [type="button"],
+    [type="submit"],
+    [type="reset"] {
+      border: 1px solid ButtonText;
+    }
+
+    input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+    textarea,
+    select {
+      border: 1px solid ButtonText;
+    }
+
+    :focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+  }
+}
+
+/* ==========================================================================
+   LAYOUT LAYER
+   Page-level layout using CSS Grid. Mobile-first, desktop breakpoint ~1024px.
+   Uses logical properties for RTL support.
+   ========================================================================== */
+
+@layer layout {
+  /* Page layout: header / main / footer with sticky footer */
+  .page-layout {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-block-size: 100vh;
+  }
+
+  /* Constrained content container */
+  .container {
+    inline-size: 100%;
+    max-inline-size: 40rem; /* ~640px -- a todo list is narrow */
+    margin-inline: auto;
+    padding-inline: var(--space-md);
+  }
+
+  /* Wider container variant for pages that need more space */
+  .container--wide {
+    max-inline-size: 64rem; /* ~1024px */
+  }
+
+  /* Responsive adjustments */
+  @media (min-width: 1024px) {
+    .container {
+      padding-inline: var(--space-lg);
+    }
+  }
+
+  /* Container query setup -- components can respond to their container */
+  .component-container {
+    container-type: inline-size;
+  }
+}
+
+/* ==========================================================================
+   COMPONENTS LAYER
+   Component-specific styles are added here as features are built.
+   Each component should be self-contained and reference only design tokens.
+   ========================================================================== */
+
+@layer components {
+  /* Components will be added here as features are developed.
+   * Each feature's CSS goes in this layer.
+   * Example (future):
+   *   .todo-item { ... }
+   *   .auth-form { ... }
+   */
+}
+
+/* ==========================================================================
+   UTILITIES LAYER
+   Helper classes. These have the highest layer priority.
+   ========================================================================== */
+
+@layer utilities {
+  /* Visually hidden -- accessible to screen readers but not visible.
+   * Uses the clip technique for reliable hiding.
+   * white-space: nowrap prevents content from being announced as
+   * multiple separate items by some screen readers. */
+  .visually-hidden,
+  .sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
