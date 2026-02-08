@@ -143,8 +143,9 @@ end-to-end first, then layer on features.
 - [ ] Each item shows its title and completion status
 - [ ] Completed items are visually distinct from pending items (not just color --
   a secondary indicator like strikethrough text)
-- [ ] **Empty state**: When the user has no todos, show a friendly, helpful message
-  (e.g., "No todos yet. Add one above to get started.") -- not a blank screen
+- [ ] **Empty state**: When the user has no todos, show a brief, friendly message
+  (e.g., "No todos yet.") -- not a blank screen. The add-todo input above makes the
+  next action obvious; don't over-explain.
 - [ ] Page title (`<title>`) is descriptive (e.g., "My Todos -- Todo List")
 - [ ] The page includes proper landmark regions (`<main>`, `<nav>`, `<header>`)
 - [ ] Skip link to main content is the first focusable element
