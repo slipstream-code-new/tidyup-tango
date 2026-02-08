@@ -46,6 +46,32 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Duplicate email | `AuthError::EmailAlreadyExists` | Registration attempted with existing email |
 | Invalid credentials | `AuthError::InvalidCredentials` | Login failed (generic -- no info leak) |
 
+## Error Copy Convention
+
+Domain error messages (`#[error("...")]`) describe **what invariant was violated** -- they
+are written for developers and logs. User-facing error messages are **instructions** that
+tell the user what to fix -- they are written for humans scanning a form.
+
+The route/template layer translates domain errors into user-facing copy. Templates never
+call `error.to_string()` on a domain error.
+
+| Domain Error | User-Facing Copy |
+|-------------|-----------------|
+| `EmailValidationError::Empty` | "Enter your email address" |
+| `EmailValidationError::MissingAtSymbol` | "Enter a valid email address, like name@example.com" |
+| `EmailValidationError::TooLong` | "That email address is too long" |
+| `PasswordError::Empty` | "Enter a password" |
+| `PasswordError::TooShort` | "Your password needs at least 8 characters" |
+| `PasswordError::TooLong` | "That password is too long" |
+| `RegistrationError::DuplicateEmail` | "Unable to create account. If you already have an account, try signing in." |
+| `AuthError::InvalidCredentials` | "That email or password didn't work. Try again." |
+| `TodoError::TitleEmpty` | "Enter a title for your todo" |
+| `TodoError::TitleTooLong` | "That title is too long (max 300 characters)" |
+
+*Copy reviewed by Steve Krug. Update this table when adding new error types.*
+
+---
+
 ## Type Design Principles
 
 These principles govern how we model the domain:
