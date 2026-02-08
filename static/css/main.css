@@ -781,8 +781,8 @@
       clip: auto;
       clip-path: none;
       white-space: normal;
-      background-color: var(--color-bg-raised);
-      color: var(--color-fg);
+      background-color: var(--color-primary);
+      color: white;
       font-size: var(--font-size-sm);
       font-weight: var(--font-medium);
       border-radius: var(--radius-md);
