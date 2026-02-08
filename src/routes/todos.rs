@@ -1,6 +1,6 @@
 use askama::Template;
 use axum::extract::{Path, State};
-use axum::http::StatusCode;
+use axum::http::{HeaderMap, StatusCode};
 use axum::response::{Html, IntoResponse, Redirect, Response};
 use axum::Form;
 use sqlx::PgPool;
@@ -12,6 +12,10 @@ use crate::services::todo_service::{
     add_todo, delete_todo, get_todos, toggle_todo_completion, update_todo_title, AddTodoError,
     DeleteTodoError, ToggleTodoError, UpdateTitleError,
 };
+
+fn is_htmx_request(headers: &HeaderMap) -> bool {
+    headers.contains_key("hx-request")
+}
 
 /// View model for a single todo item in the template.
 pub struct TodoItemView {
@@ -35,6 +39,12 @@ impl From<&TodoItem> for TodoItemView {
 pub struct TodosTemplate {
     pub todos: Vec<TodoItemView>,
     pub error_message: Option<String>,
+}
+
+#[derive(Template)]
+#[template(path = "todo_item.html")]
+pub struct TodoItemTemplate {
+    pub todo: TodoItemView,
 }
 
 pub async fn get_todos_page(
@@ -62,19 +72,38 @@ pub struct AddTodoForm {
 pub async fn post_todo(
     AuthenticatedUser(user_id): AuthenticatedUser,
     State(pool): State<PgPool>,
+    headers: HeaderMap,
     Form(form): Form<AddTodoForm>,
 ) -> Result<Response, TodosError> {
+    let htmx = is_htmx_request(&headers);
+
     // Silently ignore empty/whitespace-only submissions per US-5
     if form.title.trim().is_empty() {
+        if htmx {
+            return Ok(StatusCode::NO_CONTENT.into_response());
+        }
         return Ok(Redirect::to("/todos").into_response());
     }
 
     match add_todo(&pool, user_id.clone(), form.title).await {
-        Ok(_) => Ok(Redirect::to("/todos").into_response()),
+        Ok(item) => {
+            if htmx {
+                let template = TodoItemTemplate {
+                    todo: TodoItemView::from(&item),
+                };
+                let body = template.render().map_err(TodosError::Render)?;
+                Ok(Html(body).into_response())
+            } else {
+                Ok(Redirect::to("/todos").into_response())
+            }
+        }
         Err(AddTodoError::InvalidTitle(title_err)) => {
             let user_facing = match title_err {
                 crate::domain::TodoTitleError::Empty => {
                     // Should not reach here due to empty check above, but handle gracefully
+                    if htmx {
+                        return Ok(StatusCode::NO_CONTENT.into_response());
+                    }
                     return Ok(Redirect::to("/todos").into_response());
                 }
                 crate::domain::TodoTitleError::TooLong { max, .. } => {
@@ -101,12 +130,24 @@ pub async fn post_todo(
 pub async fn post_toggle_todo(
     AuthenticatedUser(user_id): AuthenticatedUser,
     State(pool): State<PgPool>,
+    headers: HeaderMap,
     Path(todo_id): Path<Uuid>,
 ) -> Result<Response, TodosError> {
+    let htmx = is_htmx_request(&headers);
     let todo_item_id = TodoItemId::from_uuid(todo_id);
 
     match toggle_todo_completion(&pool, &todo_item_id, &user_id).await {
-        Ok(_) => Ok(Redirect::to("/todos").into_response()),
+        Ok(toggled) => {
+            if htmx {
+                let template = TodoItemTemplate {
+                    todo: TodoItemView::from(&toggled),
+                };
+                let body = template.render().map_err(TodosError::Render)?;
+                Ok(Html(body).into_response())
+            } else {
+                Ok(Redirect::to("/todos").into_response())
+            }
+        }
         Err(ToggleTodoError::NotFound) => Ok((
             StatusCode::NOT_FOUND,
             Html("<h1>Todo not found</h1>".to_string()),
@@ -124,12 +165,20 @@ pub async fn post_toggle_todo(
 pub async fn post_delete_todo(
     AuthenticatedUser(user_id): AuthenticatedUser,
     State(pool): State<PgPool>,
+    headers: HeaderMap,
     Path(todo_id): Path<Uuid>,
 ) -> Result<Response, TodosError> {
+    let htmx = is_htmx_request(&headers);
     let todo_item_id = TodoItemId::from_uuid(todo_id);
 
     match delete_todo(&pool, &todo_item_id, &user_id).await {
-        Ok(()) => Ok(Redirect::to("/todos").into_response()),
+        Ok(()) => {
+            if htmx {
+                Ok(Html(String::new()).into_response())
+            } else {
+                Ok(Redirect::to("/todos").into_response())
+            }
+        }
         Err(DeleteTodoError::NotFound) => Ok((
             StatusCode::NOT_FOUND,
             Html("<h1>Todo not found</h1>".to_string()),

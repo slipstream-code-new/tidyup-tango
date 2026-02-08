@@ -1,0 +1,22 @@
+<li class="todo-item{% if todo.is_completed %} todo-item--completed{% endif %}" id="todo-{{ todo.id }}">
+    <form method="post" action="/todos/{{ todo.id }}/toggle" class="todo-item__toggle-form"
+        hx-post="/todos/{{ todo.id }}/toggle" hx-target="#todo-{{ todo.id }}" hx-swap="outerHTML">
+        <button type="submit" class="todo-item__toggle"
+            aria-label="{% if todo.is_completed %}Mark &quot;{{ todo.title }}&quot; as pending{% else %}Mark &quot;{{ todo.title }}&quot; as complete{% endif %}">
+            {% if todo.is_completed %}&#x2611;{% else %}&#x2610;{% endif %}
+        </button>
+    </form>
+    <span class="todo-item__title">{{ todo.title }}</span>
+    <a href="/todos/{{ todo.id }}/edit" class="todo-item__edit"
+        aria-label="Edit &quot;{{ todo.title }}&quot;">
+        &#x270E;
+    </a>
+    <details class="todo-item__delete-confirm">
+        <summary class="todo-item__delete" aria-label="Delete &quot;{{ todo.title }}&quot;">&#x2715;</summary>
+        <form method="post" action="/todos/{{ todo.id }}/delete"
+            hx-post="/todos/{{ todo.id }}/delete" hx-target="#todo-{{ todo.id }}" hx-swap="outerHTML">
+            <span>Delete?</span>
+            <button type="submit" class="todo-item__delete-yes">Yes</button>
+        </form>
+    </details>
+</li>

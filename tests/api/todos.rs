@@ -143,10 +143,10 @@ async fn get_todos_shows_empty_state_for_new_user() {
         "Missing sign out button in navigation"
     );
 
-    // No list rendered
+    // List is present but hidden when empty (for HTMX targeting)
     assert!(
-        !body.contains("<ul"),
-        "Should not render a list when there are no todos"
+        body.contains("<ul") && body.contains("hidden"),
+        "Todo list should be in DOM but hidden when there are no todos"
     );
 }
 
@@ -1227,5 +1227,159 @@ async fn edit_link_has_accessible_label() {
     assert!(
         body.contains("Edit &quot;A11y edit&quot;"),
         "Edit link should have an aria-label with the todo title"
+    );
+}
+
+// --- HTMX progressive enhancement tests ---
+
+#[tokio::test]
+async fn base_html_includes_htmx_script() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "htmxscript@example.com", "securepassword123").await;
+
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("htmx.min.js"),
+        "Base template should include the HTMX script"
+    );
+}
+
+#[tokio::test]
+async fn htmx_post_todo_returns_fragment_not_redirect() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "htmx_add@example.com", "securepassword123").await;
+
+    // POST with HX-Request header should return HTML fragment, not 303 redirect
+    let response = client
+        .post(format!("{}/todos", &app.address))
+        .header("HX-Request", "true")
+        .form(&[("title", "HTMX todo")])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        response.status().as_u16(),
+        200,
+        "HTMX add-todo should return 200 with HTML fragment, not redirect"
+    );
+
+    let body = response.text().await.unwrap();
+
+    // Should return the new todo item as an <li> fragment, not a full page
+    assert!(
+        !body.contains("<!DOCTYPE html>"),
+        "HTMX response should be a fragment, not a full page"
+    );
+    assert!(
+        body.contains("HTMX todo"),
+        "Fragment should contain the new todo item"
+    );
+    assert!(
+        body.contains("todo-item"),
+        "Fragment should contain a todo-item element"
+    );
+}
+
+#[tokio::test]
+async fn htmx_post_toggle_returns_updated_item_fragment() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "htmxtoggle@example.com", "securepassword123").await;
+
+    // Add a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Toggle via HTMX")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Get the todo ID
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // Toggle with HX-Request header
+    let response = client
+        .post(format!("{}/todos/{}/toggle", &app.address, todo_id))
+        .header("HX-Request", "true")
+        .send()
+        .await
+        .expect("Failed to toggle todo");
+
+    assert_eq!(
+        response.status().as_u16(),
+        200,
+        "HTMX toggle should return 200 with fragment"
+    );
+
+    let body = response.text().await.unwrap();
+    assert!(
+        !body.contains("<!DOCTYPE html>"),
+        "HTMX response should not contain full page"
+    );
+    assert!(
+        body.contains("todo-item--completed"),
+        "Toggled item should have completed class"
+    );
+    assert!(
+        body.contains("Toggle via HTMX"),
+        "Response should contain the item title"
+    );
+}
+
+#[tokio::test]
+async fn htmx_post_delete_returns_empty_body() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "htmxdel@example.com", "securepassword123").await;
+
+    // Add a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Delete via HTMX")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Get the todo ID
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id_from_delete(&body);
+
+    // Delete with HX-Request header
+    let response = client
+        .post(format!("{}/todos/{}/delete", &app.address, todo_id))
+        .header("HX-Request", "true")
+        .send()
+        .await
+        .expect("Failed to delete todo");
+
+    assert_eq!(
+        response.status().as_u16(),
+        200,
+        "HTMX delete should return 200"
+    );
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.trim().is_empty(),
+        "HTMX delete should return empty body to remove the element"
     );
 }
