@@ -779,6 +779,45 @@ async fn delete_button_has_accessible_label() {
     );
 }
 
+#[tokio::test]
+async fn delete_uses_confirmation_pattern() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "delconfirm@example.com", "securepassword123").await;
+
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Confirm delete")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+
+    // The delete action should use a details/summary disclosure pattern
+    assert!(
+        body.contains("<details"),
+        "Delete should use a <details> element for confirmation"
+    );
+    assert!(
+        body.contains("<summary"),
+        "Delete should use a <summary> element as the trigger"
+    );
+    assert!(
+        body.contains("Delete?"),
+        "Confirmation step should ask 'Delete?'"
+    );
+    assert!(
+        body.contains("todo-item__delete-yes"),
+        "Confirmation should have a 'Yes' button"
+    );
+}
+
 // --- Edit tests ---
 
 #[tokio::test]

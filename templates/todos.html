@@ -50,12 +50,13 @@
                 aria-label="Edit &quot;{{ todo.title }}&quot;">
                 &#x270E;
             </a>
-            <form method="post" action="/todos/{{ todo.id }}/delete" class="todo-item__delete-form">
-                <button type="submit" class="todo-item__delete"
-                    aria-label="Delete &quot;{{ todo.title }}&quot;">
-                    &#x2715;
-                </button>
-            </form>
+            <details class="todo-item__delete-confirm">
+                <summary class="todo-item__delete" aria-label="Delete &quot;{{ todo.title }}&quot;">&#x2715;</summary>
+                <form method="post" action="/todos/{{ todo.id }}/delete">
+                    <span>Delete?</span>
+                    <button type="submit" class="todo-item__delete-yes">Yes</button>
+                </form>
+            </details>
         </li>
         {% endfor %}
     </ul>
