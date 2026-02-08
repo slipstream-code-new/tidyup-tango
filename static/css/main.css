@@ -592,6 +592,11 @@
     margin-block-end: var(--space-lg);
   }
 
+  /* Collapse empty message containers so they don't leave a gap */
+  .auth-form__message:empty {
+    display: none;
+  }
+
   .auth-form__message--error {
     background-color: var(--color-danger-light);
     color: var(--color-danger);
@@ -599,6 +604,23 @@
 
   .auth-form__submit {
     inline-size: 100%;
+  }
+
+  /* Actions row (save + cancel) for edit forms */
+  .auth-form__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  /* Cancel link styled as secondary text action */
+  .auth-form__cancel {
+    font-size: var(--font-size-sm);
+    color: var(--color-fg-muted);
+  }
+
+  .auth-form__cancel:hover {
+    color: var(--color-fg);
   }
 
   .auth-form__footer {
@@ -652,11 +674,39 @@
     text-decoration: underline;
   }
 
+  /* ---- Nav Logout ----
+   * Logout form positioned to the right side of the header nav.
+   * The button is styled as a text link, not a primary button. */
+  .nav-logout {
+    margin-inline-start: auto;
+  }
+
+  .nav-logout__button {
+    background: none;
+    border: none;
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-normal);
+    padding: 0;
+    border-radius: 0;
+    cursor: pointer;
+  }
+
+  .nav-logout__button:hover {
+    background: none;
+    color: var(--color-fg);
+    text-decoration: underline;
+  }
+
   /* ---- Todo Add Form ----
    * Prominent input at top of todo list for adding new items.
    * Label above, input + button row below. */
   .todo-add {
     margin-block: var(--space-lg);
+  }
+
+  .todo-add__group {
+    margin-block-end: var(--space-xs);
   }
 
   .todo-add__label {
@@ -675,8 +725,18 @@
     flex: 1;
   }
 
-  .todo-add__button {
+  .todo-add__submit {
     flex-shrink: 0;
+  }
+
+  /* Error text for the add-todo form (always in DOM for aria-describedby) */
+  .todo-add__error {
+    color: var(--color-danger);
+    font-size: var(--font-size-sm);
+  }
+
+  .todo-add__error:empty {
+    display: none;
   }
 
   /* ---- Todo List ----
