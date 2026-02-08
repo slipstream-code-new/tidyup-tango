@@ -10,9 +10,9 @@ use tower_sessions_sqlx_store::PostgresStore;
 
 use crate::configuration::Settings;
 use crate::routes::{
-    get_edit_todo, get_forgot_password, get_login, get_register, get_todos_page, health_check,
-    index, post_delete_todo, post_edit_todo, post_login, post_logout, post_register, post_todo,
-    post_toggle_todo,
+    get_edit_todo, get_forgot_password, get_login, get_register, get_todo_item, get_todos_page,
+    health_check, index, post_delete_todo, post_edit_todo, post_login, post_logout, post_register,
+    post_todo, post_toggle_todo,
 };
 
 pub struct Application {
@@ -63,6 +63,7 @@ impl Application {
             .route("/forgot-password", axum::routing::get(get_forgot_password))
             .route("/logout", axum::routing::post(post_logout))
             .route("/todos", axum::routing::get(get_todos_page).post(post_todo))
+            .route("/todos/{id}", axum::routing::get(get_todo_item))
             .route("/todos/{id}/toggle", axum::routing::post(post_toggle_todo))
             .route("/todos/{id}/delete", axum::routing::post(post_delete_todo))
             .route(

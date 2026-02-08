@@ -1,0 +1,18 @@
+<li class="todo-item todo-item--editing" id="todo-{{ todo_id }}">
+    <form method="post" action="/todos/{{ todo_id }}/edit" class="todo-item__edit-form"
+        hx-post="/todos/{{ todo_id }}/edit" hx-target="#todo-{{ todo_id }}" hx-swap="outerHTML">
+        <input
+            type="text"
+            name="title"
+            value="{{ current_title }}"
+            class="todo-item__edit-input"
+            maxlength="300"
+            required
+            autofocus
+            aria-label="Edit todo title"
+        >
+        <button type="submit" class="todo-item__edit-save">Save</button>
+        <button type="button" class="todo-item__edit-cancel"
+            hx-get="/todos/{{ todo_id }}" hx-target="#todo-{{ todo_id }}" hx-swap="outerHTML">Cancel</button>
+    </form>
+</li>

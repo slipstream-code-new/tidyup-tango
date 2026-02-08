@@ -223,11 +223,20 @@ pub struct EditTodoTemplate {
     pub error_message: Option<String>,
 }
 
+#[derive(Template)]
+#[template(path = "todo_item_edit.html")]
+pub struct TodoItemEditTemplate {
+    pub todo_id: String,
+    pub current_title: String,
+}
+
 pub async fn get_edit_todo(
     AuthenticatedUser(user_id): AuthenticatedUser,
     State(pool): State<PgPool>,
+    headers: HeaderMap,
     Path(todo_id): Path<Uuid>,
 ) -> Result<Response, TodosError> {
+    let htmx = is_htmx_request(&headers);
     let todo_item_id = TodoItemId::from_uuid(todo_id);
 
     let item = crate::infrastructure::todo_repository::find_todo_by_id(&pool, &todo_item_id)
@@ -236,12 +245,20 @@ pub async fn get_edit_todo(
 
     match item {
         Some(todo) if todo.user_id() == &user_id => {
-            let template = EditTodoTemplate {
-                todo_id: todo_id.to_string(),
-                current_title: todo.title().as_str().to_string(),
-                error_message: None,
-            };
-            Ok(Html(template.render()?).into_response())
+            if htmx {
+                let template = TodoItemEditTemplate {
+                    todo_id: todo_id.to_string(),
+                    current_title: todo.title().as_str().to_string(),
+                };
+                Ok(Html(template.render()?).into_response())
+            } else {
+                let template = EditTodoTemplate {
+                    todo_id: todo_id.to_string(),
+                    current_title: todo.title().as_str().to_string(),
+                    error_message: None,
+                };
+                Ok(Html(template.render()?).into_response())
+            }
         }
         Some(_) => Ok((
             StatusCode::FORBIDDEN,
@@ -264,13 +281,37 @@ pub struct EditTodoForm {
 pub async fn post_edit_todo(
     AuthenticatedUser(user_id): AuthenticatedUser,
     State(pool): State<PgPool>,
+    headers: HeaderMap,
     Path(todo_id): Path<Uuid>,
     Form(form): Form<EditTodoForm>,
 ) -> Result<Response, TodosError> {
+    let htmx = is_htmx_request(&headers);
     let todo_item_id = TodoItemId::from_uuid(todo_id);
 
     match update_todo_title(&pool, &todo_item_id, &user_id, form.title.clone()).await {
-        Ok(()) => Ok(Redirect::to("/todos").into_response()),
+        Ok(()) => {
+            if htmx {
+                // Return the updated item fragment
+                let item =
+                    crate::infrastructure::todo_repository::find_todo_by_id(&pool, &todo_item_id)
+                        .await
+                        .map_err(|e| {
+                            TodosError::Unexpected(anyhow::anyhow!("Database error: {e}"))
+                        })?;
+                match item {
+                    Some(todo) => {
+                        let template = TodoItemTemplate {
+                            todo: TodoItemView::from(&todo),
+                        };
+                        let body = template.render().map_err(TodosError::Render)?;
+                        Ok(htmx_response_with_announce(Html(body), "Todo updated"))
+                    }
+                    None => Ok(Redirect::to("/todos").into_response()),
+                }
+            } else {
+                Ok(Redirect::to("/todos").into_response())
+            }
+        }
         Err(UpdateTitleError::NotFound) => Ok((
             StatusCode::NOT_FOUND,
             Html("<h1>Todo not found</h1>".to_string()),
@@ -288,15 +329,57 @@ pub async fn post_edit_todo(
                     format!("That title is too long (max {max} characters)")
                 }
             };
-            let template = EditTodoTemplate {
-                todo_id: todo_id.to_string(),
-                current_title: form.title,
-                error_message: Some(user_facing),
-            };
-            let body = template.render().map_err(TodosError::Render)?;
-            Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(body)).into_response())
+            if htmx {
+                // Return the inline edit form with error
+                let template = TodoItemEditTemplate {
+                    todo_id: todo_id.to_string(),
+                    current_title: form.title,
+                };
+                let body = template.render().map_err(TodosError::Render)?;
+                Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(body)).into_response())
+            } else {
+                let template = EditTodoTemplate {
+                    todo_id: todo_id.to_string(),
+                    current_title: form.title,
+                    error_message: Some(user_facing),
+                };
+                let body = template.render().map_err(TodosError::Render)?;
+                Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(body)).into_response())
+            }
         }
         Err(UpdateTitleError::Unexpected(err)) => Err(TodosError::Unexpected(err)),
+    }
+}
+
+/// Return a single todo item as an HTML fragment (for HTMX cancel-edit).
+pub async fn get_todo_item(
+    AuthenticatedUser(user_id): AuthenticatedUser,
+    State(pool): State<PgPool>,
+    Path(todo_id): Path<Uuid>,
+) -> Result<Response, TodosError> {
+    let todo_item_id = TodoItemId::from_uuid(todo_id);
+
+    let item = crate::infrastructure::todo_repository::find_todo_by_id(&pool, &todo_item_id)
+        .await
+        .map_err(|e| TodosError::Unexpected(anyhow::anyhow!("Database error: {e}")))?;
+
+    match item {
+        Some(todo) if todo.user_id() == &user_id => {
+            let template = TodoItemTemplate {
+                todo: TodoItemView::from(&todo),
+            };
+            Ok(Html(template.render()?).into_response())
+        }
+        Some(_) => Ok((
+            StatusCode::FORBIDDEN,
+            Html("<h1>Not authorized</h1>".to_string()),
+        )
+            .into_response()),
+        None => Ok((
+            StatusCode::NOT_FOUND,
+            Html("<h1>Todo not found</h1>".to_string()),
+        )
+            .into_response()),
     }
 }
 

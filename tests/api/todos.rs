@@ -1556,3 +1556,241 @@ async fn htmx_post_delete_includes_announce_trigger() {
         "Announcement should mention deletion, got: {hx_trigger}"
     );
 }
+
+// --- HTMX inline editing tests ---
+
+#[tokio::test]
+async fn htmx_get_edit_returns_inline_edit_form_fragment() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "htmx_edit@example.com", "securepassword123").await;
+
+    // Add a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Inline edit me")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Get the todo ID
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // GET edit with HX-Request header should return inline form fragment
+    let response = client
+        .get(format!("{}/todos/{}/edit", &app.address, todo_id))
+        .header("HX-Request", "true")
+        .send()
+        .await
+        .expect("Failed to get inline edit form");
+
+    assert_eq!(
+        response.status().as_u16(),
+        200,
+        "HTMX edit should return 200"
+    );
+
+    let body = response.text().await.unwrap();
+
+    // Should be a fragment, not a full page
+    assert!(
+        !body.contains("<!DOCTYPE html>"),
+        "HTMX response should be a fragment, not a full page"
+    );
+
+    // Should contain the inline edit form
+    assert!(
+        body.contains("todo-item--editing"),
+        "Should contain the editing state class"
+    );
+    assert!(
+        body.contains("todo-item__edit-input"),
+        "Should contain the edit input"
+    );
+    assert!(
+        body.contains("Inline edit me"),
+        "Should contain the current title in the input"
+    );
+    assert!(body.contains("Save"), "Should contain a Save button");
+    assert!(body.contains("Cancel"), "Should contain a Cancel button");
+}
+
+#[tokio::test]
+async fn htmx_post_edit_returns_updated_item_fragment() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "htmx_edit_save@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    // Add a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Old HTMX title")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Get the todo ID
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // POST edit with HX-Request header should return updated item fragment
+    let response = client
+        .post(format!("{}/todos/{}/edit", &app.address, todo_id))
+        .header("HX-Request", "true")
+        .form(&[("title", "New HTMX title")])
+        .send()
+        .await
+        .expect("Failed to save inline edit");
+
+    assert_eq!(
+        response.status().as_u16(),
+        200,
+        "HTMX edit save should return 200"
+    );
+
+    // Should have announce trigger
+    let hx_trigger = response
+        .headers()
+        .get("hx-trigger")
+        .expect("HTMX edit response should include HX-Trigger header")
+        .to_str()
+        .unwrap();
+    assert!(
+        hx_trigger.contains("announce"),
+        "Should fire announce event, got: {hx_trigger}"
+    );
+    assert!(
+        hx_trigger.contains("updated"),
+        "Announcement should mention update, got: {hx_trigger}"
+    );
+
+    let body = response.text().await.unwrap();
+
+    // Should be a fragment, not a full page
+    assert!(
+        !body.contains("<!DOCTYPE html>"),
+        "HTMX response should be a fragment"
+    );
+
+    // Should contain the updated item (not the edit form)
+    assert!(
+        body.contains("New HTMX title"),
+        "Should contain the updated title"
+    );
+    assert!(
+        !body.contains("todo-item--editing"),
+        "Should not be in editing state after save"
+    );
+    assert!(
+        body.contains("todo-item"),
+        "Should contain the todo-item class"
+    );
+}
+
+#[tokio::test]
+async fn htmx_get_todo_item_returns_item_fragment() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "htmx_cancel@example.com", "securepassword123").await;
+
+    // Add a todo
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Cancel edit me")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    // Get the todo ID
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+    let todo_id = extract_todo_id(&body);
+
+    // GET /todos/{id} should return the item fragment (used by cancel button)
+    let response = client
+        .get(format!("{}/todos/{}", &app.address, todo_id))
+        .header("HX-Request", "true")
+        .send()
+        .await
+        .expect("Failed to get todo item");
+
+    assert_eq!(
+        response.status().as_u16(),
+        200,
+        "GET /todos/{{id}} should return 200"
+    );
+
+    let body = response.text().await.unwrap();
+
+    assert!(!body.contains("<!DOCTYPE html>"), "Should be a fragment");
+    assert!(
+        body.contains("Cancel edit me"),
+        "Should contain the todo title"
+    );
+    assert!(
+        body.contains("todo-item"),
+        "Should contain the todo-item element"
+    );
+    assert!(
+        !body.contains("todo-item--editing"),
+        "Should be in view mode, not edit mode"
+    );
+}
+
+#[tokio::test]
+async fn edit_link_has_htmx_attributes_for_inline_editing() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "htmx_edit_attrs@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    client
+        .post(format!("{}/todos", &app.address))
+        .form(&[("title", "Check attrs")])
+        .send()
+        .await
+        .expect("Failed to add todo");
+
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to get todos page");
+    let body = response.text().await.unwrap();
+
+    // The edit link should have hx-get for inline editing
+    assert!(
+        body.contains("hx-get"),
+        "Edit link should have hx-get attribute for HTMX inline editing"
+    );
+    assert!(
+        body.contains("hx-target"),
+        "Edit link should have hx-target for swapping the item"
+    );
+    assert!(
+        body.contains("hx-swap=\"outerHTML\""),
+        "Edit link should swap outerHTML to replace the entire item"
+    );
+}

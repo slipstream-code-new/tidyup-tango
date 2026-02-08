@@ -8,6 +8,7 @@
     </form>
     <span class="todo-item__title">{{ todo.title }}</span>
     <a href="/todos/{{ todo.id }}/edit" class="todo-item__edit"
+        hx-get="/todos/{{ todo.id }}/edit" hx-target="#todo-{{ todo.id }}" hx-swap="outerHTML"
         aria-label="Edit &quot;{{ todo.title }}&quot;">
         &#x270E;
     </a>

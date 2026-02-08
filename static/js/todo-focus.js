@@ -9,6 +9,10 @@
  *   2. Previous sibling todo item (if deleted was last in list)
  *   3. The "New todo" input (if the list is now empty)
  *
+ * Inline edit focus:
+ * Entering edit mode focuses the edit input. Saving or canceling
+ * focuses the edit link on the restored item.
+ *
  * Empty state transitions:
  * When the last item is deleted, shows the "No todos yet." message
  * and hides the empty list. When the first item is added to an empty
@@ -27,30 +31,40 @@
   document.body.addEventListener("htmx:beforeSwap", function (e) {
     var target = e.detail.target;
 
-    // Only handle delete swaps (empty response that removes an element)
+    // Only handle swaps targeting todo items
     if (!target || !target.classList || !target.classList.contains("todo-item")) {
       return;
     }
 
-    // If the response body is empty, this is a delete operation
     var responseText = e.detail.xhr ? e.detail.xhr.responseText : "";
-    if (responseText.trim() !== "") {
+
+    // Empty response = delete operation
+    if (responseText.trim() === "") {
+      pendingDeleteSwap = true;
+
+      var nextItem = target.nextElementSibling;
+      var prevItem = target.previousElementSibling;
+
+      if (nextItem && nextItem.classList.contains("todo-item")) {
+        pendingFocusTarget = { type: "element", el: nextItem };
+      } else if (prevItem && prevItem.classList.contains("todo-item")) {
+        pendingFocusTarget = { type: "element", el: prevItem };
+      } else {
+        pendingFocusTarget = { type: "element", el: document.getElementById("title") };
+      }
       return;
     }
 
-    pendingDeleteSwap = true;
+    // Check if the response contains the edit form (entering edit mode)
+    if (responseText.indexOf("todo-item--editing") !== -1) {
+      pendingFocusTarget = { type: "selector", selector: "#" + target.id + " .todo-item__edit-input" };
+      return;
+    }
 
-    // Determine focus target before the element is removed
-    var nextItem = target.nextElementSibling;
-    var prevItem = target.previousElementSibling;
-
-    if (nextItem && nextItem.classList.contains("todo-item")) {
-      pendingFocusTarget = nextItem;
-    } else if (prevItem && prevItem.classList.contains("todo-item")) {
-      pendingFocusTarget = prevItem;
-    } else {
-      // List will be empty after this deletion -- focus the add input
-      pendingFocusTarget = document.getElementById("title");
+    // Check if the response is a normal todo item (exiting edit mode)
+    if (responseText.indexOf("todo-item__edit") !== -1 && responseText.indexOf("todo-item--editing") === -1) {
+      pendingFocusTarget = { type: "selector", selector: "#" + target.id + " .todo-item__edit" };
+      return;
     }
   });
 
@@ -65,8 +79,19 @@
       return;
     }
 
-    var el = pendingFocusTarget;
+    var pending = pendingFocusTarget;
     pendingFocusTarget = null;
+
+    var el;
+    if (pending.type === "element") {
+      el = pending.el;
+    } else if (pending.type === "selector") {
+      el = document.querySelector(pending.selector);
+    }
+
+    if (!el) {
+      return;
+    }
 
     // Make the target focusable if it isn't already
     if (!el.hasAttribute("tabindex") && el.tagName !== "INPUT" && el.tagName !== "BUTTON" && el.tagName !== "A") {
