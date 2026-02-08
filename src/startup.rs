@@ -27,6 +27,9 @@ impl Application {
 
         sqlx::migrate!("./migrations").run(&pool).await?;
 
+        let session_store = PostgresStore::new(pool.clone());
+        session_store.migrate().await?;
+
         let address = format!(
             "{}:{}",
             settings.application.host, settings.application.port
