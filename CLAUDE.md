@@ -145,6 +145,37 @@ If the team cannot reach consensus after 10 rounds of discussion:
 
 This should be extremely rare. Most decisions should resolve through discussion.
 
+## Environment & Tooling
+
+### Nix
+
+This project runs on NixOS with a `flake.nix` already in place. When the team needs
+a utility that isn't currently installed:
+- Use `nix shell nixpkgs#<package> --command <cmd>` for one-off commands
+- For tools used regularly, add them to `buildInputs` in the devshell in `flake.nix`
+
+### Agent Skills
+
+The team is encouraged to find and install agent skills to make their work easier via
+`npx skills`. The `find-skill` skill is already installed. When adding skills:
+- Add them for **this project only** (not globally)
+- Use support for **generic agent locations** (Codex, OpenCode, etc.) **and** Claude Code
+
+### Custom Skills
+
+When the team finds an approach that works and was not completely obvious (anything
+that took a few tries to figure out), and there is not already an existing skill
+available (after searching with `find-skill`), the team **should** create a
+**local-only, project-specific skill** using the `skills.sh` format. This ensures
+hard-won knowledge is captured and reusable.
+
+### External Services (Docker)
+
+If the team needs any external services running (e.g., a PostgreSQL database server),
+use a `docker-compose.yml` file and Docker to run them. Do **not** run services
+directly on the host machine. This keeps the dev environment reproducible and
+self-contained.
+
 ## MVP Scope
 
 Defined by the product manager (Marty Cagan):
