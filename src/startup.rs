@@ -2,9 +2,12 @@ use axum::Router;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 use tokio::net::TcpListener;
+use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
+use tower_http::services::ServeDir;
+use tower_http::trace::TraceLayer;
 
 use crate::configuration::Settings;
-use crate::routes::health_check;
+use crate::routes::{health_check, index};
 
 pub struct Application {
     listener: TcpListener,
@@ -34,8 +37,15 @@ impl Application {
     }
 
     pub fn router(pool: PgPool) -> Router {
+        let x_request_id = axum::http::HeaderName::from_static("x-request-id");
+
         Router::new()
+            .route("/", axum::routing::get(index))
             .route("/health_check", axum::routing::get(health_check))
+            .nest_service("/static", ServeDir::new("static"))
+            .layer(TraceLayer::new_for_http())
+            .layer(PropagateRequestIdLayer::new(x_request_id.clone()))
+            .layer(SetRequestIdLayer::new(x_request_id, MakeRequestUuid))
             .with_state(pool)
     }
 
