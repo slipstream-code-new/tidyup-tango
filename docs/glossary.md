@@ -1,0 +1,90 @@
+# Domain Glossary
+
+Maps business terms to Rust types. This is the ubiquitous language of our todo list
+application. Code should read like these definitions -- if the business says "complete
+a todo," the code says `complete_todo()`.
+
+Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin).
+
+---
+
+## Core Domain Types
+
+| Domain Term | Rust Type | Module | Notes |
+|-------------|-----------|--------|-------|
+| User | `User` | `domain` | An authenticated user with valid credentials |
+| User ID | `UserId(Uuid)` | `domain` | Newtype wrapper; uniquely identifies a user |
+| Email address | `ValidatedEmail` | `domain` | Constructed via `ValidatedEmail::parse()`; validated format, normalized to lowercase (case-insensitive per US-2) |
+| Password | (not stored as domain type) | -- | Hashed with Argon2 at the boundary; the domain never sees raw passwords |
+| Todo item | `TodoItem` (enum) | `domain` | Sum type: `Pending` or `Completed` variant. No boolean flags. |
+| Todo item ID | `TodoItemId(Uuid)` | `domain` | Newtype wrapper; uniquely identifies a todo item |
+| Todo title | `TodoTitle` | `domain` | Non-empty, max 200 chars (per US-5), trimmed; constructed via `TodoTitle::parse()` |
+| Pending todo | `TodoItem::Pending { ... }` | `domain` | A todo that has not been completed; has title and created_at |
+| Completed todo | `TodoItem::Completed { ... }` | `domain` | A todo that has been completed; has title, created_at, and completed_at |
+
+## Domain Actions (Ubiquitous Language)
+
+| Business Action | Rust Function / Method | Notes |
+|-----------------|----------------------|-------|
+| Register a user | `register_user()` | Creates a new user account with validated email |
+| Log in | `authenticate()` | Verifies credentials, establishes session |
+| Log out | `end_session()` | Terminates the user's session |
+| Add a todo | `add_todo()` | Creates a `TodoItem::Pending` with a validated title |
+| Complete a todo | `complete_todo()` | Transitions `Pending` -> `Completed`; records completion time |
+| Uncomplete a todo | `uncomplete_todo()` | Transitions `Completed` -> `Pending`; removes completion time |
+| Delete a todo | `delete_todo()` | Removes a todo item from the user's list |
+| Edit a todo title | `edit_todo_title()` | Updates the title on an existing todo item |
+
+## Domain Errors
+
+| Error Condition | Rust Type | Notes |
+|-----------------|-----------|-------|
+| Title is empty | `TodoError::TitleEmpty` | Todo title cannot be blank |
+| Title too long | `TodoError::TitleTooLong { max, actual }` | Exceeds maximum allowed length |
+| Todo not found | `TodoError::NotFound { id }` | Referenced todo does not exist |
+| Email invalid | `AuthError::InvalidEmail` | Email fails format validation |
+| Duplicate email | `AuthError::EmailAlreadyExists` | Registration attempted with existing email |
+| Invalid credentials | `AuthError::InvalidCredentials` | Login failed (generic -- no info leak) |
+
+## Type Design Principles
+
+These principles govern how we model the domain:
+
+1. **Parse, don't validate**: `TodoTitle::parse(input) -> Result<TodoTitle, TodoError>`
+   not `fn is_valid_title(input: &str) -> bool`. Parsing produces a typed value that
+   carries proof of validity. Validate once at the boundary; never re-validate inside.
+
+2. **Make illegal states unrepresentable**: A `TodoItem` is either `Pending` or
+   `Completed` -- never both, never neither. The enum enforces this at compile time.
+   No boolean `is_completed` flag with an `Option<completed_at>` that could be
+   inconsistent.
+
+3. **Newtypes for everything**: `UserId` is not a bare `Uuid`. `ValidatedEmail` is
+   not a bare `String`. The type system prevents mixing them up. These are zero-cost
+   abstractions in Rust.
+
+4. **Pure domain core**: Everything in `src/domain/` is pure functions and types. No
+   database imports, no HTTP types, no I/O. If you need a mock to test domain logic,
+   I/O has leaked into the domain.
+
+5. **Workflows as type-safe pipelines**:
+   ```
+   UnvalidatedInput -> ValidatedInput -> DomainResult
+   ```
+   Each step's output type is the next step's input. You cannot skip validation.
+
+## State Machine: TodoItem
+
+```
+                add_todo()
+  [nothing] ───────────────> Pending
+                                │  ^
+                  complete_todo() │  │ uncomplete_todo()
+                                │  │
+                                v  │
+                            Completed
+```
+
+Both `Pending` and `Completed` variants can be deleted (`delete_todo()`).
+The `edit_todo_title()` action applies to both states.
+Completion is **reversible** -- users can toggle between Pending and Completed (US-6).
