@@ -764,6 +764,63 @@
     background-color: var(--color-danger-dark, oklch(0.45 0.2 25));
   }
 
+  /* ---- Edit Mode ----
+   * Pencil icon button triggers edit mode (US-8). No-JS baseline
+   * navigates to an edit page; HTMX swaps inline. */
+  .todo-item__edit {
+    background: none;
+    border: none;
+    padding: var(--space-xs);
+    cursor: pointer;
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
+  }
+
+  .todo-item__edit:hover {
+    color: var(--color-primary);
+  }
+
+  /* Edit form replaces the title when in edit mode */
+  .todo-item__edit-form {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-inline-size: 0;
+  }
+
+  .todo-item__edit-input {
+    flex: 1;
+    min-inline-size: 0;
+    font-size: var(--font-size-base);
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .todo-item__edit-save,
+  .todo-item__edit-cancel {
+    font-size: var(--font-size-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .todo-item__edit-save {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .todo-item__edit-cancel {
+    background: none;
+    color: var(--color-fg-muted);
+  }
+
+  .todo-item__edit-cancel:hover {
+    color: var(--color-fg);
+  }
+
   /* ---- Empty State ---- */
   .todo-empty {
     color: var(--color-fg-muted);
