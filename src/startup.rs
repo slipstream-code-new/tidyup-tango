@@ -5,9 +5,13 @@ use tokio::net::TcpListener;
 use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
+use tower_sessions::SessionManagerLayer;
+use tower_sessions_sqlx_store::PostgresStore;
 
 use crate::configuration::Settings;
-use crate::routes::{get_register, health_check, index, post_register};
+use crate::routes::{
+    get_login, get_register, health_check, index, post_login, post_logout, post_register,
+};
 
 pub struct Application {
     listener: TcpListener,
@@ -41,14 +45,20 @@ impl Application {
     pub fn router(pool: PgPool) -> Router {
         let x_request_id = axum::http::HeaderName::from_static("x-request-id");
 
+        let session_store = PostgresStore::new(pool.clone());
+        let session_layer = SessionManagerLayer::new(session_store);
+
         Router::new()
             .route("/", axum::routing::get(index))
             .route(
                 "/register",
                 axum::routing::get(get_register).post(post_register),
             )
+            .route("/login", axum::routing::get(get_login).post(post_login))
+            .route("/logout", axum::routing::post(post_logout))
             .route("/health_check", axum::routing::get(health_check))
             .nest_service("/static", ServeDir::new("static"))
+            .layer(session_layer)
             .layer(TraceLayer::new_for_http())
             .layer(PropagateRequestIdLayer::new(x_request_id.clone()))
             .layer(SetRequestIdLayer::new(x_request_id, MakeRequestUuid))

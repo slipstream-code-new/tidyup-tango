@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Sign in -- Todo List{% endblock %}
+
+{% block content %}
+<div class="auth-form">
+    <h1>Sign in</h1>
+    {% if let Some(error) = error_message %}
+    <div class="auth-form__message auth-form__message--error" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+    <form method="post" action="/login" class="auth-form__fields" novalidate>
+        <div class="auth-form__group">
+            <label for="email">Email</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                autocomplete="email"
+                required
+                value="{{ form_email }}"
+            >
+        </div>
+        <div class="auth-form__group">
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                autocomplete="current-password"
+                required
+            >
+        </div>
+        <button type="submit" class="auth-form__submit">Sign in</button>
+    </form>
+    <p class="auth-form__footer">
+        Don't have an account? <a href="/register">Create account</a>
+    </p>
+</div>
+{% endblock %}
