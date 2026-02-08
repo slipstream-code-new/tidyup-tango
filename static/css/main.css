@@ -704,7 +704,14 @@
     color: var(--color-fg-muted);
   }
 
-  /* Delete button -- small, muted, danger on hover. Per US-7: button not link. */
+  /* ---- Delete Confirmation ----
+   * Uses <details>/<summary> for no-JS two-click delete.
+   * Summary shows the delete icon; opening reveals confirm form. */
+  .todo-item__delete-confirm {
+    flex-shrink: 0;
+  }
+
+  /* Delete trigger -- the summary element styled as a small muted button */
   .todo-item__delete {
     background: none;
     border: none;
@@ -712,11 +719,49 @@
     cursor: pointer;
     color: var(--color-fg-muted);
     font-size: var(--font-size-sm);
-    flex-shrink: 0;
+    list-style: none;
+  }
+
+  /* Remove default summary marker in WebKit/Blink */
+  .todo-item__delete::-webkit-details-marker {
+    display: none;
   }
 
   .todo-item__delete:hover {
     color: var(--color-danger);
+  }
+
+  /* Confirmation controls revealed when <details> is open */
+  .todo-item__delete-confirm[open] {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .todo-item__delete-confirm[open] > form {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .todo-item__delete-confirm[open] > form span {
+    font-size: var(--font-size-xs);
+    color: var(--color-fg-muted);
+    white-space: nowrap;
+  }
+
+  .todo-item__delete-yes {
+    font-size: var(--font-size-xs);
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--color-danger);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  .todo-item__delete-yes:hover {
+    background-color: var(--color-danger-dark, oklch(0.45 0.2 25));
   }
 
   /* ---- Empty State ---- */
