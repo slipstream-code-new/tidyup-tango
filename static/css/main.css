@@ -561,6 +561,11 @@
     font-size: var(--font-size-sm);
   }
 
+  .auth-form__hint {
+    font-size: var(--font-size-xs);
+    color: var(--color-fg-muted);
+  }
+
   .auth-form__message {
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-md);
