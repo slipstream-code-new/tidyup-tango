@@ -35,7 +35,7 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Complete a todo | `TodoItem::complete()` | Domain method: Pending -> Completed; records completion time |
 | Uncomplete a todo | `TodoItem::uncomplete()` | Domain method: Completed -> Pending; drops completion time |
 | Delete a todo | `delete_todo()` | Service: verifies ownership, permanently removes from DB |
-| Edit a todo title | `edit_todo_title()` | Updates the title on an existing todo item |
+| Edit a todo title | `update_todo_title()` | Service: verifies ownership, parses new title, persists |
 
 ## Domain Errors
 
@@ -50,7 +50,10 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Email invalid | `RegistrationError::InvalidEmail(EmailValidationError)` | Email fails format validation |
 | Duplicate email | `RegistrationError::DuplicateEmail` | Registration attempted with existing email |
 | Invalid credentials | `AuthenticationError::InvalidCredentials` | Login failed (generic -- no info leak) |
-| Invalid title | `AddTodoError::InvalidTitle(TodoTitleError)` | Title validation failure in add_todo service |
+| Invalid title (add) | `AddTodoError::InvalidTitle(TodoTitleError)` | Title validation failure in add_todo service |
+| Todo not found (edit) | `UpdateTitleError::NotFound` | Referenced todo does not exist |
+| Not authorized (edit) | `UpdateTitleError::Unauthorized` | User does not own the todo |
+| Invalid title (edit) | `UpdateTitleError::InvalidTitle(TodoTitleError)` | Title validation failure in update_todo_title service |
 
 ## Error Copy Convention
 
@@ -71,7 +74,8 @@ call `error.to_string()` on a domain error.
 | `PasswordError::TooLong` | "That password is too long" |
 | `RegistrationError::DuplicateEmail` | "Unable to create account. If you already have an account, try signing in." |
 | `AuthenticationError::InvalidCredentials` | "That email or password didn't work. Try again." |
-| `TodoTitleError::Empty` | (silently ignored per US-5 -- empty submissions are not errors) |
+| `TodoTitleError::Empty` (add) | (silently ignored per US-5 -- empty submissions are not errors) |
+| `TodoTitleError::Empty` (edit) | "Title cannot be empty" |
 | `TodoTitleError::TooLong` | "That title is too long (max 300 characters)" |
 
 *Copy reviewed by Steve Krug. Update this table when adding new error types.*
@@ -118,5 +122,5 @@ These principles govern how we model the domain:
 ```
 
 Both `Pending` and `Completed` variants can be deleted (`delete_todo()`).
-The `edit_todo_title()` action applies to both states.
+The `update_todo_title()` action applies to both states.
 Completion is **reversible** -- users can toggle between Pending and Completed (US-6).
