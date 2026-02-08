@@ -200,7 +200,7 @@
      * style change, etc. This is a WCAG requirement and team agreement. */
     --color-danger:        oklch(0.55 0.2 25);   /* destructive actions, errors */
     --color-danger-light:  oklch(0.92 0.04 25);  /* danger backgrounds */
-    --color-success:       oklch(0.6 0.17 145);  /* completed states */
+    --color-success:       oklch(0.6 0.17 145);  /* icons/indicators only -- ~3.9:1, fails AA for normal text */
     --color-success-light: oklch(0.92 0.04 145); /* success backgrounds */
     --color-warning:       oklch(0.75 0.15 75);  /* warnings */
     --color-warning-light: oklch(0.93 0.04 75);  /* warning backgrounds */
@@ -587,6 +587,146 @@
     text-align: center;
     font-size: var(--font-size-sm);
     color: var(--color-fg-muted);
+  }
+
+  /* ---- Site Header ----
+   * Authenticated page header with brand link and user actions (logout).
+   * Flexbox layout: brand left, actions right. */
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-md);
+  }
+
+  .site-header__brand {
+    font-weight: var(--font-semibold);
+    color: var(--color-fg);
+    text-decoration: none;
+  }
+
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-fg-muted);
+  }
+
+  /* ---- Text Button ----
+   * Button styled as a text link. Used for logout and other
+   * non-primary actions that are semantically form submissions. */
+  .button--text {
+    background: none;
+    border: none;
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-normal);
+    padding: 0;
+    border-radius: 0;
+    cursor: pointer;
+  }
+
+  .button--text:hover {
+    background: none;
+    color: var(--color-fg);
+    text-decoration: underline;
+  }
+
+  /* ---- Todo Add Form ----
+   * Prominent input at top of todo list for adding new items.
+   * Label above, input + button row below. */
+  .todo-add {
+    margin-block: var(--space-lg);
+  }
+
+  .todo-add__label {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-medium);
+    margin-block-end: var(--space-xs);
+  }
+
+  .todo-add__row {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .todo-add__input {
+    flex: 1;
+  }
+
+  .todo-add__button {
+    flex-shrink: 0;
+  }
+
+  /* ---- Todo List ----
+   * Vertical list of todo items separated by borders.
+   * Each item is a flex row: checkbox + label (title). */
+  .todo-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding-block: var(--space-sm);
+    padding-inline: var(--space-sm);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .todo-item:first-child {
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .todo-item__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  /* Custom checkbox -- native checkbox with appearance stripped */
+  .todo-item__toggle input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    flex-shrink: 0;
+    border: 2px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-raised);
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .todo-item__toggle input[type="checkbox"]:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .todo-item__title {
+    flex: 1;
+    min-inline-size: 0;
+    overflow-wrap: break-word;
+    cursor: pointer;
+  }
+
+  /* Completed items: strikethrough + muted color (two visual indicators) */
+  .todo-item--completed .todo-item__title {
+    text-decoration: line-through;
+    color: var(--color-fg-muted);
+  }
+
+  /* ---- Empty State ---- */
+  .todo-empty {
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    text-align: center;
+    padding-block: var(--space-xl);
   }
 }
 
