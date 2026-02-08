@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}My Todos -- Todo List{% endblock %}
+
+{% block nav %}
+<form method="post" action="/logout" class="nav-logout">
+    <button type="submit" class="nav-logout__button">Sign out</button>
+</form>
+{% endblock %}
+
+{% block content %}
+<div class="todo-page">
+    <h1>My Todos</h1>
+
+    <form method="post" action="/todos" class="todo-add">
+        <div class="todo-add__group">
+            <label for="title">New todo</label>
+            <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="What do you need to do?"
+                maxlength="300"
+                autocomplete="off"
+            >
+        </div>
+        <button type="submit" class="todo-add__submit">Add todo</button>
+    </form>
+
+    {% if let Some(error) = error_message %}
+    <div class="todo-add__error" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    {% if todos.is_empty() %}
+    <p class="todo-empty">No todos yet.</p>
+    {% else %}
+    <ul class="todo-list" role="list">
+        {% for todo in todos %}
+        <li class="todo-item{% if todo.is_completed %} todo-item--completed{% endif %}">
+            <span class="todo-item__title">{{ todo.title }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{% endblock %}

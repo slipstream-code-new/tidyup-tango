@@ -26,10 +26,11 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 
 | Business Action | Rust Function / Method | Notes |
 |-----------------|----------------------|-------|
-| Register a user | `register_user()` | Creates a new user account with validated email |
-| Log in | `authenticate()` | Verifies credentials, establishes session |
-| Log out | `end_session()` | Terminates the user's session |
-| Add a todo | `add_todo()` | Creates a `TodoItem::Pending` with a validated title |
+| Register a user | `register_user()` | Service: creates user with validated email and hashed password |
+| Log in | `authenticate_user()` | Service: verifies credentials; route stores user_id in session |
+| Log out | `post_logout()` | Route: flushes session, redirects to login |
+| Add a todo | `add_todo()` | Service: parses title, creates `TodoItem::Pending`, persists |
+| View todos | `get_todos()` | Service: fetches all todos for authenticated user |
 | Complete a todo | `complete_todo()` | Transitions `Pending` -> `Completed`; records completion time |
 | Uncomplete a todo | `uncomplete_todo()` | Transitions `Completed` -> `Pending`; removes completion time |
 | Delete a todo | `delete_todo()` | Removes a todo item from the user's list |
@@ -39,12 +40,13 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 
 | Error Condition | Rust Type | Notes |
 |-----------------|-----------|-------|
-| Title is empty | `TodoError::TitleEmpty` | Todo title cannot be blank |
-| Title too long | `TodoError::TitleTooLong { max, actual }` | Exceeds maximum allowed length |
-| Todo not found | `TodoError::NotFound { id }` | Referenced todo does not exist |
-| Email invalid | `AuthError::InvalidEmail` | Email fails format validation |
-| Duplicate email | `AuthError::EmailAlreadyExists` | Registration attempted with existing email |
-| Invalid credentials | `AuthError::InvalidCredentials` | Login failed (generic -- no info leak) |
+| Title is empty | `TodoTitleError::Empty` | Todo title cannot be blank |
+| Title too long | `TodoTitleError::TooLong { max, actual }` | Exceeds maximum allowed length |
+| Todo not found | (TBD) | Referenced todo does not exist |
+| Email invalid | `RegistrationError::InvalidEmail(EmailValidationError)` | Email fails format validation |
+| Duplicate email | `RegistrationError::DuplicateEmail` | Registration attempted with existing email |
+| Invalid credentials | `AuthenticationError::InvalidCredentials` | Login failed (generic -- no info leak) |
+| Invalid title | `AddTodoError::InvalidTitle(TodoTitleError)` | Title validation failure in add_todo service |
 
 ## Error Copy Convention
 
@@ -65,8 +67,8 @@ call `error.to_string()` on a domain error.
 | `PasswordError::TooLong` | "That password is too long" |
 | `RegistrationError::DuplicateEmail` | "Unable to create account. If you already have an account, try signing in." |
 | `AuthError::InvalidCredentials` | "That email or password didn't work. Try again." |
-| `TodoError::TitleEmpty` | "Enter a title for your todo" |
-| `TodoError::TitleTooLong` | "That title is too long (max 300 characters)" |
+| `TodoTitleError::Empty` | (silently ignored per US-5 -- empty submissions are not errors) |
+| `TodoTitleError::TooLong` | "That title is too long (max 300 characters)" |
 
 *Copy reviewed by Steve Krug. Update this table when adding new error types.*
 
