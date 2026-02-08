@@ -133,7 +133,8 @@ end-to-end first, then layer on features.
 
 - [ ] Todo list is the main screen after login
 - [ ] Page has a clear heading (e.g., "My Todos") as the `<h1>`
-- [ ] Todo items are displayed in a semantic list (`<ul>` or `<ol>`)
+- [ ] Todo items are displayed in a semantic list (`<ul>` or `<ol>`) so screen readers
+  automatically announce the item count (e.g., "list, 5 items")
 - [ ] Each item shows its title and completion status
 - [ ] Completed items are visually distinct from pending items (not just color --
   a secondary indicator like strikethrough text)
