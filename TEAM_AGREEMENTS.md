@@ -480,15 +480,17 @@ Every commit must pass (in order):
 2. **`cargo fmt --check`** — fix formatting if needed.
 3. **`cargo clippy -- -D warnings`** — fix warnings if needed.
 4. **`cargo test`** — fix failures if needed.
-5. **`git commit` + `git push`** — commit and push immediately.
-6. **`gh run list --limit 1`** — wait for CI to complete green before writing any new code.
-7. **All 9 agents review and reach consensus** — Driver and Reviewers confirm the change
-   is correct before proceeding.
-8. **Only then begin the next change.**
+5. **`git commit`** — commit locally. **Do NOT push yet.**
+6. **All 9 agents review and reach consensus** — Driver and Reviewers confirm the change
+   is correct. If concerns are raised, the Driver fixes them, re-runs steps 2–5, and
+   re-seeks consensus.
+7. **Once 9/9 consensus → `git push`.**
+8. **`gh run list --limit 1`** — verify CI completes green.
+9. **Only then begin the next change.**
 
 Additional rules:
-- **Never start new work on top of unpushed commits.** If the branch is ahead of origin,
-  push first.
+- **Consensus before push.** Code is reviewed locally before it reaches the remote. This
+  keeps the CI wait out of the feedback loop.
 - **If CI fails, fix it before writing new code.** A red CI is the team's top priority.
   No new features, no new tests, no refactoring until CI is green again.
 - **One Driver at a time.** Only the designated Driver may modify files. Non-driver agents
