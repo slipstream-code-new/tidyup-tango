@@ -18,17 +18,22 @@ end-to-end first, then layer on features.
 
 - [ ] User can navigate to a registration page from the login page
 - [ ] Registration form has fields: email, password, password confirmation
-- [ ] **Open question for mob**: Consider replacing password confirmation with a password
-  visibility toggle (show/hide). The toggle is better UX (see what you typed) but
-  requires JS. Proposal: keep confirm field for no-JS baseline, add visibility toggle
-  as progressive enhancement that hides the confirm field when JS is available.
+- [ ] **Password progressive enhancement** (consensus: Marty, Steve Krug, Heydon):
+  - **No-JS baseline**: Email + password + password confirmation. Confirm field catches
+    typos. Both password fields use `autocomplete="new-password"`.
+  - **JS enhancement**: Password visibility toggle replaces confirm field. Toggle is a
+    `<button type="button">` with `aria-label` ("Show password" / "Hide password") and
+    `aria-pressed`. When toggle is active, confirm field is removed from DOM (not just
+    hidden). Input type changes between `password` and `text`.
+  - This is the agreed approach -- no further discussion needed.
 - [ ] Every form input has a visible `<label>` element
 - [ ] Submit button label is "Create account" (action words, not "Submit" or "Register")
 - [ ] Successful registration creates a new user account and redirects to the todo list
   (user is automatically logged in)
 - [ ] Email must be a valid email format
 - [ ] Password must be at least 8 characters
-- [ ] Password and password confirmation must match (unless mob decides on toggle approach)
+- [ ] Password and password confirmation must match (no-JS baseline); or password
+  verified via visibility toggle (JS enhancement)
 - [ ] If email is already registered, show a secure, helpful error message that does NOT
   reveal whether the email exists (account enumeration prevention): "Something went
   wrong. If you already have an account, try signing in instead." with "signing in" as
