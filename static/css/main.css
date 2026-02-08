@@ -681,57 +681,42 @@
     border-block-start: 1px solid var(--color-border);
   }
 
+  /* Toggle button -- styled as minimal inline button for completion toggle */
   .todo-item__toggle {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    flex: 1;
-    min-inline-size: 0;
-  }
-
-  /* Custom checkbox -- native checkbox with appearance stripped */
-  .todo-item__toggle input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
-    flex-shrink: 0;
-    border: 2px solid var(--color-border-strong);
-    border-radius: var(--radius-sm);
-    background: var(--color-bg-raised);
+    background: none;
+    border: none;
+    padding: var(--space-xs);
     cursor: pointer;
-    margin: 0;
-  }
-
-  .todo-item__toggle input[type="checkbox"]:checked {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-  }
-
-  /* Checkmark indicator using a rotated border trick */
-  .todo-item__toggle input[type="checkbox"]:checked::after {
-    content: "";
-    display: block;
-    inline-size: 0.35rem;
-    block-size: 0.65rem;
-    margin-inline-start: 0.35rem;
-    margin-block-start: 0.05rem;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+    font-size: var(--font-size-lg);
+    line-height: 1;
+    flex-shrink: 0;
   }
 
   .todo-item__title {
     flex: 1;
     min-inline-size: 0;
     overflow-wrap: break-word;
-    cursor: pointer;
   }
 
   /* Completed items: strikethrough + muted color (two visual indicators) */
   .todo-item--completed .todo-item__title {
     text-decoration: line-through;
     color: var(--color-fg-muted);
+  }
+
+  /* Delete button -- small, muted, danger on hover. Per US-7: button not link. */
+  .todo-item__delete {
+    background: none;
+    border: none;
+    padding: var(--space-xs);
+    cursor: pointer;
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
+  }
+
+  .todo-item__delete:hover {
+    color: var(--color-danger);
   }
 
   /* ---- Empty State ---- */
