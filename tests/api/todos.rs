@@ -1252,6 +1252,25 @@ async fn base_html_includes_htmx_script() {
 }
 
 #[tokio::test]
+async fn todos_page_includes_focus_management_script() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "focusscript@example.com", "securepassword123").await;
+
+    let response = client
+        .get(format!("{}/todos", &app.address))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("todo-focus.js"),
+        "Todos page should include the focus management script"
+    );
+}
+
+#[tokio::test]
 async fn htmx_post_todo_returns_fragment_not_redirect() {
     let app = spawn_app().await;
     let client =
