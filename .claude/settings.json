@@ -1,18 +1,22 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx skills:*)",
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Bash(*)",
+      "WebSearch",
+      "WebFetch",
+      "Skill",
+      "TaskCreate",
+      "TaskGet",
+      "TaskUpdate",
+      "TaskList",
+      "SendMessage",
       "mcp__plugin_context7_context7__resolve-library-id",
-      "mcp__plugin_context7_context7__query-docs",
-      "Bash(cargo *)",
-      "Bash(git status*)",
-      "Bash(git log*)",
-      "Bash(git diff*)",
-      "Bash(git add *)",
-      "Bash(git commit *)",
-      "Bash(nix *)",
-      "Bash(mkdir *)",
-      "Bash(ls *)"
+      "mcp__plugin_context7_context7__query-docs"
     ]
   }
 }
