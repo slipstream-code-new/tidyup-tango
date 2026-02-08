@@ -283,6 +283,60 @@ async fn post_register_returns_422_for_duplicate_email_without_leaking_info() {
 }
 
 #[tokio::test]
+async fn register_page_includes_password_toggle_script() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::new();
+    let response = client
+        .get(format!("{}/register", &app.address))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    let body = response.text().await.unwrap();
+
+    // The register page should include the password toggle script
+    assert!(
+        body.contains("password-toggle.js"),
+        "Register page should include the password-toggle.js script"
+    );
+
+    // The confirm group should have an id for the JS to target
+    assert!(
+        body.contains("id=\"confirm-group\""),
+        "Confirm password group should have id=\"confirm-group\" for JS targeting"
+    );
+}
+
+#[tokio::test]
+async fn password_toggle_script_is_served() {
+    let app = spawn_app().await;
+
+    let client = reqwest::Client::new();
+    let response = client
+        .get(format!("{}/static/js/password-toggle.js", &app.address))
+        .send()
+        .await
+        .expect("Failed to fetch password-toggle.js");
+
+    assert_eq!(
+        response.status().as_u16(),
+        200,
+        "password-toggle.js should be served as a static file"
+    );
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("aria-pressed"),
+        "Script should set aria-pressed for accessibility"
+    );
+    assert!(
+        body.contains("aria-label"),
+        "Script should set aria-label for accessibility"
+    );
+}
+
+#[tokio::test]
 async fn post_register_preserves_email_on_validation_error() {
     let app = spawn_app().await;
 

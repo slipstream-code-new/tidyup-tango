@@ -566,6 +566,25 @@
     color: var(--color-fg-muted);
   }
 
+  /* Password visibility toggle -- JS progressive enhancement */
+  .password-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    border-radius: 0;
+    color: var(--color-primary);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-normal);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .password-toggle:hover {
+    background: none;
+    color: var(--color-primary-dark);
+  }
+
   .auth-form__message {
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-md);

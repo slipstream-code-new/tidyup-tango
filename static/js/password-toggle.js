@@ -1,0 +1,75 @@
+/**
+ * Password visibility toggle -- progressive enhancement.
+ *
+ * No-JS baseline: password + confirm password fields work normally.
+ * With JS: a toggle button replaces the confirm field. When password
+ * is visible, the user can see what they typed, so confirmation is
+ * unnecessary. When hidden again, confirm field returns.
+ *
+ * A11y:
+ * - Toggle is a <button type="button"> (not a checkbox or link)
+ * - aria-pressed communicates toggle state to screen readers
+ * - aria-label describes the action ("Show password" / "Hide password")
+ * - Focus remains on the toggle after activation
+ */
+(function () {
+  "use strict";
+
+  var passwordInput = document.getElementById("password");
+  var confirmGroup = document.getElementById("confirm-group");
+
+  // Only enhance if both elements exist (registration page)
+  if (!passwordInput || !confirmGroup) {
+    return;
+  }
+
+  // Store the confirm group's position in the DOM
+  var confirmGroupParent = confirmGroup.parentNode;
+  var confirmGroupNextSibling = confirmGroup.nextSibling;
+
+  // Create the toggle button
+  var toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "password-toggle";
+  toggle.setAttribute("aria-label", "Show password");
+  toggle.setAttribute("aria-pressed", "false");
+  toggle.textContent = "Show password";
+
+  // Insert toggle after the password input's parent group
+  var passwordGroup = passwordInput.closest(".auth-form__group");
+  if (!passwordGroup) {
+    return;
+  }
+  passwordGroup.appendChild(toggle);
+
+  // Remove the confirm group (JS is working, toggle replaces it)
+  confirmGroup.remove();
+
+  toggle.addEventListener("click", function () {
+    var isPressed = toggle.getAttribute("aria-pressed") === "true";
+
+    if (isPressed) {
+      // Hide password: restore confirm field
+      passwordInput.type = "password";
+      toggle.setAttribute("aria-pressed", "false");
+      toggle.setAttribute("aria-label", "Show password");
+      toggle.textContent = "Show password";
+
+      // Restore the confirm group
+      if (confirmGroupNextSibling) {
+        confirmGroupParent.insertBefore(confirmGroup, confirmGroupNextSibling);
+      } else {
+        confirmGroupParent.appendChild(confirmGroup);
+      }
+    } else {
+      // Show password: remove confirm field
+      passwordInput.type = "text";
+      toggle.setAttribute("aria-pressed", "true");
+      toggle.setAttribute("aria-label", "Hide password");
+      toggle.textContent = "Hide password";
+
+      // Remove the confirm group
+      confirmGroup.remove();
+    }
+  });
+})();
