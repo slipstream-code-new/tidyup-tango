@@ -67,6 +67,22 @@ teammates spawned while in that mode.
 to press **Shift+Tab** to enter delegate mode. This prevents the lead from accidentally
 writing code or making decisions that belong to the team.
 
+## Driver Rotation and Team Persistence
+
+When the Driver role rotates between tasks (e.g., from a CSS specialist to an HTMX
+specialist), **keep all Reviewer agents alive** to preserve their context. Only shut
+down and respawn the agents directly involved in the rotation:
+
+1. Shut down the **outgoing Driver** (they will be respawned as a Reviewer).
+2. Shut down the **incoming Driver** (they need to be respawned with Driver permissions).
+3. Respawn the incoming Driver with full write access and Driver instructions.
+4. Respawn the outgoing Driver as a Reviewer with read-only instructions.
+
+The other 7 Reviewers remain running with their accumulated context from reviewing
+prior tasks. This avoids unnecessary context loss and reduces spawn overhead.
+
+**Before spawning the new Driver**, verify the working tree is clean (`git status`).
+
 ## Coordinator Verification Duties
 
 ### Clean Working Tree
