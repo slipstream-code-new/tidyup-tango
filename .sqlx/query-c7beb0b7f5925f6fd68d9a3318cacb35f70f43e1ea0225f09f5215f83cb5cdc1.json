@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE todos SET completed_at = $1 :: timestamptz WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c7beb0b7f5925f6fd68d9a3318cacb35f70f43e1ea0225f09f5215f83cb5cdc1"
+}

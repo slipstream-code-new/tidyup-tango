@@ -46,6 +46,12 @@
                 </button>
             </form>
             <span class="todo-item__title">{{ todo.title }}</span>
+            <form method="post" action="/todos/{{ todo.id }}/delete" class="todo-item__delete-form">
+                <button type="submit" class="todo-item__delete"
+                    aria-label="Delete &quot;{{ todo.title }}&quot;">
+                    &#x2715;
+                </button>
+            </form>
         </li>
         {% endfor %}
     </ul>

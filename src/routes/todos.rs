@@ -9,7 +9,8 @@ use uuid::Uuid;
 use super::auth::AuthenticatedUser;
 use crate::domain::{TodoItem, TodoItemId};
 use crate::services::todo_service::{
-    add_todo, get_todos, toggle_todo_completion, AddTodoError, ToggleTodoError,
+    add_todo, delete_todo, get_todos, toggle_todo_completion, AddTodoError, DeleteTodoError,
+    ToggleTodoError,
 };
 
 /// View model for a single todo item in the template.
@@ -117,6 +118,29 @@ pub async fn post_toggle_todo(
         )
             .into_response()),
         Err(ToggleTodoError::Unexpected(err)) => Err(TodosError::Unexpected(err)),
+    }
+}
+
+pub async fn post_delete_todo(
+    AuthenticatedUser(user_id): AuthenticatedUser,
+    State(pool): State<PgPool>,
+    Path(todo_id): Path<Uuid>,
+) -> Result<Response, TodosError> {
+    let todo_item_id = TodoItemId::from_uuid(todo_id);
+
+    match delete_todo(&pool, &todo_item_id, &user_id).await {
+        Ok(()) => Ok(Redirect::to("/todos").into_response()),
+        Err(DeleteTodoError::NotFound) => Ok((
+            StatusCode::NOT_FOUND,
+            Html("<h1>Todo not found</h1>".to_string()),
+        )
+            .into_response()),
+        Err(DeleteTodoError::Unauthorized) => Ok((
+            StatusCode::FORBIDDEN,
+            Html("<h1>Not authorized</h1>".to_string()),
+        )
+            .into_response()),
+        Err(DeleteTodoError::Unexpected(err)) => Err(TodosError::Unexpected(err)),
     }
 }
 

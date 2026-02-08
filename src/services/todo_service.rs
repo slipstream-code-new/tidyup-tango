@@ -95,3 +95,40 @@ pub async fn toggle_todo_completion(
 
     Ok(toggled)
 }
+
+#[derive(Debug, thiserror::Error)]
+pub enum DeleteTodoError {
+    #[error("Todo not found")]
+    NotFound,
+    #[error("Not authorized to delete this todo")]
+    Unauthorized,
+    #[error(transparent)]
+    Unexpected(#[from] anyhow::Error),
+}
+
+#[tracing::instrument(
+    name = "delete_todo",
+    skip(pool),
+    fields(todo_id = %todo_id.as_uuid(), user_id = %user_id.as_uuid())
+)]
+pub async fn delete_todo(
+    pool: &PgPool,
+    todo_id: &TodoItemId,
+    user_id: &UserId,
+) -> Result<(), DeleteTodoError> {
+    let item = todo_repository::find_todo_by_id(pool, todo_id)
+        .await
+        .map_err(|e| DeleteTodoError::Unexpected(anyhow::anyhow!("Database error: {e}")))?
+        .ok_or(DeleteTodoError::NotFound)?;
+
+    if item.user_id() != user_id {
+        return Err(DeleteTodoError::Unauthorized);
+    }
+
+    todo_repository::delete_todo(pool, todo_id)
+        .await
+        .map_err(|e| DeleteTodoError::Unexpected(anyhow::anyhow!("Failed to delete todo: {e}")))?;
+
+    tracing::info!("Todo deleted");
+    Ok(())
+}

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO todos (id, user_id, title, completed_at, created_at) VALUES ($1, $2, $3, $4, $5)",
+  "query": "INSERT INTO todos (id, user_id, title, completed_at, created_at)\n           VALUES ($1, $2, $3, $4 :: timestamptz, $5 :: timestamptz)",
   "describe": {
     "columns": [],
     "parameters": {
@@ -14,5 +14,5 @@
     },
     "nullable": []
   },
-  "hash": "64320a189df33a6f73b4e2a84f9680aa0ebee6ba82f9a06080add6c16b6c6ba2"
+  "hash": "e30ebf8adafc62862083e4760a2b77a3726de8b70e7f492b251581f1c601754a"
 }

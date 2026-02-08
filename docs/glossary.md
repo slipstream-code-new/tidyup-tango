@@ -31,9 +31,10 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Log out | `post_logout()` | Route: flushes session, redirects to login |
 | Add a todo | `add_todo()` | Service: parses title, creates `TodoItem::Pending`, persists |
 | View todos | `get_todos()` | Service: fetches all todos for authenticated user |
-| Complete a todo | `complete_todo()` | Transitions `Pending` -> `Completed`; records completion time |
-| Uncomplete a todo | `uncomplete_todo()` | Transitions `Completed` -> `Pending`; removes completion time |
-| Delete a todo | `delete_todo()` | Removes a todo item from the user's list |
+| Toggle completion | `toggle_todo_completion()` | Service: looks up todo, verifies ownership, toggles state |
+| Complete a todo | `TodoItem::complete()` | Domain method: Pending -> Completed; records completion time |
+| Uncomplete a todo | `TodoItem::uncomplete()` | Domain method: Completed -> Pending; drops completion time |
+| Delete a todo | `delete_todo()` | Service: verifies ownership, permanently removes from DB |
 | Edit a todo title | `edit_todo_title()` | Updates the title on an existing todo item |
 
 ## Domain Errors
@@ -42,7 +43,10 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 |-----------------|-----------|-------|
 | Title is empty | `TodoTitleError::Empty` | Todo title cannot be blank |
 | Title too long | `TodoTitleError::TooLong { max, actual }` | Exceeds maximum allowed length |
-| Todo not found | (TBD) | Referenced todo does not exist |
+| Todo not found (toggle) | `ToggleTodoError::NotFound` | Referenced todo does not exist |
+| Not authorized (toggle) | `ToggleTodoError::Unauthorized` | User does not own the todo |
+| Todo not found (delete) | `DeleteTodoError::NotFound` | Referenced todo does not exist |
+| Not authorized (delete) | `DeleteTodoError::Unauthorized` | User does not own the todo |
 | Email invalid | `RegistrationError::InvalidEmail(EmailValidationError)` | Email fails format validation |
 | Duplicate email | `RegistrationError::DuplicateEmail` | Registration attempted with existing email |
 | Invalid credentials | `AuthenticationError::InvalidCredentials` | Login failed (generic -- no info leak) |
@@ -104,13 +108,13 @@ These principles govern how we model the domain:
 ## State Machine: TodoItem
 
 ```
-                add_todo()
-  [nothing] ───────────────> Pending
-                                │  ^
-                  complete_todo() │  │ uncomplete_todo()
-                                │  │
-                                v  │
-                            Completed
+                 add_todo()
+  [nothing] ────────────────> Pending
+                                 │  ^
+               item.complete()   │  │  item.uncomplete()
+                                 │  │
+                                 v  │
+                             Completed
 ```
 
 Both `Pending` and `Completed` variants can be deleted (`delete_todo()`).

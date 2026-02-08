@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, user_id, title, completed_at, created_at FROM todos WHERE user_id = $1 ORDER BY created_at ASC",
+  "query": "SELECT id, user_id, title,\n           completed_at as \"completed_at: DateTime<Utc>\",\n           created_at as \"created_at: DateTime<Utc>\"\n           FROM todos WHERE user_id = $1 ORDER BY created_at ASC",
   "describe": {
     "columns": [
       {
@@ -20,12 +20,12 @@
       },
       {
         "ordinal": 3,
-        "name": "completed_at",
+        "name": "completed_at: DateTime<Utc>",
         "type_info": "Timestamptz"
       },
       {
         "ordinal": 4,
-        "name": "created_at",
+        "name": "created_at: DateTime<Utc>",
         "type_info": "Timestamptz"
       }
     ],
@@ -42,5 +42,5 @@
       false
     ]
   },
-  "hash": "33fb03467b6861fcd8090929c6b034dddde1ae3d43176cc7c7aa57da12e14545"
+  "hash": "3b08fb269a878b856a8e2f63a50ad2b66d6a391fe745dc1938f75c43a2d2617f"
 }

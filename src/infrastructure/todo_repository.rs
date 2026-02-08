@@ -97,6 +97,13 @@ pub async fn find_todo_by_id(
     Ok(record.map(|r| r.to_domain()))
 }
 
+pub async fn delete_todo(pool: &PgPool, todo_id: &TodoItemId) -> Result<(), sqlx::Error> {
+    sqlx::query!(r#"DELETE FROM todos WHERE id = $1"#, todo_id.as_uuid(),)
+        .execute(pool)
+        .await?;
+    Ok(())
+}
+
 pub async fn update_todo_completion(
     pool: &PgPool,
     todo_id: &TodoItemId,
