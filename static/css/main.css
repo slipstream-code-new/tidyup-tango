@@ -510,12 +510,20 @@
    ========================================================================== */
 
 @layer components {
-  /* Components will be added here as features are developed.
-   * Each feature's CSS goes in this layer.
-   * Example (future):
-   *   .todo-item { ... }
-   *   .auth-form { ... }
-   */
+  /* ---- HTMX Indicators ----
+   * .htmx-indicator elements are hidden by default and revealed when
+   * HTMX adds .htmx-request to a requesting element or its parent.
+   * Used for inline loading spinners/text during server requests.
+   * See: https://htmx.org/attributes/hx-indicator/ */
+  .htmx-indicator {
+    opacity: 0;
+    transition: opacity var(--transition-normal) ease;
+  }
+
+  .htmx-request .htmx-indicator,
+  .htmx-request.htmx-indicator {
+    opacity: 1;
+  }
 }
 
 /* ==========================================================================

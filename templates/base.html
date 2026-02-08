@@ -20,7 +20,7 @@
     <footer class="container">
         {% block footer %}{% endblock %}
     </footer>
-    <div aria-live="polite" id="live-region" class="visually-hidden"></div>
+    <div aria-live="polite" aria-atomic="true" id="live-region" class="visually-hidden"></div>
     {% block scripts %}{% endblock %}
 </body>
 </html>
