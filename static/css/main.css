@@ -209,7 +209,7 @@
     --color-bg:            var(--color-gray-50);   /* page background */
     --color-bg-raised:     white;                  /* cards, raised surfaces */
     --color-fg:            var(--color-gray-800);  /* primary text */
-    --color-fg-muted:      var(--color-gray-500);  /* secondary text (~4.6:1 vs white -- AA compliant for normal text, but tight. Use --color-fg for body text, this for supporting/secondary text only) */
+    --color-fg-muted:      var(--color-gray-600);  /* secondary text (~7.4:1 vs white -- comfortable AA for all text sizes) */
     --color-fg-subtle:     var(--color-gray-400);  /* placeholders, hint text (3:1 -- NOT for body text) */
     --color-border:        var(--color-gray-200);  /* default borders */
     --color-border-strong: var(--color-gray-300);  /* emphasized borders, input focus */
