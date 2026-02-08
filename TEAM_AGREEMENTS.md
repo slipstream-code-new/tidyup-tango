@@ -85,6 +85,9 @@ A feature is **done** when ALL of the following are true:
 - [ ] The user problem is clearly solved
 - [ ] All acceptance criteria from the user story are met
 - [ ] A first-time user can accomplish the task without hesitating (Trunk Test)
+- [ ] User can complete a full journey from the landing page through the feature
+      being delivered
+- [ ] All navigation paths lead somewhere useful (no dead-end pages)
 - [ ] Edge cases are handled gracefully (not just the happy path)
 - [ ] The feature is deployable -- not just merged, but shippable to real users
 
@@ -93,6 +96,8 @@ A feature is **done** when ALL of the following are true:
 - [ ] `cargo fmt --check` passes
 - [ ] `cargo clippy -- -D warnings` passes with zero warnings
 - [ ] `cargo test` passes (unit + integration)
+- [ ] `npx playwright test` passes -- browser-based e2e tests pass for affected
+      user flows
 - [ ] Error cases return meaningful HTML responses with structured logging
 - [ ] Tracing spans cover the new functionality
 - [ ] Database migrations (if any) are committed and `sqlx-data.json` is updated
@@ -234,6 +239,11 @@ persist before validating.
 - **Acceptance tests as usability statements**: "When I type a todo and press Enter,
   it appears in my list." Tests describe what the user expects to happen.
 - **Property-based tests** with `proptest` where appropriate.
+- **End-to-end tests** (`e2e/` directory): Playwright browser tests against the
+  running application. Cover critical user journeys (register, login, core feature,
+  logout). Use role-based and label-based locators (`getByRole`, `getByLabel`) so
+  tests double as accessibility assertions. Keep this layer thin -- only add e2e
+  tests for flows that integration tests cannot adequately verify.
 - **Accessibility testing** (four layers):
   - *Automated*: axe-core (or equivalent) in the test suite for missing labels,
     contrast violations, and structural issues
@@ -470,7 +480,8 @@ Every commit must pass (in order):
 1. `cargo fmt --check`
 2. `cargo clippy -- -D warnings`
 3. `cargo test` (unit + integration)
-4. `cargo audit` (dependency vulnerabilities)
+4. `npx playwright test` (browser-based e2e)
+5. `cargo audit` (dependency vulnerabilities)
 
 ### Atomic Green Step Pipeline
 
@@ -480,13 +491,14 @@ Every commit must pass (in order):
 2. **`cargo fmt --check`** — fix formatting if needed.
 3. **`cargo clippy -- -D warnings`** — fix warnings if needed.
 4. **`cargo test`** — fix failures if needed.
-5. **`git commit`** — commit locally. **Do NOT push yet.**
-6. **All 9 agents review and reach consensus** — Driver and Reviewers confirm the change
-   is correct. If concerns are raised, the Driver fixes them, re-runs steps 2–5, and
+5. **`npx playwright test`** — fix e2e failures if needed.
+6. **`git commit`** — commit locally. **Do NOT push yet.**
+7. **All 9 agents review and reach consensus** — Driver and Reviewers confirm the change
+   is correct. If concerns are raised, the Driver fixes them, re-runs steps 2–6, and
    re-seeks consensus.
-7. **Once 9/9 consensus → `git push`.**
-8. **`gh run list --limit 1`** — verify CI completes green.
-9. **Only then begin the next change.**
+8. **Once 9/9 consensus → `git push`.**
+9. **`gh run list --limit 1`** — verify CI completes green.
+10. **Only then begin the next change.**
 
 Additional rules:
 - **Consensus before push.** Code is reviewed locally before it reaches the remote. This
@@ -624,7 +636,9 @@ bi-weekly) do not apply. Instead, retros are triggered by events.
   1. `cargo fmt --check`
   2. `cargo clippy -- -D warnings`
   3. `cargo test`
+  4. `npx playwright test`
 - Rust nightly toolchain (matching the project's `rust-toolchain.toml`)
+- Node.js 22 for Playwright e2e tests
 - CI must pass before merging any pull request.
 
 ### Work Tracking
