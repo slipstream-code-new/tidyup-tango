@@ -30,8 +30,9 @@ end-to-end first, then layer on features.
 - [ ] Password must be at least 8 characters
 - [ ] Password and password confirmation must match (unless mob decides on toggle approach)
 - [ ] If email is already registered, show a secure, helpful error message that does NOT
-  reveal whether the email exists (account enumeration prevention): "Unable to create
-  account. If you already have an account, try signing in." with a link to the login page
+  reveal whether the email exists (account enumeration prevention): "Something went
+  wrong. If you already have an account, try signing in instead." with "signing in" as
+  a link to the login page
 - [ ] Validation errors are shown inline next to the relevant field
 - [ ] Validation errors are associated with inputs via `aria-describedby`
 - [ ] Password is hashed with Argon2 before storage (never stored in plaintext)
@@ -174,9 +175,10 @@ end-to-end first, then layer on features.
 - [ ] New items are added in the `Pending` state
 - [ ] After adding, the input field is cleared and focus returns to it (ready for the
   next item)
-- [ ] Empty title submission is rejected with a clear inline error
+- [ ] Empty or whitespace-only submissions are silently ignored (no error message --
+  an accidental Enter press is not an intentional submission)
 - [ ] Title has a maximum length of 300 characters (agreed with domain architect)
-- [ ] Whitespace-only titles are rejected
+- [ ] Titles exceeding max length show a clear inline validation error
 - [ ] Form works without JavaScript (full page reload, item appears in list)
 - [ ] HTMX enhances: item is appended to the list without page reload
 - [ ] New item creation is logged with structured tracing
@@ -185,8 +187,9 @@ end-to-end first, then layer on features.
 
 ### Edge Cases
 
-- Adding an item with only whitespace
-- Adding an item with very long text (at or beyond max length)
+- Adding an item with only whitespace (silently ignored)
+- Pressing Enter with empty input (silently ignored)
+- Adding an item with very long text (at or beyond max length -- show error)
 - Adding an item with special characters, HTML, or emoji
 - Rapid successive additions (no duplicate submissions)
 - Adding when disconnected (graceful failure)
@@ -274,7 +277,9 @@ end-to-end first, then layer on features.
 
 ### Acceptance Criteria
 
-- [ ] Each todo item has an edit mechanism (e.g., clicking the title, an edit button)
+- [ ] Each todo item has a visible edit button (pencil icon) as the primary affordance
+  (click-on-title as an optional progressive enhancement for power users, but the icon
+  is what new users will discover)
 - [ ] Edit mode replaces the title with an input field pre-filled with the current title
 - [ ] Input has a visible `<label>` (may be visually hidden if the context is clear,
   but must be present for screen readers)
