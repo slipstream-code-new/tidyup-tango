@@ -27,6 +27,8 @@
               rustToolchain
               pkgs.pkg-config
               pkgs.openssl
+              pkgs.sqlx-cli
+              pkgs.docker-compose
             ];
           };
         }
