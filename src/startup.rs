@@ -7,7 +7,7 @@ use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 
 use crate::configuration::Settings;
-use crate::routes::{get_register, health_check, index};
+use crate::routes::{get_register, health_check, index, post_register};
 
 pub struct Application {
     listener: TcpListener,
@@ -43,7 +43,10 @@ impl Application {
 
         Router::new()
             .route("/", axum::routing::get(index))
-            .route("/register", axum::routing::get(get_register))
+            .route(
+                "/register",
+                axum::routing::get(get_register).post(post_register),
+            )
             .route("/health_check", axum::routing::get(health_check))
             .nest_service("/static", ServeDir::new("static"))
             .layer(TraceLayer::new_for_http())
