@@ -64,12 +64,17 @@ async fn get_register_returns_200_with_registration_form() {
 
     // Accessibility: no error states on initial load
     assert!(
-        !body.contains("aria-invalid"),
-        "Should not have aria-invalid on initial load"
+        !body.contains("aria-invalid=\"true\""),
+        "Should not have aria-invalid=\"true\" on initial load"
+    );
+    // Error containers exist (for aria-describedby targets) but should be empty
+    assert!(
+        !body.contains("Enter your email address"),
+        "Should not show email error text on initial load"
     );
     assert!(
-        !body.contains("auth-form__error"),
-        "Should not show error messages on initial load"
+        !body.contains("at least 8 characters</p>"),
+        "Should not show password error text on initial load"
     );
 }
 
