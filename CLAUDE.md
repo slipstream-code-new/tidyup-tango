@@ -90,6 +90,11 @@ Before and after each task, the coordinator must run `git status` to verify a cl
 working tree. No task begins with uncommitted changes, and no task ends until all
 changes are committed and pushed.
 
+### Session Transcripts
+The `.claude-sessions/` directory contains Claude Code session transcripts and must
+**always** be staged (`git add .claude-sessions/`) when making any commit. This
+ensures session history is versioned alongside the code it produced.
+
 ### Consensus Gating
 A task is not complete until **all 9 team members** (Driver + 8 Reviewers) have
 reviewed the work and reached consensus. The coordinator must collect explicit
