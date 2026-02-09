@@ -30,6 +30,8 @@
               pkgs.sqlx-cli
               pkgs.docker-compose
               pkgs.nodejs_22
+              pkgs.python3
+              pkgs.pre-commit
             ];
           };
         }

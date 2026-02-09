@@ -66,6 +66,21 @@ This project uses [Nix flakes](https://nixos.org/) with [direnv](https://direnv.
 
    The app will be available at [http://127.0.0.1:8080](http://127.0.0.1:8080).
 
+## Git Hooks Setup
+
+This project uses [pre-commit](https://pre-commit.com/) to manage git hooks. After entering the dev environment:
+
+```sh
+pre-commit install
+```
+
+This installs a pre-commit hook that automatically:
+- Stages Claude Code session transcripts (`.claude-sessions/`)
+- Generates human-readable markdown chat logs from JSONL transcripts
+- Stages the generated chat logs so they're included in every commit
+
+The chat logs are written to `.claude-sessions/chat-logs/` and provide a readable history of AI-assisted development sessions.
+
 ## Running Tests
 
 Tests require PostgreSQL to be running (step 3 above).
