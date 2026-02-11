@@ -77,7 +77,7 @@ async fn index_returns_200_with_html_content() {
         body.contains("id=\"main-content\""),
         "Missing main content landmark"
     );
-    assert!(body.contains("<header>"), "Missing header landmark");
+    assert!(body.contains("<header"), "Missing header landmark");
     assert!(body.contains("<main"), "Missing main landmark");
     assert!(body.contains("<footer"), "Missing footer landmark");
     assert!(
@@ -147,7 +147,7 @@ async fn index_shows_register_and_login_links_for_unauthenticated_visitor() {
 }
 
 #[tokio::test]
-async fn index_redirects_authenticated_user_to_todos() {
+async fn index_redirects_authenticated_user_to_dashboard() {
     let app = spawn_app().await;
 
     let client = register_and_login(&app.address, "index@example.com", "securepassword123").await;
@@ -171,7 +171,7 @@ async fn index_redirects_authenticated_user_to_todos() {
         .to_str()
         .unwrap();
     assert_eq!(
-        location, "/todos",
-        "Authenticated user should be redirected to /todos"
+        location, "/dashboard",
+        "Authenticated user should be redirected to /dashboard"
     );
 }

@@ -3,9 +3,11 @@
 {% block title %}Edit Todo -- Todo List{% endblock %}
 
 {% block nav %}
-<form method="post" action="/logout" class="nav-logout">
-    <button type="submit" class="nav-logout__button">Sign out</button>
-</form>
+<nav aria-label="Main navigation">
+    <form method="post" action="/logout" class="nav-logout" hx-boost="false">
+        <button type="submit" class="nav-logout__button">Sign out</button>
+    </form>
+</nav>
 {% endblock %}
 
 {% block content %}

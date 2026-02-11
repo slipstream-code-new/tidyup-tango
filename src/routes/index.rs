@@ -17,7 +17,7 @@ pub async fn index(session: Session) -> Result<Response, IndexError> {
 
     if let Some(ref id_str) = user_id {
         if Uuid::parse_str(id_str).is_ok() {
-            return Ok(Redirect::to("/todos").into_response());
+            return Ok(Redirect::to("/dashboard").into_response());
         }
     }
 

@@ -1,0 +1,31 @@
+<div class="gtd-header">
+    <nav aria-label="GTD lists" class="gtd-nav">
+        <ul class="gtd-nav__list" role="list">
+            <li><a href="/dashboard"{% if current_page == "dashboard" %} aria-current="page"{% endif %} class="gtd-nav__link">Dashboard</a></li>
+            <li><a href="/inbox"{% if current_page == "inbox" %} aria-current="page"{% endif %} class="gtd-nav__link">Inbox{% if inbox_count > 0 %} <span class="gtd-nav__badge" aria-label="({{ inbox_count }} items to process)">{{ inbox_count }}</span>{% endif %}</a></li>
+            <li><a href="/next-actions"{% if current_page == "next_actions" %} aria-current="page"{% endif %} class="gtd-nav__link">Next Actions</a></li>
+            <li><a href="/projects"{% if current_page == "projects" %} aria-current="page"{% endif %} class="gtd-nav__link">Projects</a></li>
+            <li><a href="/waiting-for"{% if current_page == "waiting_for" %} aria-current="page"{% endif %} class="gtd-nav__link">Waiting For</a></li>
+            <li><a href="/someday-maybe"{% if current_page == "someday_maybe" %} aria-current="page"{% endif %} class="gtd-nav__link">Someday/Maybe</a></li>
+            <li><a href="/review"{% if current_page == "review" %} aria-current="page"{% endif %} class="gtd-nav__link">Weekly Review</a></li>
+        </ul>
+    </nav>
+    <div class="gtd-header__actions">
+        <form method="post" action="/inbox" class="quick-capture" aria-label="Quick capture">
+            <label for="quick-capture-title" class="visually-hidden">Quick capture</label>
+            <input
+                type="text"
+                id="quick-capture-title"
+                name="title"
+                placeholder="Capture something..."
+                maxlength="300"
+                autocomplete="off"
+                class="quick-capture__input"
+            >
+            <button type="submit" class="quick-capture__submit">Capture</button>
+        </form>
+        <form method="post" action="/logout" class="nav-logout" hx-boost="false">
+            <button type="submit" class="nav-logout__button">Sign out</button>
+        </form>
+    </div>
+</div>

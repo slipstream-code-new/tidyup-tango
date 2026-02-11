@@ -110,7 +110,7 @@ async fn get_login_returns_200_with_login_form() {
 }
 
 #[tokio::test]
-async fn post_login_with_valid_credentials_redirects_to_todos() {
+async fn post_login_with_valid_credentials_redirects_to_dashboard() {
     let app = spawn_app().await;
     let email = "login@example.com";
     let password = "securepassword123";
@@ -142,8 +142,8 @@ async fn post_login_with_valid_credentials_redirects_to_todos() {
     );
     assert_eq!(
         location.as_deref(),
-        Some("/todos"),
-        "Should redirect to /todos after login"
+        Some("/dashboard"),
+        "Should redirect to /dashboard after login"
     );
 }
 

@@ -48,7 +48,7 @@ pub async fn post_register(
     )
     .await
     {
-        Ok(_user_id) => Ok(Redirect::to("/todos").into_response()),
+        Ok(_user_id) => Ok(Redirect::to("/dashboard").into_response()),
         Err(e) => {
             let mut template = RegisterTemplate {
                 general_error: None,

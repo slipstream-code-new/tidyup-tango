@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard -- Todo List{% endblock %}
+
+{% block nav %}
+{% include "gtd_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Dashboard</h1>
+
+    <dl class="dashboard__summary">
+        <div class="dashboard__stat">
+            <dt><a href="/inbox">Inbox</a></dt>
+            <dd>{{ inbox_count }} items</dd>
+        </div>
+        <div class="dashboard__stat">
+            <dt><a href="/next-actions">Next Actions</a></dt>
+            <dd>0 items</dd>
+        </div>
+        <div class="dashboard__stat">
+            <dt><a href="/projects">Stalled Projects</a></dt>
+            <dd>0 items</dd>
+        </div>
+        <div class="dashboard__stat">
+            <dt><a href="/waiting-for">Waiting For</a></dt>
+            <dd>0 items</dd>
+        </div>
+    </dl>
+
+    {% if inbox_count == 0 %}
+    <div class="dashboard__getting-started">
+        <h2>Getting Started</h2>
+        <p>Your system is empty. Start by capturing what's on your mind -- use the
+           <a href="/inbox">Inbox</a> or the quick capture input above. Then
+           <a href="/review">start your first weekly review</a> to organize everything.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

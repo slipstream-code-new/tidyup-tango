@@ -78,11 +78,14 @@ test.describe("Core user journey", () => {
     await page.getByLabel("Password").fill(testPassword);
     await page.getByRole("button", { name: "Sign in" }).click();
 
-    // Should redirect to todos
-    await expect(page).toHaveURL(/\/todos/);
+    // Should redirect to dashboard
+    await expect(page).toHaveURL(/\/dashboard/);
     await expect(
-      page.getByRole("heading", { name: "My Todos" })
+      page.getByRole("heading", { name: "Dashboard" })
     ).toBeVisible();
+
+    // Navigate to todos page to manage todo items
+    await page.goto("/todos");
 
     // 4. Add a todo
     await page.getByLabel("New todo").fill("Buy groceries");
@@ -168,7 +171,10 @@ test.describe("Core user journey", () => {
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Password").fill(testPassword);
     await page.getByRole("button", { name: "Sign in" }).click();
-    await expect(page).toHaveURL(/\/todos/);
+    await expect(page).toHaveURL(/\/dashboard/);
+
+    // Navigate to todos page
+    await page.goto("/todos");
 
     // Add a todo so we test the page with content
     await page.getByLabel("New todo").fill("Test item");
@@ -201,7 +207,39 @@ test.describe("Core user journey", () => {
     ).toEqual([]);
   });
 
-  test("authenticated user is redirected from index to todos", async ({
+  test("dashboard page has no automatically detectable a11y violations", async ({
+    page,
+  }) => {
+    const email = `e2e-axe-dash-${Date.now()}@example.com`;
+
+    // Register and login
+    await page.goto("/register");
+    await fillRegistrationForm(page, email, testPassword);
+    await page.goto("/login");
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password").fill(testPassword);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/dashboard/);
+
+    // Dashboard should have proper heading and nav
+    await expect(
+      page.getByRole("heading", { name: "Dashboard" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("navigation", { name: "GTD lists" })
+    ).toBeVisible();
+
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    expect(
+      results.violations,
+      JSON.stringify(results.violations, null, 2)
+    ).toEqual([]);
+  });
+
+  test("authenticated user is redirected from index to dashboard", async ({
     page,
   }) => {
     const email = `e2e-redirect-${Date.now()}@example.com`;
@@ -215,10 +253,10 @@ test.describe("Core user journey", () => {
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Password").fill(testPassword);
     await page.getByRole("button", { name: "Sign in" }).click();
-    await expect(page).toHaveURL(/\/todos/);
+    await expect(page).toHaveURL(/\/dashboard/);
 
-    // Now visit index -- should redirect to /todos
+    // Now visit index -- should redirect to /dashboard
     await page.goto("/");
-    await expect(page).toHaveURL(/\/todos/);
+    await expect(page).toHaveURL(/\/dashboard/);
   });
 });

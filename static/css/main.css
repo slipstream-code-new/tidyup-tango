@@ -485,7 +485,7 @@
   /* Constrained content container */
   .container {
     inline-size: 100%;
-    max-inline-size: 40rem; /* ~640px -- a todo list is narrow */
+    max-inline-size: 44rem; /* ~704px -- GTD nav needs more room */
     margin-inline: auto;
     padding-inline: var(--space-md);
   }
@@ -963,6 +963,178 @@
 
   .landing-hero__alt {
     font-size: var(--font-size-sm);
+    color: var(--color-fg-muted);
+  }
+
+  /* ---- GTD Navigation ----
+   * Header nav for authenticated GTD pages. Mobile-first flexbox
+   * wrap layout. Active page gets bottom border accent + semibold.
+   * Single <nav> landmark with all GTD list links. */
+  .gtd-nav {
+    flex: 1;
+  }
+
+  .gtd-nav__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+    align-items: center;
+  }
+
+  .gtd-nav__link {
+    font-size: var(--font-size-sm);
+    color: var(--color-fg-muted);
+    text-decoration: none;
+    padding-block: var(--space-xs);
+    border-block-end: 3px solid transparent;
+  }
+
+  .gtd-nav__link:hover {
+    color: var(--color-fg);
+  }
+
+  .gtd-nav__link[aria-current="page"] {
+    color: var(--color-fg);
+    font-weight: var(--font-semibold);
+    border-block-end-color: var(--color-primary);
+  }
+
+  /* Inbox count badge -- small pill inside the nav link */
+  .gtd-nav__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 1.25em;
+    padding-inline: 0.4em;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-semibold);
+    line-height: 1.4;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: var(--radius-full);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .gtd-nav__link {
+      transition: color var(--transition-fast) ease,
+                  border-color var(--transition-fast) ease;
+    }
+  }
+
+  /* ---- GTD Header Layout ----
+   * Wraps the GTD nav + quick capture + logout in the header.
+   * Two rows on mobile: nav wraps on top, actions below. */
+  .gtd-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+    padding-block: var(--space-sm);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .gtd-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-inline-start: auto;
+  }
+
+  /* ---- Quick Capture ----
+   * Persistent capture input in the header. Always available
+   * on authenticated pages for fast inbox capture. */
+  .quick-capture {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .quick-capture__input {
+    font-size: var(--font-size-sm);
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-sm);
+    inline-size: 12rem;
+  }
+
+  .quick-capture__submit {
+    font-size: var(--font-size-xs);
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-sm);
+  }
+
+  /* ---- Dashboard ---- */
+  .dashboard {
+    padding-block-start: var(--space-lg);
+  }
+
+  .dashboard h1 {
+    margin-block-end: var(--space-lg);
+  }
+
+  .dashboard__summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: var(--space-md);
+  }
+
+  .dashboard__stat {
+    padding: var(--space-md);
+    background-color: var(--color-bg-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .dashboard__stat dt {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-medium);
+  }
+
+  .dashboard__stat dt a {
+    color: var(--color-fg-muted);
+    text-decoration: none;
+  }
+
+  .dashboard__stat dt a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .dashboard__stat dd {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-bold);
+    color: var(--color-fg);
+  }
+
+  /* ---- Dashboard Getting Started ---- */
+  .dashboard__getting-started {
+    margin-block-start: var(--space-xl);
+    padding: var(--space-lg);
+    background-color: var(--color-bg-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .dashboard__getting-started h2 {
+    font-size: var(--font-size-lg);
+    margin-block-end: var(--space-sm);
+  }
+
+  .dashboard__getting-started p {
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* ---- GTD Placeholder Pages ---- */
+  .gtd-placeholder {
+    padding-block-start: var(--space-lg);
+  }
+
+  .gtd-placeholder h1 {
+    margin-block-end: var(--space-sm);
+  }
+
+  .gtd-placeholder__description {
     color: var(--color-fg-muted);
   }
 

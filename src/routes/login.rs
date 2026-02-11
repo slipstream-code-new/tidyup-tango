@@ -45,7 +45,7 @@ pub async fn post_login(
                 .map_err(|e| {
                     LoginError::Session(anyhow::anyhow!("Failed to store user_id in session: {e}"))
                 })?;
-            Ok(Redirect::to("/todos").into_response())
+            Ok(Redirect::to("/dashboard").into_response())
         }
         Err(AuthenticationError::InvalidCredentials) => {
             let template = LoginTemplate {

@@ -14,7 +14,7 @@
         {{ error }}
     </div>
     {% endif %}
-    <form method="post" action="/register" class="auth-form__fields" novalidate>
+    <form method="post" action="/register" class="auth-form__fields" novalidate hx-boost="false">
         <div class="auth-form__group">
             <label for="email">Email</label>
             <input
