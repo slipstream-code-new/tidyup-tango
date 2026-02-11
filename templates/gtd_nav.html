@@ -11,6 +11,7 @@
         </ul>
     </nav>
     <div class="gtd-header__actions">
+        {% if current_page != "inbox" %}
         <form
             method="post"
             action="/inbox"
@@ -32,6 +33,7 @@
             >
             <button type="submit" class="quick-capture__submit">Capture</button>
         </form>
+        {% endif %}
         <form method="post" action="/logout" class="nav-logout" hx-boost="false">
             <button type="submit" class="nav-logout__button">Sign out</button>
         </form>

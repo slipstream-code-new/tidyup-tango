@@ -239,6 +239,92 @@ test.describe("Core user journey", () => {
     ).toEqual([]);
   });
 
+  test("inbox capture: add item, see it listed, delete it", async ({
+    page,
+  }) => {
+    const email = `e2e-inbox-${Date.now()}@example.com`;
+
+    // Register and login
+    await page.goto("/register");
+    await fillRegistrationForm(page, email, testPassword);
+    await page.goto("/login");
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password").fill(testPassword);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/dashboard/);
+
+    // Navigate to inbox via direct URL (bypass hx-boost)
+    await page.goto("/inbox");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { name: "Inbox" })
+    ).toBeVisible();
+
+    // Empty state should show
+    await expect(page.getByText("Inbox zero")).toBeVisible();
+
+    // Capture an item using the inbox page's main capture form
+    const captureInput = page.locator("#inbox-title");
+    await expect(captureInput).toBeVisible();
+    await captureInput.fill("Call the dentist");
+    await page.locator("button.inbox-capture__submit").click();
+
+    // Item should appear (via HTMX swap or page reload)
+    await expect(page.getByText("Call the dentist")).toBeVisible();
+
+    // Delete the item
+    await page.getByRole("button", { name: "Delete" }).click();
+
+    // Item should be gone
+    await expect(page.getByText("Call the dentist")).not.toBeVisible();
+  });
+
+  test("inbox page has no automatically detectable a11y violations", async ({
+    page,
+  }) => {
+    const email = `e2e-axe-inbox-${Date.now()}@example.com`;
+
+    // Register and login
+    await page.goto("/register");
+    await fillRegistrationForm(page, email, testPassword);
+    await page.goto("/login");
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password").fill(testPassword);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/dashboard/);
+
+    // Navigate to inbox
+    await page.goto("/inbox");
+
+    // Scan empty inbox
+    const emptyResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    expect(
+      emptyResults.violations,
+      JSON.stringify(emptyResults.violations, null, 2)
+    ).toEqual([]);
+
+    // Add an item and scan again (populated state)
+    await page.goto("/inbox");
+    await page.waitForLoadState("networkidle");
+    const inboxInput = page.locator("#inbox-title");
+    await expect(inboxInput).toBeVisible();
+    await inboxInput.fill("Test a11y item");
+    await page.locator("button.inbox-capture__submit").click();
+    await expect(page.getByText("Test a11y item")).toBeVisible();
+
+    const withItemResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    expect(
+      withItemResults.violations,
+      JSON.stringify(withItemResults.violations, null, 2)
+    ).toEqual([]);
+  });
+
   test("authenticated user is redirected from index to dashboard", async ({
     page,
   }) => {
