@@ -1,8 +1,8 @@
 # Domain Glossary
 
-Maps business terms to Rust types. This is the ubiquitous language of our todo list
-application. Code should read like these definitions -- if the business says "complete
-a todo," the code says `complete_todo()`.
+Maps business terms to Rust types. This is the ubiquitous language of our GTD (Getting
+Things Done) application. Code should read like these definitions -- if the business
+says "capture to inbox," the code says `capture_to_inbox()`.
 
 Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin).
 
@@ -124,3 +124,75 @@ These principles govern how we model the domain:
 Both `Pending` and `Completed` variants can be deleted (`delete_todo()`).
 The `update_todo_title()` action applies to both states.
 Completion is **reversible** -- users can toggle between Pending and Completed (US-6).
+
+---
+
+## GTD Domain Types (V1 -- Approved)
+
+*These types will replace the simple TodoItem model as we evolve to GTD. Approved by
+team consensus. Final type signatures subject to domain architect guidance during
+implementation.*
+
+### Core GTD Concepts
+
+| Domain Term | Proposed Rust Type | Notes |
+|-------------|-------------------|-------|
+| Inbox item | `InboxItem` | Raw, unclarified capture. Has title and created_at. No context, no project link. |
+| Next action | `NextAction` (enum: Active, Completed) | A concrete, physical action ready to do. Has context and optional project link. |
+| Project | `Project` (enum: Active, Completed, Dropped) | An outcome requiring 2+ actions. Has title and linked next actions. |
+| Context | `Context` | Where/how an action can be performed. User-defined. Defaults: @computer, @home, @errands, @phone, @anywhere |
+| Waiting For item | `WaitingForItem` | Delegated/blocked item. Has title, waiting_on (text), and date added. |
+| Someday/Maybe item | `SomedayMaybeItem` | Parked idea. Has title and created_at. Not committed to. |
+| Item title | `ItemTitle` | Replaces `TodoTitle`. Non-empty, max 300 chars, trimmed. Same validation. |
+| Context name | `ContextName` | Non-empty, max 50 chars, trimmed. Validated at construction. |
+
+### GTD Actions (Ubiquitous Language)
+
+| Business Action | Proposed Rust Function / Method | Notes |
+|-----------------|-------------------------------|-------|
+| Capture to inbox | `capture_to_inbox()` | Creates InboxItem from raw text |
+| Clarify as next action | `clarify_as_next_action()` | InboxItem -> NextAction (requires context) |
+| Clarify as project | `clarify_as_project()` | InboxItem -> Project + first NextAction |
+| Delegate | `delegate()` | InboxItem or NextAction -> WaitingForItem |
+| Defer | `defer()` | InboxItem or NextAction -> SomedayMaybeItem |
+| Trash | (delete) | InboxItem is permanently removed |
+| Complete action | `NextAction::complete()` | Active -> Completed; records completion time |
+| Complete project | `Project::complete()` | Active -> Completed; records completion time |
+| Drop project | `Project::drop()` | Active -> Dropped; project abandoned |
+| Activate someday/maybe | `activate()` | SomedayMaybeItem -> InboxItem (for re-clarification) |
+| Resolve waiting for | `resolve()` | WaitingForItem -> completed or moved to inbox |
+| Add context | `add_context()` | Creates a new user-defined context |
+| Start weekly review | `start_review()` | Initiates the three-phase review flow |
+
+### GTD State Machines
+
+**InboxItem Lifecycle:**
+```
+                capture()
+  [nothing] ──────────────> InboxItem
+                                │
+                      clarify() │
+              ┌────────┬────────┼────────┬────────┐
+              v        v        v        v        v
+         NextAction  Project  WaitingFor  Someday  [trash]
+```
+
+**NextAction Lifecycle:**
+```
+                  clarify_as_next_action()
+  InboxItem ─────────────────────────────> NextAction (Active)
+                                               │
+                                   complete()  │
+                                               v
+                                         NextAction (Completed)
+```
+
+**Project Lifecycle:**
+```
+                    clarify_as_project()
+  InboxItem ──────────────────────────> Project (Active)
+                                           │  │
+                              complete()   │  │  drop()
+                                           v  v
+                                    Completed / Dropped
+```

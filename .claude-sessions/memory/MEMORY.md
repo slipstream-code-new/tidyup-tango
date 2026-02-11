@@ -46,6 +46,13 @@
 - Updated Definition of Done with e2e user journey requirements
 - README.md added to project root
 - All 97 Rust tests + 3 Playwright e2e tests pass, CI green
+- Fix: Welcome page nav links visible to sighted users (added visually-hidden class)
+- Fix: Invisible checkbox characters on todo list (base button `color: white` not overridden)
+- Fix: `--color-primary` contrast ratio was 4.34:1 (below WCAG AA 4.5:1), adjusted oklch lightness 0.55→0.52
+- Fix: `.todo-item__toggle` border lost in Windows High Contrast Mode (forced-colors fix)
+- Integrated axe-core for automated WCAG scanning (index + todos pages, pending + completed states)
+- Improved e2e tests to test quality over implementation (6 Playwright tests total)
+- All 97 Rust tests + 6 Playwright e2e tests pass, CI green
 
 ## Lessons Learned
 - COMMIT AFTER EVERY GREEN: All code was lost due to uncommitted working directory reset
@@ -76,3 +83,13 @@
 - Teammates can have stale context about task status — always explicitly update them when tasks are pushed/completed
 - Landing page CSS: `.landing-hero` component scoped, centered 24rem max-width, matches auth-form pattern
 - Empty nav landmarks are a11y failures — always populate `{% block nav %}` in templates
+- Base button styles set `color: white` — any button with `background: none` MUST explicitly set `color` or text becomes invisible
+- Duplicate nav links (nav + hero CTAs) should use `visually-hidden` class, not be removed, to preserve screen reader nav landmarks
+- Playwright `not.toBeVisible()` does NOT work for `clip-path: inset(50%)` elements — they're still considered "visible"; use `toHaveClass(/visually-hidden/)` instead
+- axe-core integration: `@axe-core/playwright` with `AxeBuilder`, use `.withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"])` for full WCAG 2.2 AA coverage
+- axe-core caught real contrast bug in `--color-primary` that manual color checks missed — validates the approach
+- Always use `JSON.stringify(results.violations, null, 2)` as second arg to `expect()` for readable axe failure diagnostics
+- Test both pending AND completed todo states with axe — different styling means different contrast characteristics
+- Test quality over implementation: prefer `toBeAttached()` + behavioral assertions over checking bounding box sizes or specific CSS values
+- `@media (forced-colors: active)` rules needed in components layer when `border: none` overrides base-layer forced-colors borders
+- Teammates sometimes go idle without executing commit commands — may need multiple explicit messages to get them to run git operations

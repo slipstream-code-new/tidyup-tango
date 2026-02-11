@@ -67,27 +67,59 @@ use a `docker-compose.yml` file and Docker to run them. Do **not** run services
 directly on the host machine. This keeps the dev environment reproducible and
 self-contained.
 
-## MVP Scope
+## MVP Scope (Completed)
 
-### Must Have
+The original MVP (simple todo list) has been completed. All features below are shipped
+and working:
+
 - User registration (email/password)
 - User login/logout
 - View personal todo list
 - Add a todo item
-- Complete a todo item
+- Complete a todo item (toggle)
 - Delete a todo item
-
-### Should Have
 - Edit a todo item title
 
+## V1 Scope: Getting Things Done (GTD) System
+
+The product is evolving from a simple todo list into a full GTD (Getting Things Done)
+system. See `docs/gtd-product-discovery.md` for the complete product discovery document.
+
+### Must Have
+- **Inbox capture**: Quick capture of anything on the user's mind, minimal friction
+- **Clarify workflow**: Process inbox items through GTD decision tree (actionable?
+  next action? project? delegate? defer? trash?)
+- **Next Actions list with contexts**: Actions organized by context (@computer, @home,
+  @errands, etc.) so users work from context-appropriate lists
+- **Projects list**: Track multi-step outcomes; each project has at least one next action;
+  stalled projects are flagged
+- **Waiting For list**: Track delegated/blocked items with who/what and date
+- **Someday/Maybe list**: Park ideas without cluttering action lists
+- **Weekly Review guided flow**: Three-phase review (Get Clear, Get Current, Get Creative)
+  to keep the system trustworthy
+- **GTD navigation and dashboard**: Navigate between all GTD lists; dashboard shows
+  inbox count, stalled projects, action counts
+- **Complete and delete**: Mark actions done, remove irrelevant items across all lists
+
+### Should Have
+- Project support materials (notes attached to projects)
+- Move items between lists (reclassify as understanding changes)
+
 ### Could Have
-- Reorder todo items (drag-and-drop with keyboard alternative)
+- Review scheduling (remind when weekly review is due)
+- Bulk inbox processing
 
 ### Out of Scope (Future)
-- Multiple lists / categories
-- Due dates and reminders
-- Sharing / collaboration
-- Tags or labels
+- Calendar / date-specific items (requires date picker, time zones, recurring events)
+- Reference file storage (needs file upload, search, storage infrastructure)
+- Horizons of Focus / goals / vision (higher-level planning)
+- Natural language input ("call Bob tomorrow")
+- Email-to-inbox capture (requires email infrastructure)
+- Mobile native app (responsive web is sufficient)
+- Sharing / delegation to other users (multi-user collaboration)
+- Tags beyond contexts
 - Search and filter
-- Mobile app (responsive web is sufficient)
+- Dark mode
+- Drag-and-drop reordering
+- Recurring items
 - Social login (OAuth)
