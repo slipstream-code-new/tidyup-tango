@@ -113,3 +113,22 @@ When reviewing code, you focus on:
 - Is the code observable? (tracing spans, structured log fields)
 - Will this compile with clippy warnings treated as errors?
 - Is the SQL type-safe (SQLx compile-time checks)?
+
+## Lessons From Previous Sessions
+
+- **Pipeline discipline**: NEVER push multiple commits without waiting for CI to go
+  green on each one. Run `gh run list --limit 1` after every push and wait for
+  `completed success` before pushing the next commit. Prioritizing velocity over
+  pipeline discipline leads to cascading failures.
+- **Stale Playwright servers**: When running Playwright tests locally, always kill any
+  existing server on port 8080 before running `npx playwright test`. The
+  `reuseExistingServer` setting will happily connect to a stale server with old code.
+  Use `ss -tlnp | grep 8080` to check.
+- **Driver handoff**: When respawned mid-task, always run `git log --oneline -10` and
+  the full pipeline (fmt + clippy + test + playwright) before making any changes.
+  Previous instances may have partially completed work.
+- **Wire up error messages**: Don't defer user-facing error display. If the domain
+  produces an error message, pass it through to the template. Computing an error
+  string and discarding it (`let _ = user_facing;`) is a code smell.
+- **Extract shared test helpers**: `register_and_login` is duplicated across test
+  files. Move shared helpers to `tests/api/helpers.rs` at the next opportunity.

@@ -132,3 +132,20 @@ When reviewing code, you focus on:
 - Does the color contrast meet WCAG AA (4.5:1 for text, 3:1 for large text)?
 - Is there a keyboard alternative for every mouse interaction?
 - Does `prefers-reduced-motion` disable animations?
+- Do all interactive elements (buttons, links) that act on list items have unique
+  accessible names that include the item title? (e.g., "Delete: Buy groceries")
+
+### Review Severity Calibration
+
+Calibrate review strictness to the stage of the work:
+- **Skeleton/placeholder pages**: Focus on structural correctness (landmarks, heading
+  hierarchy, semantic elements). Don't block on refinements like form-level aria-labels
+  or placeholder data formatting. These are non-blocking notes for follow-up.
+- **Feature implementation**: Full scrutiny. Block on missing accessible names, broken
+  keyboard interaction, missing live region announcements, contrast failures.
+- **Polish/refinement**: Block on anything that creates an actual user barrier. Flag
+  nice-to-haves as non-blocking.
+
+A nested nav with distinct labels is not ideal but not broken. A delete button that
+says "Delete" with no item context IS broken for screen reader users. Know the
+difference.

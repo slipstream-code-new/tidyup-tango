@@ -47,6 +47,23 @@
   every perspective matters. Different eyes catch different things.
 - **It's okay to say "I don't understand."** The mob is a learning environment.
 
+### Driver Handoff Protocol
+When a Driver is respawned (due to context loss, rotation, or session restart):
+1. The coordinator provides a written summary of: what has been completed, what
+   remains, and where to find the relevant code.
+2. The new Driver reads the summary AND runs `git log --oneline -10` and
+   `git diff HEAD` before writing any code.
+3. The new Driver runs the full pipeline (fmt + clippy + test + playwright) to
+   verify the current state is green before making changes.
+4. The new Driver sends a "ready" message to the coordinator confirming they have
+   context and a green baseline.
+
+### Reviewer Coordination
+- Before writing a detailed review, check if other reviewers have already flagged
+  the same files. Build on their observations rather than duplicating. A brief "+1"
+  is fine for agreement.
+- Once a review is acknowledged, do not re-send it.
+
 ### Feature Workflow
 Each feature follows this process with the full 9-person mob:
 
@@ -106,9 +123,12 @@ A feature is **done** when ALL of the following are true:
 - [ ] HTML is semantic and uses correct elements (`<button>`, `<label>`, `<ul>`, etc.)
 - [ ] All form inputs have visible `<label>` elements (no placeholder-only inputs)
 - [ ] All interactive elements are fully keyboard operable
-- [ ] Screen reader testing (VoiceOver, NVDA, or equivalent) confirms: interactive
-      elements are announced correctly, state changes are communicated, and dynamic
-      content updates are announced via live regions
+- [ ] All interactive elements have unique accessible names including the item they
+      act on (e.g., "Delete: Buy groceries", not just "Delete")
+- [ ] Structural a11y verified via axe-core. Manual screen reader testing (VoiceOver,
+      NVDA, or equivalent) for NEW interaction patterns (modals, live regions, focus
+      management). Routine pages covered by axe-core don't require manual SR testing
+      on every change
 - [ ] ARIA used only when native HTML semantics are insufficient (with comments explaining why)
 - [ ] Color contrast meets WCAG AA (4.5:1 for normal text, 3:1 for large text/UI)
 - [ ] Color is never the only indicator of state (always a secondary visual cue)
@@ -304,6 +324,18 @@ proof of validity.
 - **Status codes**: 200 for success with HTML, 422 for validation errors with error
   HTML, 200 with empty body for deletion (allows HTMX swap to remove element).
 
+**HTMX Architecture Strategy:**
+- `hx-boost="true"` on `<body>` — universal navigation enhancement. All `<a>` and
+  `<form>` elements automatically use AJAX with history management. No per-link
+  attributes needed for standard navigation.
+- **Explicit attributes for in-page interactions**: Use `hx-post`, `hx-target`,
+  `hx-swap` for operations that update part of the page without navigation (e.g.,
+  adding a todo item, deleting an inbox item).
+- **Auth forms opt out** with `hx-boost="false"` — login/logout/register forms need
+  full page redirects for session cookie handling.
+- **Server renders full pages; boost handles swap transparently.** Handlers check the
+  `HX-Request` header to decide whether to return a full page or a fragment.
+
 **Progressive enhancement (non-negotiable):**
 - The app MUST work without JavaScript. Forms submit, links navigate, content is
   readable with HTML alone.
@@ -492,13 +524,21 @@ Every commit must pass (in order):
 3. **`cargo clippy -- -D warnings`** — fix warnings if needed.
 4. **`cargo test`** — fix failures if needed.
 5. **`npx playwright test`** — fix e2e failures if needed.
-6. **`git commit`** — commit locally. **Do NOT push yet.**
-7. **All 9 agents review and reach consensus** — Driver and Reviewers confirm the change
-   is correct. If concerns are raised, the Driver fixes them, re-runs steps 2–6, and
+6. **Refactor** — look for duplication, unclear names, or structural improvements
+   before committing. The Refactor step is not optional.
+7. **Glossary check** — verify new domain types/fields match `docs/glossary.md`. If
+   deviating, update the glossary first (with domain architect approval).
+8. **`git commit`** — commit locally. **Do NOT push yet.**
+9. **All 9 agents review and reach consensus** — Driver and Reviewers confirm the change
+   is correct. If concerns are raised, the Driver fixes them, re-runs steps 2–7, and
    re-seeks consensus.
-8. **Once 9/9 consensus → `git push`.**
-9. **`gh run list --limit 1`** — verify CI completes green.
-10. **Only then begin the next change.**
+10. **Once 9/9 consensus → `git push`.**
+11. **Wait for CI green** — run `gh run list --limit 1` and WAIT for CI to complete
+    green before beginning the next change. Never have more than 1 pending CI run. If
+    CI fails, fix it before pushing anything else.
+12. **Mini-retrospective** (1-minute checkpoint) — Driver confirms: (a) Did we follow
+    the pipeline? (b) Was the commit atomic? (c) Any process improvements?
+13. **Only then begin the next change.**
 
 Additional rules:
 - **Consensus before push.** Code is reviewed locally before it reaches the remote. This
@@ -619,6 +659,11 @@ bi-weekly) do not apply. Instead, retros are triggered by events.
 - **Usability testing**: Aim for informal testing -- three users, 20 minutes each --
   at natural breakpoints. Even watching one person use the app for 5 minutes reveals
   more than a week of discussion.
+- **Post-CI checkpoint**: After each CI build (pass or fail), the Driver briefly
+  confirms: (a) Did we follow the pipeline? (b) Was the commit atomic? (c) Any
+  process improvements? This is a 1-minute checkpoint, not a full retro.
+- **Deferred items**: Non-blocking a11y, design, and UX items are tracked in
+  `docs/deferred-items.md` and reviewed at each retrospective.
 
 ---
 

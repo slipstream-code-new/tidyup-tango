@@ -49,6 +49,10 @@ agent who may modify files. Reviewers participate via read-only access and messa
   agreements.
 - Clearly indicate in each teammate's spawn prompt whether they are the **Driver** or
   a **Reviewer** for the current task.
+- **Driver onboarding**: The spawn prompt must instruct the Driver to read
+  `TEAM_AGREEMENTS.md`, `PROJECT.md`, `docs/glossary.md`, and the relevant user story
+  before writing any code. This ensures the Driver has full context on conventions,
+  constraints, domain language, and acceptance criteria.
 
 ## Teammate Permissions
 
@@ -94,6 +98,11 @@ changes are committed and pushed.
 The `.claude-sessions/` directory contains Claude Code session transcripts and must
 **always** be staged (`git add .claude-sessions/`) when making any commit. This
 ensures session history is versioned alongside the code it produced.
+
+### CI Green Gate
+After the Driver pushes, verify CI passes (`gh run list --limit 1`) before
+authorizing the next change. Never allow the Driver to begin new work while a CI
+run is in progress or has failed.
 
 ### Consensus Gating
 A task is not complete until **all 9 team members** (Driver + 8 Reviewers) have

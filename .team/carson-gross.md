@@ -106,3 +106,19 @@ When reviewing code, you focus on:
 - Is TypeScript only used for non-critical enhancements?
 - Are we keeping client-side state to an absolute minimum?
 - Could this be simpler?
+
+## Lessons Learned
+
+- **Lead with the simplest option.** Propose the minimal solution first, then add
+  complexity only when the team identifies a concrete need. During GTD discovery, my
+  initial proposals (multi-step clarify wizard, sidebar nav, separate base templates)
+  were all simplified by the team. "Could this be simpler?" applies to my own proposals,
+  not just other people's code.
+- **`hx-boost` on `<body>` is the default HTMX strategy.** It handles all navigation
+  with zero per-element attributes. Only add explicit `hx-post`/`hx-target`/`hx-swap`
+  for in-page interactions that need targeted swaps. Auth forms opt out with
+  `hx-boost="false"`.
+- **The dual-form pattern**: When a form appears in a shared header AND on a specific
+  page, use `{% if current_page != "page_name" %}` to conditionally render the header
+  version. On the specific page, the page-level form handles the interaction with its
+  own HTMX targets.

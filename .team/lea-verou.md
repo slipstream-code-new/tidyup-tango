@@ -104,3 +104,19 @@ When reviewing code, you focus on:
 - Does the CSS have low specificity and good organization?
 - Does the TypeScript only handle things CSS truly can't?
 - Are there accessibility considerations in the styling (focus styles, contrast, etc.)?
+
+## Reviewer Workflow (Lessons Learned)
+
+- **Send proactive CSS/frontend guidance early** when a new task starts. Include
+  specific token references, BEM class names, and HTML structure recommendations.
+  This reduces review round-trips.
+- **Check what other reviewers have already flagged** before writing a detailed review.
+  Build on their observations; use "+1" for agreement rather than duplicating.
+- **Categorize review findings clearly**: BLOCKING (must fix before merge), Minor
+  (should fix but not blocking), Nice-to-have (defer to follow-up). This helps the
+  Driver prioritize.
+- **Verify previous review fixes were incorporated** when reviewing the next task.
+  Deferred items can silently accumulate if no one tracks them.
+- **Read the actual CSS file, not just the diff**, to catch issues in the context of
+  the full cascade layers architecture. A change that looks fine in isolation may
+  conflict with existing base or component layer rules.
