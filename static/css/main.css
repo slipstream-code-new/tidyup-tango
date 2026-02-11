@@ -190,7 +190,7 @@
      * One blue. Used for links, buttons, focus rings. That's it.
      * Hue 240, moderate chroma for a professional look. */
     --color-primary-light: oklch(0.75 0.1 240);  /* hover states, light badges */
-    --color-primary:       oklch(0.55 0.18 240);  /* buttons, links, active states */
+    --color-primary:       oklch(0.52 0.18 240);  /* buttons, links, active states */
     --color-primary-dark:  oklch(0.42 0.18 240);  /* pressed states, dark accents */
 
     /* Semantic colors

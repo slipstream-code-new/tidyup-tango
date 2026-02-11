@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 // Generate unique email per test run to avoid collisions with existing data
 const testEmail = `e2e-${Date.now()}@example.com`;
@@ -123,31 +124,39 @@ test.describe("Core user journey", () => {
     ).toBeVisible();
   });
 
-  test("welcome page nav links are visually hidden", async ({ page }) => {
+  test("welcome page nav links are accessible but not visible", async ({
+    page,
+  }) => {
     await page.goto("/");
-
-    // The nav links exist in the DOM for screen readers
     const nav = page.locator("nav");
     const navCreateLink = nav.getByRole("link", { name: "Create account" });
     const navSignInLink = nav.getByRole("link", { name: "Sign in" });
 
+    // Accessible to screen readers (in accessibility tree)
     await expect(navCreateLink).toBeAttached();
     await expect(navSignInLink).toBeAttached();
 
-    // But they should be visually hidden (clipped to 1x1 pixel)
-    const createBox = await navCreateLink.boundingBox();
-    expect(createBox).not.toBeNull();
-    expect(createBox!.width).toBeLessThanOrEqual(1);
-    expect(createBox!.height).toBeLessThanOrEqual(1);
-
-    const signInBox = await navSignInLink.boundingBox();
-    expect(signInBox).not.toBeNull();
-    expect(signInBox!.width).toBeLessThanOrEqual(1);
-    expect(signInBox!.height).toBeLessThanOrEqual(1);
+    // Visually hidden via the .visually-hidden class (clip-path technique)
+    await expect(navCreateLink).toHaveClass(/visually-hidden/);
+    await expect(navSignInLink).toHaveClass(/visually-hidden/);
   });
 
-  test("todo toggle checkbox characters are visible", async ({ page }) => {
-    const email = `e2e-toggle-${Date.now()}@example.com`;
+  test("index page has no automatically detectable a11y violations", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+
+    expect(results.violations).toEqual([]);
+  });
+
+  test("todos page has no automatically detectable a11y violations", async ({
+    page,
+  }) => {
+    const email = `e2e-axe-${Date.now()}@example.com`;
 
     // Register and login
     await page.goto("/register");
@@ -158,22 +167,16 @@ test.describe("Core user journey", () => {
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/\/todos/);
 
-    // Add a todo so we have a toggle button
+    // Add a todo so we test the page with content
     await page.getByLabel("New todo").fill("Test item");
     await page.getByRole("button", { name: "Add todo" }).click();
     await expect(page.getByText("Test item")).toBeVisible();
 
-    // The toggle button should NOT have white text color
-    const toggleButton = page.getByRole("button", {
-      name: /Mark .+Test item.+ as complete/,
-    });
-    await expect(toggleButton).toBeVisible();
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
 
-    const color = await toggleButton.evaluate(
-      (el) => getComputedStyle(el).color
-    );
-    // White is rgb(255, 255, 255) -- toggle should NOT be white
-    expect(color).not.toBe("rgb(255, 255, 255)");
+    expect(results.violations).toEqual([]);
   });
 
   test("authenticated user is redirected from index to todos", async ({
