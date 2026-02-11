@@ -8,6 +8,6 @@
         hx-target="#inbox-item-{{ item.id }}"
         hx-swap="outerHTML"
     >
-        <button type="submit" class="inbox-item__delete-button">Delete</button>
+        <button type="submit" class="inbox-item__delete-button" aria-label="Delete: {{ item.title }}">Delete</button>
     </form>
 </li>

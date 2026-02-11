@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `9823e89e-4a23-4ccc-9757-1b9bb393ba5c` |
-| **Date Range** | 2026-02-11 18:30 UTC -- 2026-02-11 19:01 UTC |
+| **Date Range** | 2026-02-11 18:30 UTC -- 2026-02-11 19:28 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -5776,5 +5776,651 @@ Luca did zero work on Task #15 — he just confirmed the old commit from Task #1
 ## 2026-02-11 19:01 UTC -- Assistant
 
 Understood — I'll let Luca finish Task #15 (Inbox Capture), collect consensus from the reviewers, and then stop. No new tasks after this one.
+
+---
+
+## 2026-02-11 19:17 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="purple" summary="Task #15 inbox capture implementation complete">
+Task #15 (Inbox Capture / US-GTD-1) implementation is complete. Here's a summary:
+
+## What was built
+
+### Database
+- `inbox_items` table migration (id UUID, user_id UUID FK, title TEXT NOT NULL, created_at TIMESTAMPTZ) with index on user_id
+
+### Domain Layer
+- `InboxItem` type with `InboxItemId` newtype, reusing `TodoTitle` for validation (non-empty, max 300 chars, trimmed)
+- Unit tests for domain types
+
+### Infrastructure Layer
+- `inbox_repository` with insert, find_by_user (oldest first), count, find_by_id, delete
+
+### Service Layer
+- `inbox_service` with capture, list, count, delete operations
+- All operations instrumented with `tracing` spans
+
+### Routes
+- `GET /inbox` -- Real inbox page replacing placeholder, shows items oldest-first with capture form and empty state
+- `POST /inbox` -- Capture new item, silently ignores empty/whitespace, redirects to /inbox (or returns HTMX fragment)
+- `POST /inbox/{id}/delete` -- Delete inbox item with ownership check
+
+### Templates
+- `inbox.html` -- Full page with capture form (visible label, maxlength, autocomplete off), item list, empty state ("Inbox zero -- nothing to process"), HTMX enhancement (hx-post, hx-target, hx-swap, focus return, empty state toggle)
+- `inbox_item.html` -- Fragment for HTMX swap (capture and delete)
+- `gtd_nav.html` -- Quick capture header form now has HTMX attributes (hx-post, hx-swap="none", focus return)
+
+### Live Inbox Count
+- Dashboard and all GTD placeholder pages now read real inbox count from database
+- Nav badge shows count when items > 0
+
+### HTMX Enhancement
+- Capture without page reload, `HX-Trigger` with "Captured to inbox" announce event
+- Delete without page reload, `HX-Trigger` with "Inbox item deleted" announce event
+- Focus returns to capture input after successful capture
+- Empty state toggles via JavaScript after HTMX swaps
+- Progressive enhancement: everything works without JavaScript
+
+### Tests
+- **99 Rust tests** all passing (36 domain unit + 63 integration)
+- **9 Playwright e2e tests** all passing (7 existing + 2 new inbox tests)
+- Integration tests cover: capture, empty/whitespace handling, title too long, empty state, delete, nonexistent delete, user isolation, inbox count badge, a11y labels, heading, HTMX fragment responses, HTMX empty handling, HTMX delete, quick capture from header
+- E2e tests cover: full capture/delete journey, axe-core WCAG 2.2 AA scanning (empty + populated states)
+- CI green on previous pushes, latest push queued
+
+### Commits (3 atomic green steps)
+1. `383fd77` -- Core implementation: migration, domain, repo, service, routes, template, first test
+2. `8978453` -- HTMX enhancement, comprehensive tests, live inbox count
+3. `a0fc258` -- E2e Playwright tests + axe-core a11y scanning
+
+Ready for reviewer feedback. All 9 team members need to review before marking complete.
+</teammate-message>
+
+---
+
+## 2026-02-11 19:17 UTC -- Assistant
+
+Luca's done with the implementation. Let me verify the state and kick off reviews.
+
+---
+
+## 2026-02-11 19:17 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Check recent commits
+
+</details>
+
+---
+
+## 2026-02-11 19:17 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Check working tree
+
+</details>
+
+---
+
+## 2026-02-11 19:17 UTC -- Assistant
+
+Good — 5 commits pushed, working tree clean. Now let me notify all reviewers to review Luca's work.
+
+---
+
+## 2026-02-11 19:17 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-11 19:17 UTC -- Assistant
+
+Luca's session ended again. Let me check if reviews are coming in from the reviewers.
+
+---
+
+## 2026-02-11 19:17 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/.claude/teams/gtd-evolution/config.json
+
+</details>
+
+---
+
+## 2026-02-11 19:17 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- TaskUpdate
+
+</details>
+
+---
+
+## 2026-02-11 19:17 UTC -- Assistant
+
+Reviews are pending from the 8 reviewers. They've been notified and should be reading through the implementation now. Waiting for their feedback.
+
+---
+
+## 2026-02-11 19:18 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="purple">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-11T19:17:18.600Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"luca-palmieri has shut down. 1 task(s) were unassigned: #15 \"Implementation Step 2: Inbox Capture (US-GTD-1)\". Use TaskList to check availability and TaskUpdate with owner to reassign them to idle teammates."}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="purple">
+{"type":"shutdown_approved","requestId":"shutdown-1770836405453@luca-palmieri","from":"luca-palmieri","timestamp":"2026-02-11T19:17:20.479Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+---
+
+## 2026-02-11 19:19 UTC -- Assistant
+
+That's the old Luca session finally terminating (stale shutdown from before). The implementation is already done and pushed by luca-palmieri-2. Still waiting for reviewer feedback from the 8 reviewers.
+
+---
+
+## 2026-02-11 19:19 UTC -- User
+
+<teammate-message teammate_id="steve-krug" color="red" summary="APPROVE Task #15 Inbox Capture, ready for consensus">
+Reviewed Task #15 (Inbox Capture). **APPROVE**, no blockers. Luca implemented all the UX patterns I requested -- fast capture, good empty state, two capture points, badge count, progressive enhancement. One minor copy note ("Inbox zero" vs "Your inbox is clear") but not blocking. Ready for consensus.
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="blue">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-11T19:18:59.910Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-11T19:19:16.801Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri-2" color="green" summary="Task #15 inbox capture complete, all tests green">
+Task #15 (Inbox Capture - US-GTD-1) implementation is complete. All tests are green.
+
+Summary of what was delivered across 5 commits:
+
+1. **383fd77** - Add inbox capture feature with database, service, and route layers
+2. **1943b22** - Add inbox capture: migration, domain type, routes, and first test  
+3. **c0e6000** - Add comprehensive inbox integration tests
+4. **7ffd08e** - Add HTMX progressive enhancement and CSS for inbox
+5. **8978453** - Add HTMX enhancement, comprehensive inbox tests, and live inbox count
+6. **a0fc258** - Add e2e Playwright tests for inbox capture and a11y scanning
+
+**What was built:**
+- Database migration (`inbox_items` table with user_id index)
+- Domain types: `InboxItem`, `InboxItemId` (reusing `TodoTitle` for validation)
+- Repository layer: insert, find, count, delete operations
+- Service layer: capture, list, count, delete with proper error types + tracing
+- Route handlers: GET /inbox, POST /inbox, POST /inbox/{id}/delete
+- HTMX progressive enhancement: capture form uses hx-post with hx-target/swap, delete uses hx-post with outerHTML swap
+- Quick capture form in GTD nav header (hidden on inbox page to avoid duplication)
+- Live inbox count badge in nav
+- Dashboard + all placeholder pages fetch real inbox count
+- CSS component styles for inbox
+- JavaScript for empty state toggle on HTMX add/delete
+- aria-live announcements via HX-Trigger for capture and delete
+
+**Test coverage:**
+- 99 Rust integration tests (16 new inbox tests)
+- 9 Playwright e2e tests (2 new: inbox capture journey + inbox a11y scan with axe-core)
+- All `cargo fmt`, `cargo clippy`, and `cargo test` pass
+- All `npx playwright test` pass
+
+All commits pushed. Working tree is clean (only session logs uncommitted).
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri-2" color="green">
+{"type":"idle_notification","from":"luca-palmieri-2","timestamp":"2026-02-11T19:19:25.875Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="red">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-11T19:19:32.543Z","idleReason":"available","summary":"[to luca-palmieri] APPROVE inbox capture -- fast, clear, good empty state and progressive enhancement"}
+</teammate-message>
+
+---
+
+## 2026-02-11 19:19 UTC -- Assistant
+
+Steve Krug approved (1/9 including Luca). Waiting for remaining 7 reviewers: Kent Beck, Scott Wlaschin, Carson Gross, Lea Verou, Steve Schoger, Heydon Pickering, Marty Cagan.
+
+---
+
+## 2026-02-11 19:19 UTC -- User
+
+<teammate-message teammate_id="carson-gross" color="orange" summary="APPROVE for Task #15 sent to Luca, no blocking changes">
+APPROVE sent to Luca for Task #15 (Inbox Capture). All HTMX patterns are correct: capture form with `hx-post`/`hx-target`/`hx-swap="beforeend"`, quick capture with `hx-swap="none"`, dual-form problem solved with `{% if current_page != "inbox" %}`, delete pattern matches existing codebase, empty state toggle, aria-live announcements. One non-blocking note about inbox count badge not updating after header capture (acceptable, updates on next navigation). No changes required.
+</teammate-message>
+
+---
+
+## 2026-02-11 19:19 UTC -- Assistant
+
+Carson Gross approved (2/9). Waiting for Kent Beck, Scott Wlaschin, Lea Verou, Steve Schoger, Heydon Pickering, Marty Cagan.
+
+---
+
+## 2026-02-11 19:19 UTC -- User
+
+<teammate-message teammate_id="carson-gross" color="orange">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-11T19:19:55.920Z","idleReason":"available","summary":"[to luca-palmieri] APPROVE: all HTMX patterns correct, dual-form solved cleanly"}
+</teammate-message>
+
+---
+
+## 2026-02-11 19:20 UTC -- Assistant
+
+Waiting for remaining reviews.
+
+---
+
+## 2026-02-11 19:20 UTC -- User
+
+<teammate-message teammate_id="marty-cagan" color="blue" summary="APPROVE Task #15 from product perspective">
+**Marty Cagan: APPROVE on Task #15 (Inbox Capture / US-GTD-1).**
+
+All 19 acceptance criteria verified. One non-blocking observation (header quick capture doesn't update nav badge count without page reload -- acceptable for now). Full review sent to luca-palmieri.
+</teammate-message>
+
+---
+
+## 2026-02-11 19:20 UTC -- Assistant
+
+Marty Cagan approved (3/9). Still waiting for: Kent Beck, Scott Wlaschin, Lea Verou, Steve Schoger, Heydon Pickering.
+
+---
+
+## 2026-02-11 19:20 UTC -- User
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-11T19:20:23.268Z","idleReason":"available","summary":"[to luca-palmieri] APPROVE Task #15: All US-GTD-1 criteria verified"}
+</teammate-message>
+
+---
+
+## 2026-02-11 19:20 UTC -- Assistant
+
+Waiting for remaining 5 reviews.
+
+---
+
+## 2026-02-11 19:20 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="pink" summary="Full CONSENT on Task #15 Inbox Capture">
+Lea Verou -- formal verdict on Task #15 (Inbox Capture, US-GTD-1):
+
+**CONSENT** -- full approval.
+
+The implementation is excellent. Key highlights:
+- Duplicate capture input correctly handled via conditional template
+- New `.inbox-item` component follows established CSS patterns
+- HTMX progressive enhancement is clean (capture append, delete remove, aria-live)
+- Empty state with helpful links
+- Live inbox count badge on all authenticated pages
+- axe-core a11y scanning in both empty and populated states
+- Active state CSS fixes from Task #11 review were incorporated (color + border width)
+
+Two minor follow-up items (non-blocking):
+1. Delete button needs item-specific `aria-label` (currently just "Delete")
+2. Nav badge count doesn't update after header quick capture on non-inbox pages (OOB swap would fix)
+
+Full details sent to Luca.
+</teammate-message>
+
+---
+
+## 2026-02-11 19:20 UTC -- Assistant
+
+Lea Verou approved (4/9). Waiting for: Kent Beck, Scott Wlaschin, Steve Schoger, Heydon Pickering.
+
+---
+
+## 2026-02-11 19:20 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="pink">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-11T19:20:29.084Z","idleReason":"available","summary":"[to luca-palmieri] Full CONSENT on Task #15 Inbox Capture"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri-2" color="green" summary="Approve with notes: 5 non-blocking items found">
+**Review of Task #15 (Inbox Capture / US-GTD-1): APPROVE WITH NOTES**
+
+I've reviewed all key files. The implementation is solid and production-worthy. Here is my detailed assessment:
+
+**Strengths:**
+
+1. **Architecture** -- Clean three-layer separation (domain -> service -> infrastructure -> routes). The inbox follows the same patterns established by the todo feature, making the codebase consistent and predictable.
+
+2. **Domain modeling** -- Good reuse of `TodoTitle` for validation (non-empty, max 300 chars, trimmed). `InboxItemId` newtype prevents UUID confusion. `from_parts` for DB reconstitution is the right pattern.
+
+3. **Service layer** -- Proper error typing (`CaptureInboxError` and `DeleteInboxError` with domain-specific variants). Tracing instrumentation on every public function. Authorization check in `delete_inbox_item` correctly verifies ownership before deletion.
+
+4. **Repository** -- Compile-time checked queries via `sqlx::query!` and `sqlx::query_as!`. The `InboxRecord` intermediate struct for DB-to-domain mapping is clean. Ordering by `created_at ASC` (oldest first) is correct for inbox processing.
+
+5. **Route handlers** -- HTMX detection and dual-path (fragment vs full-page) responses are well-structured. Empty title silently redirects (good UX for accidental submits). The 422 for too-long titles is correct.
+
+6. **Migration** -- Index on `user_id` is essential for the query patterns. Foreign key to `users(id)` enforces referential integrity.
+
+7. **Test coverage** -- 16 integration tests cover all key paths including HTMX fragments, empty/whitespace handling, user isolation, nav badge, and accessibility. Two new Playwright e2e tests cover the full capture-delete journey and axe-core a11y scanning of both empty and populated states.
+
+8. **Progressive enhancement** -- Works without JS (standard form POST + redirect). HTMX adds smooth capture/delete without reload. Focus returns to input after capture. aria-live announcements for screen readers.
+
+**Notes (non-blocking):**
+
+1. **Dead `user_facing` variable** (`src/routes/inbox.rs:135`): Line `let _ = user_facing;` discards the "too long" error message without showing it to the user. The 422 response re-renders the inbox template but never passes the error string into it. The user sees the same page with no feedback about WHY their title was rejected. This should be addressed as a follow-up -- add an error field to `InboxTemplate` and display it (similar to the auth form error pattern).
+
+2. **`InboxRecord.into_domain` panic** (`src/infrastructure/inbox_repository.rs:18`): `TodoTitle::parse(self.title).expect("stored title should be valid")` will panic if the DB somehow contains an invalid title. While unlikely in practice (titles are validated before insertion), a more defensive approach would use `map_err` to convert to `sqlx::Error` or return a custom error. Low risk but worth noting.
+
+3. **`htmx_response_with_announce` unwrap** (`src/routes/inbox.rs:24`): `HeaderValue::from_str(&trigger_json).unwrap()` will panic if the message contains non-ASCII characters. The current messages are ASCII-safe, but this is a latent bug if someone adds a message with e.g. an em dash. Consider using `HeaderValue::try_from` and propagating the error.
+
+4. **Quick capture `hx-swap="none"`** (`templates/gtd_nav.html:21`): The quick capture form uses `hx-swap="none"`, which means the captured item doesn't appear anywhere until the user navigates to the inbox. This is fine for MVP UX (fire-and-forget capture), but the user gets no visual confirmation beyond the form clearing. The aria-live announce is also missing here since `hx-swap="none"` doesn't trigger the response processing that would fire the HX-Trigger event. Worth verifying.
+
+5. **E2e test locators** (`e2e/user-journey.spec.ts:267,270`): The inbox e2e tests use `page.locator("#inbox-title")` and `page.locator("button.inbox-capture__submit")` (CSS selectors) rather than the project convention of `getByRole`/`getByLabel`. The existing tests for other features use a11y-centric locators. This works but is a minor consistency gap.
+
+None of these are blockers. The implementation is complete, well-tested, and follows established patterns. I approve.
+</teammate-message>
+
+---
+
+## 2026-02-11 19:20 UTC -- Assistant
+
+Luca self-reviewed and approved with notes (5/9). Still waiting for: Kent Beck, Scott Wlaschin, Steve Schoger, Heydon Pickering.
+
+---
+
+## 2026-02-11 19:20 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow" summary="CONSENT for Task #15 with review summary">
+Scott Wlaschin (Domain Architect) -- **CONSENT** for Task #15 (Inbox Capture, US-GTD-1).
+
+Detailed review sent to Luca. Summary:
+
+**Approved:**
+- Domain type `InboxItem` correctly modeled as struct (not enum), separate `InboxItemId` newtype
+- Clean 4-layer architecture: domain -> repository -> service -> route (matches established patterns)
+- Repository with `InboxRecord` mapping, FIFO ordering, proper count query
+- Service correctly parses then constructs then persists; authorization check before delete
+- Route handler: empty/whitespace silently ignored, HTMX fragments with `aria-live` announcements
+- Templates: quick capture suppressed on inbox page (no duplicate inputs), inbox badge with `aria-label`
+- Live `inbox_count` wired up on all authenticated pages via `render_placeholder` helper
+- Migration schema matches my specification exactly
+- 16 integration tests + 3 e2e Playwright tests with axe-core a11y scanning
+
+**Non-blocking notes for future steps:**
+- `InboxItem::new()` should be `capture()` (ubiquitous language)
+- `created_at` field/column should be `captured_at` (GTD terminology)
+- `TodoTitle` reuse is pragmatic; rename to `ItemTitle` deferred to migration step
+
+None of these block consensus. The domain boundaries, layering, and behavior are all correct.
+</teammate-message>
+
+---
+
+## 2026-02-11 19:20 UTC -- Assistant
+
+Scott Wlaschin approved (6/9). Waiting for: Kent Beck, Steve Schoger, Heydon Pickering.
+
+---
+
+## 2026-02-11 19:20 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri-2" color="green">
+{"type":"idle_notification","from":"luca-palmieri-2","timestamp":"2026-02-11T19:20:35.987Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-11 19:20 UTC -- Assistant
+
+Waiting for 3 remaining reviews.
+
+---
+
+## 2026-02-11 19:20 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-11T19:20:39.204Z","idleReason":"available","summary":"[to luca-palmieri] CONSENT with notes for Task #15 Inbox Capture"}
+</teammate-message>
+
+---
+
+## 2026-02-11 19:20 UTC -- Assistant
+
+Waiting for Kent Beck, Steve Schoger, Heydon Pickering.
+
+---
+
+## 2026-02-11 19:20 UTC -- User
+
+Once the current task is finished, I want the team to look at what has gone well and where there have been problems since we started working on the new GTD features. I've noticed a few issues around team agreement violations. Let's have the team do another retrospective and propose team agreement updates and/or CLAUDE.md or PROJECT.md updates to keep things on the rails. One *suggestion* (not requirement) would be that the team should make it part of their process to hold a retrospective after every CI build, regardless of pass/fail status, to ensure they are constantly working on improving their process through updates to the relevant processes. Importantly, each agent *also* has permission to update its *own* profile in .team/ (but NOT anyone else's profile) if they discover that they specifically need to remember something that they want to do differently.
+
+---
+
+## 2026-02-11 19:20 UTC -- Assistant
+
+Understood. Once Task #15 consensus is complete, I'll have the team run a retrospective covering the GTD work so far, with the goal of proposing updates to TEAM_AGREEMENTS.md and/or other process docs. I'll relay your suggestion about post-CI-build retros and the permission for agents to update their own `.team/` profiles.
+
+I also note from the CI screenshot that runs #60-62 (session transcript commits) are still in progress — that's something the retro should discuss too (whether session-only commits should trigger CI).
+
+Still waiting for Kent Beck, Steve Schoger, and Heydon Pickering to review Task #15.
+
+---
+
+## 2026-02-11 19:21 UTC -- User
+
+<teammate-message teammate_id="steve-schoger" color="cyan" summary="Approve Task #15 with 4 non-blocking design notes">
+**Task #15 (Inbox Capture / US-GTD-1) — Design Review Verdict: APPROVE with non-blocking notes**
+
+I reviewed the implementation files: `templates/inbox.html`, `templates/inbox_item.html`, `templates/gtd_nav.html`, and the relevant CSS in `static/css/main.css`.
+
+The inbox capture feature is solid. The page structure, HTMX progressive enhancement, empty state handling, and quick capture form all work well. I approve this for completion.
+
+**4 non-blocking notes for a future polish pass:**
+
+1. **Nav badge styling mismatch**: The `.gtd-nav__badge` is implemented as a blue pill (white text on `--color-primary` background with `border-radius: var(--radius-full)`). The team agreed on calm muted text in parentheses — `font-size: var(--font-size-xs)`, `color: var(--color-fg-muted)`, no background. The `aria-label` on the non-interactive `<span>` should also be replaced with plain visible text per Heydon's guidance.
+
+2. **"Process" link on inbox items**: Correctly deferred since the clarify route doesn't exist yet. Should be added when US-GTD-2 lands.
+
+3. **Label copy refinement**: The inbox page label says "Capture" — consider "What's on your mind?" for a friendlier tone (minor).
+
+4. **Item count near heading**: No count displayed near the page heading (e.g., "Inbox (3)"). Low priority but helps orientation.
+
+None of these block the skeleton. Ship it.
+</teammate-message>
+
+---
+
+## 2026-02-11 19:21 UTC -- Assistant
+
+Steve Schoger approved (7/9). Waiting for: Kent Beck, Heydon Pickering.
+
+---
+
+## 2026-02-11 19:21 UTC -- User
+
+<teammate-message teammate_id="steve-schoger" color="cyan">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-11T19:21:45.852Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-11 19:21 UTC -- Assistant
+
+Waiting for Kent Beck and Heydon Pickering.
+
+---
+
+## 2026-02-11 19:21 UTC -- User
+
+n.b. those runs are not *still* in progress; I was pointing out that there were multiple runs which violates the atomic green-step pipeline
+
+---
+
+## 2026-02-11 19:21 UTC -- Assistant
+
+Good catch — the pipeline is supposed to be: code -> fmt -> clippy -> test -> commit+push -> **CI green** -> then next step. Multiple commits pushed without waiting for each CI run to go green first violates the atomic green step. That's a clear retro topic. Thanks for the clarification.
+
+Still waiting for Kent Beck and Heydon Pickering reviews.
+
+---
+
+## 2026-02-11 19:27 UTC -- User
+
+all agents seem to be idle
+
+---
+
+## 2026-02-11 19:27 UTC -- Assistant
+
+Let me nudge them directly.
+
+---
+
+## 2026-02-11 19:27 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-11 19:27 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-11 19:27 UTC -- Assistant
+
+Nudged both. Waiting for their responses.
+
+---
+
+## 2026-02-11 19:28 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green" summary="APPROVE Task #15 — 8/9, who's remaining?">
+Kent Beck: **APPROVE** on Task #15 (Inbox Capture / US-GTD-1).
+
+Thorough four-layer test coverage: 3 domain unit tests + 17 integration tests + 2 Playwright e2e tests. All acceptance criteria are covered by at least one test. HTMX dual-path testing (standard form + HTMX fragment) is a highlight. Domain layer is pure, architecture layers are correct.
+
+Two minor non-blocking observations:
+1. `register_and_login` test helper is now duplicated in 3 files — should extract to shared helpers soon
+2. Delete button in `inbox_item.html` lacks accessible label with item title (a11y gap, not a TDD issue)
+
+That's 8/9 approvals. Who are we waiting on?
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri-2" color="green" summary="Agree with Kent's review, 3/9 approvals so far">
+Acknowledging Kent's review. I agree with all three of his observations:
+
+1. **`register_and_login` duplication** -- I noticed this too. We now have the helper duplicated in `tests/api/inbox.rs`, and similar patterns in the dashboard and placeholder test files. Moving it to `helpers.rs` in the test crate would be a clean refactor for the next step.
+
+2. **Delete button accessible label** -- Kent is right. The `inbox_item.html` delete button just says "Delete" with no item-title context. Screen reader users with multiple inbox items would hear "Delete", "Delete", "Delete" with no way to distinguish which item each button targets. This should be `aria-label="Delete {{ item.title }}"` or similar. Heydon's input would be valuable here. This is a real a11y gap.
+
+3. **Dead `user_facing` error** -- Both Kent and I flagged this independently. The error message is computed but discarded. The `maxlength="300"` attribute prevents the issue in browsers, but programmatic submissions (curl, API clients) would get a 422 with no explanation. Worth a follow-up.
+
+All three of us (Kent, myself as reviewer, myself as driver) have now approved. Waiting for the remaining 6 reviewers.
+</teammate-message>
+
+---
+
+## 2026-02-11 19:28 UTC -- Assistant
+
+Kent Beck approved (8/9). Only Heydon Pickering remaining.
+
+---
+
+## 2026-02-11 19:28 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="blue" summary="One blocking fix: delete button aria-label needed">
+Task #15 a11y review: **APPROVED WITH ONE BLOCKING FIX.**
+
+**Blocking**: Delete buttons in `templates/inbox_item.html` lack item-specific accessible names. Currently just "Delete" -- screen reader users can't distinguish which item each button acts on. Fix is one line: add `aria-label="Delete: {{ item.title }}"` to the button. Same pattern as the existing todo list delete buttons. WCAG SC 4.1.2 / SC 2.4.6.
+
+**Non-blocking note**: The too-long title error message in `inbox.rs` is computed then discarded (line 135). Template has no error display for this case. `maxlength="300"` prevents it for most users, so non-blocking.
+
+Everything else is well done -- semantic markup, proper labels, HTMX announcements, focus management, no duplicate capture inputs, axe-core coverage. Once the delete button aria-label is fixed, I'm at full approval.
+</teammate-message>
+
+---
+
+## 2026-02-11 19:28 UTC -- Assistant
+
+8/9 approved, Heydon has one blocking fix. Let me get Luca to apply it.
+
+---
+
+## 2026-02-11 19:28 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-11 19:28 UTC -- Assistant
+
+Sent the fix request to Luca. Waiting for the one-line change.
+
+---
+
+## 2026-02-11 19:28 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-11T19:28:16.433Z","idleReason":"available","summary":"[to luca-palmieri-2] TDD review: APPROVE — thorough test coverage across all 4 layers"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri-2" color="green">
+{"type":"idle_notification","from":"luca-palmieri-2","timestamp":"2026-02-11T19:28:16.459Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="blue">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-11T19:28:17.588Z","idleReason":"available","summary":"[to luca-palmieri-2] Approved with one blocking fix: delete aria-label"}
+</teammate-message>
+
+---
+
+## 2026-02-11 19:28 UTC -- Assistant
+
+Luca went idle without making the fix. Let me nudge again.
+
+---
+
+## 2026-02-11 19:28 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
 
 ---

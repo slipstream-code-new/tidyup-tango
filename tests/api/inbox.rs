@@ -375,6 +375,33 @@ async fn inbox_page_has_proper_heading() {
     );
 }
 
+#[tokio::test]
+async fn delete_button_has_accessible_label_with_item_title() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "dellabel@example.com", "securepassword123").await;
+
+    // Capture an item
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Call the dentist")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let response = client
+        .get(format!("{}/inbox", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /inbox");
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("aria-label=\"Delete: Call the dentist\""),
+        "Delete button should have aria-label including the item title"
+    );
+}
+
 // ---- HTMX Fragment Responses ----
 
 #[tokio::test]
