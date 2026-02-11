@@ -58,11 +58,11 @@ test.describe("Core user journey", () => {
   test("full user journey: register, add, complete, delete, logout", async ({
     page,
   }) => {
-    // 1. Visit index and click Create account
+    // 1. Visit index and click Create account (the visible hero CTA)
     await page.goto("/");
     await page
+      .locator(".landing-hero")
       .getByRole("link", { name: "Create account" })
-      .first()
       .click();
     await expect(page).toHaveURL(/\/register/);
 
@@ -121,6 +121,59 @@ test.describe("Core user journey", () => {
     await expect(
       page.getByRole("link", { name: "Sign in" }).first()
     ).toBeVisible();
+  });
+
+  test("welcome page nav links are visually hidden", async ({ page }) => {
+    await page.goto("/");
+
+    // The nav links exist in the DOM for screen readers
+    const nav = page.locator("nav");
+    const navCreateLink = nav.getByRole("link", { name: "Create account" });
+    const navSignInLink = nav.getByRole("link", { name: "Sign in" });
+
+    await expect(navCreateLink).toBeAttached();
+    await expect(navSignInLink).toBeAttached();
+
+    // But they should be visually hidden (clipped to 1x1 pixel)
+    const createBox = await navCreateLink.boundingBox();
+    expect(createBox).not.toBeNull();
+    expect(createBox!.width).toBeLessThanOrEqual(1);
+    expect(createBox!.height).toBeLessThanOrEqual(1);
+
+    const signInBox = await navSignInLink.boundingBox();
+    expect(signInBox).not.toBeNull();
+    expect(signInBox!.width).toBeLessThanOrEqual(1);
+    expect(signInBox!.height).toBeLessThanOrEqual(1);
+  });
+
+  test("todo toggle checkbox characters are visible", async ({ page }) => {
+    const email = `e2e-toggle-${Date.now()}@example.com`;
+
+    // Register and login
+    await page.goto("/register");
+    await fillRegistrationForm(page, email, testPassword);
+    await page.goto("/login");
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password").fill(testPassword);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/todos/);
+
+    // Add a todo so we have a toggle button
+    await page.getByLabel("New todo").fill("Test item");
+    await page.getByRole("button", { name: "Add todo" }).click();
+    await expect(page.getByText("Test item")).toBeVisible();
+
+    // The toggle button should NOT have white text color
+    const toggleButton = page.getByRole("button", {
+      name: /Mark .+Test item.+ as complete/,
+    });
+    await expect(toggleButton).toBeVisible();
+
+    const color = await toggleButton.evaluate(
+      (el) => getComputedStyle(el).color
+    );
+    // White is rgb(255, 255, 255) -- toggle should NOT be white
+    expect(color).not.toBe("rgb(255, 255, 255)");
   });
 
   test("authenticated user is redirected from index to todos", async ({

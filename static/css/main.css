@@ -769,6 +769,7 @@
     font-size: var(--font-size-lg);
     line-height: 1;
     flex-shrink: 0;
+    color: var(--color-fg);
   }
 
   .todo-item__title {
