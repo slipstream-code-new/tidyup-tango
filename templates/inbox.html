@@ -10,7 +10,15 @@
 <div class="inbox">
     <h1>Inbox</h1>
 
-    <form method="post" action="/inbox" class="inbox-capture">
+    <form
+        method="post"
+        action="/inbox"
+        class="inbox-capture"
+        hx-post="/inbox"
+        hx-target="#inbox-list"
+        hx-swap="beforeend"
+        hx-on::after-request="if(event.detail.successful) this.reset(); this.querySelector('#inbox-title').focus();"
+    >
         <label for="inbox-title">Capture</label>
         <input
             type="text"
@@ -25,20 +33,37 @@
     </form>
 
     {% if items.is_empty() %}
-    <div class="inbox__empty-state">
+    <div class="inbox__empty-state" id="inbox-empty-state">
         <p>Inbox zero -- nothing to process. <a href="#inbox-title">Capture something new</a> or start your <a href="/review">weekly review</a>.</p>
     </div>
-    {% else %}
-    <ul class="inbox__list" role="list">
+    {% endif %}
+    <ul class="inbox__list" role="list" id="inbox-list"{% if items.is_empty() %} hidden{% endif %}>
         {% for item in items %}
-        <li class="inbox-item" id="inbox-item-{{ item.id }}">
-            <span class="inbox-item__title">{{ item.title }}</span>
-            <form method="post" action="/inbox/{{ item.id }}/delete" class="inbox-item__delete">
-                <button type="submit" class="inbox-item__delete-button">Delete</button>
-            </form>
-        </li>
+        {% include "inbox_item.html" %}
         {% endfor %}
     </ul>
-    {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Hide empty state and show list when items are added via HTMX
+document.getElementById('inbox-list').addEventListener('htmx:afterSwap', function() {
+    var list = document.getElementById('inbox-list');
+    var emptyState = document.getElementById('inbox-empty-state');
+    if (list && list.children.length > 0) {
+        list.hidden = false;
+        if (emptyState) emptyState.hidden = true;
+    }
+});
+// Show empty state when list becomes empty after HTMX delete
+document.body.addEventListener('htmx:afterSettle', function() {
+    var list = document.getElementById('inbox-list');
+    var emptyState = document.getElementById('inbox-empty-state');
+    if (list && list.children.length === 0 && emptyState) {
+        list.hidden = true;
+        emptyState.hidden = false;
+    }
+});
+</script>
 {% endblock %}

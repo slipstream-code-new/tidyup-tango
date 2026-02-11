@@ -1,6 +1,13 @@
 <li class="inbox-item" id="inbox-item-{{ item.id }}">
     <span class="inbox-item__title">{{ item.title }}</span>
-    <form method="post" action="/inbox/{{ item.id }}/delete" class="inbox-item__delete">
+    <form
+        method="post"
+        action="/inbox/{{ item.id }}/delete"
+        class="inbox-item__delete"
+        hx-post="/inbox/{{ item.id }}/delete"
+        hx-target="#inbox-item-{{ item.id }}"
+        hx-swap="outerHTML"
+    >
         <button type="submit" class="inbox-item__delete-button">Delete</button>
     </form>
 </li>
