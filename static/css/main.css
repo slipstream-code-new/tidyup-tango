@@ -772,6 +772,15 @@
     color: var(--color-fg);
   }
 
+  /* Restore border in forced-colors mode since the base layer's
+   * button border: none is overridden by components, but forced-colors
+   * needs an explicit border to make the toggle visible. */
+  @media (forced-colors: active) {
+    .todo-item__toggle {
+      border: 1px solid ButtonText;
+    }
+  }
+
   .todo-item__title {
     flex: 1;
     min-inline-size: 0;

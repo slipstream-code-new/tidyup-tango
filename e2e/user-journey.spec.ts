@@ -147,10 +147,13 @@ test.describe("Core user journey", () => {
     await page.goto("/");
 
     const results = await new AxeBuilder({ page })
-      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
       .analyze();
 
-    expect(results.violations).toEqual([]);
+    expect(
+      results.violations,
+      JSON.stringify(results.violations, null, 2)
+    ).toEqual([]);
   });
 
   test("todos page has no automatically detectable a11y violations", async ({
@@ -172,11 +175,30 @@ test.describe("Core user journey", () => {
     await page.getByRole("button", { name: "Add todo" }).click();
     await expect(page.getByText("Test item")).toBeVisible();
 
-    const results = await new AxeBuilder({ page })
-      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    const pendingResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
       .analyze();
 
-    expect(results.violations).toEqual([]);
+    expect(
+      pendingResults.violations,
+      JSON.stringify(pendingResults.violations, null, 2)
+    ).toEqual([]);
+
+    // Toggle the todo to completed and scan again -- completed items
+    // use strikethrough + muted color which may have different contrast
+    await page
+      .getByRole("button", { name: /Mark .+Test item.+ as complete/ })
+      .click();
+    await expect(page.getByText("Test item")).toBeVisible();
+
+    const completedResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    expect(
+      completedResults.violations,
+      JSON.stringify(completedResults.violations, null, 2)
+    ).toEqual([]);
   });
 
   test("authenticated user is redirected from index to todos", async ({
