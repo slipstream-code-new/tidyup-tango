@@ -12,8 +12,8 @@ use crate::configuration::Settings;
 use crate::routes::{
     get_dashboard, get_edit_todo, get_forgot_password, get_inbox, get_login, get_next_actions,
     get_projects, get_register, get_review, get_someday_maybe, get_todo_item, get_todos_page,
-    get_waiting_for, health_check, index, post_delete_todo, post_edit_todo, post_login,
-    post_logout, post_register, post_todo, post_toggle_todo,
+    get_waiting_for, health_check, index, post_delete_inbox_item, post_delete_todo, post_edit_todo,
+    post_inbox, post_login, post_logout, post_register, post_todo, post_toggle_todo,
 };
 
 pub struct Application {
@@ -57,7 +57,11 @@ impl Application {
         Router::new()
             .route("/", axum::routing::get(index))
             .route("/dashboard", axum::routing::get(get_dashboard))
-            .route("/inbox", axum::routing::get(get_inbox))
+            .route("/inbox", axum::routing::get(get_inbox).post(post_inbox))
+            .route(
+                "/inbox/{id}/delete",
+                axum::routing::post(post_delete_inbox_item),
+            )
             .route("/next-actions", axum::routing::get(get_next_actions))
             .route("/projects", axum::routing::get(get_projects))
             .route("/waiting-for", axum::routing::get(get_waiting_for))

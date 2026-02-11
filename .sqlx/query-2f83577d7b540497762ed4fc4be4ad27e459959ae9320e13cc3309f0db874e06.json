@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO inbox_items (id, user_id, title, created_at)\n           VALUES ($1, $2, $3, $4 :: timestamptz)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2f83577d7b540497762ed4fc4be4ad27e459959ae9320e13cc3309f0db874e06"
+}

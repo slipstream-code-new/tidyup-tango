@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Inbox -- Todo List{% endblock %}
+
+{% block nav %}
+{% include "gtd_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="inbox">
+    <h1>Inbox</h1>
+
+    <form method="post" action="/inbox" class="inbox-capture">
+        <label for="inbox-title">Capture</label>
+        <input
+            type="text"
+            id="inbox-title"
+            name="title"
+            placeholder="What's on your mind?"
+            maxlength="300"
+            autocomplete="off"
+            class="inbox-capture__input"
+        >
+        <button type="submit" class="inbox-capture__submit">Capture</button>
+    </form>
+
+    {% if items.is_empty() %}
+    <div class="inbox__empty-state">
+        <p>Inbox zero -- nothing to process. <a href="#inbox-title">Capture something new</a> or start your <a href="/review">weekly review</a>.</p>
+    </div>
+    {% else %}
+    <ul class="inbox__list" role="list">
+        {% for item in items %}
+        <li class="inbox-item" id="inbox-item-{{ item.id }}">
+            <span class="inbox-item__title">{{ item.title }}</span>
+            <form method="post" action="/inbox/{{ item.id }}/delete" class="inbox-item__delete">
+                <button type="submit" class="inbox-item__delete-button">Delete</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{% endblock %}

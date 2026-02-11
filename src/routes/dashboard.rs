@@ -1,8 +1,11 @@
 use askama::Template;
+use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{Html, IntoResponse, Response};
+use sqlx::PgPool;
 
 use super::auth::AuthenticatedUser;
+use crate::services::inbox_service;
 
 #[derive(Template)]
 #[template(path = "dashboard.html")]
@@ -12,11 +15,16 @@ struct DashboardTemplate {
 }
 
 pub async fn get_dashboard(
-    AuthenticatedUser(_user_id): AuthenticatedUser,
+    AuthenticatedUser(user_id): AuthenticatedUser,
+    State(pool): State<PgPool>,
 ) -> Result<impl IntoResponse, DashboardError> {
+    let inbox_count = inbox_service::get_inbox_count(&pool, &user_id)
+        .await
+        .map_err(DashboardError::Unexpected)?;
+
     let template = DashboardTemplate {
         current_page: "dashboard",
-        inbox_count: 0, // Placeholder until inbox table exists
+        inbox_count,
     };
     Ok(Html(template.render()?))
 }
@@ -25,6 +33,8 @@ pub async fn get_dashboard(
 pub enum DashboardError {
     #[error("Failed to render template")]
     Render(#[from] askama::Error),
+    #[error(transparent)]
+    Unexpected(anyhow::Error),
 }
 
 impl IntoResponse for DashboardError {

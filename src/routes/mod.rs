@@ -3,6 +3,7 @@ mod dashboard;
 mod forgot_password;
 mod gtd_placeholders;
 mod health_check;
+mod inbox;
 mod index;
 mod login;
 mod register;
@@ -11,9 +12,10 @@ mod todos;
 pub use dashboard::get_dashboard;
 pub use forgot_password::get_forgot_password;
 pub use gtd_placeholders::{
-    get_inbox, get_next_actions, get_projects, get_review, get_someday_maybe, get_waiting_for,
+    get_next_actions, get_projects, get_review, get_someday_maybe, get_waiting_for,
 };
 pub use health_check::health_check;
+pub use inbox::{get_inbox, post_delete_inbox_item, post_inbox};
 pub use index::index;
 pub use login::{get_login, post_login, post_logout};
 pub use register::{get_register, post_register};

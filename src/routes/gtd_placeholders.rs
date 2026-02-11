@@ -1,8 +1,11 @@
 use askama::Template;
+use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{Html, IntoResponse, Response};
+use sqlx::PgPool;
 
 use super::auth::AuthenticatedUser;
+use crate::services::inbox_service;
 
 #[derive(Template)]
 #[template(path = "gtd_placeholder.html")]
@@ -18,6 +21,8 @@ struct GtdPlaceholderTemplate {
 pub enum GtdPlaceholderError {
     #[error("Failed to render template")]
     Render(#[from] askama::Error),
+    #[error(transparent)]
+    Unexpected(anyhow::Error),
 }
 
 impl IntoResponse for GtdPlaceholderError {
@@ -31,80 +36,99 @@ impl IntoResponse for GtdPlaceholderError {
     }
 }
 
-pub async fn get_inbox(
-    AuthenticatedUser(_user_id): AuthenticatedUser,
+async fn render_placeholder(
+    user_id: &crate::domain::UserId,
+    pool: &PgPool,
+    current_page: &'static str,
+    page_title: &'static str,
+    heading: &'static str,
+    description: &'static str,
 ) -> Result<impl IntoResponse, GtdPlaceholderError> {
+    let inbox_count = inbox_service::get_inbox_count(pool, user_id)
+        .await
+        .map_err(GtdPlaceholderError::Unexpected)?;
+
     let template = GtdPlaceholderTemplate {
-        current_page: "inbox",
-        page_title: "Inbox -- Todo List",
-        heading: "Inbox",
-        description: "Capture anything on your mind. Process it later.",
-        inbox_count: 0,
+        current_page,
+        page_title,
+        heading,
+        description,
+        inbox_count,
     };
     Ok(Html(template.render()?))
 }
 
 pub async fn get_next_actions(
-    AuthenticatedUser(_user_id): AuthenticatedUser,
+    AuthenticatedUser(user_id): AuthenticatedUser,
+    State(pool): State<PgPool>,
 ) -> Result<impl IntoResponse, GtdPlaceholderError> {
-    let template = GtdPlaceholderTemplate {
-        current_page: "next_actions",
-        page_title: "Next Actions -- Todo List",
-        heading: "Next Actions",
-        description: "Concrete actions you can do right now, organized by context.",
-        inbox_count: 0,
-    };
-    Ok(Html(template.render()?))
+    render_placeholder(
+        &user_id,
+        &pool,
+        "next_actions",
+        "Next Actions -- Todo List",
+        "Next Actions",
+        "Concrete actions you can do right now, organized by context.",
+    )
+    .await
 }
 
 pub async fn get_projects(
-    AuthenticatedUser(_user_id): AuthenticatedUser,
+    AuthenticatedUser(user_id): AuthenticatedUser,
+    State(pool): State<PgPool>,
 ) -> Result<impl IntoResponse, GtdPlaceholderError> {
-    let template = GtdPlaceholderTemplate {
-        current_page: "projects",
-        page_title: "Projects -- Todo List",
-        heading: "Projects",
-        description: "Outcomes that need more than one action step.",
-        inbox_count: 0,
-    };
-    Ok(Html(template.render()?))
+    render_placeholder(
+        &user_id,
+        &pool,
+        "projects",
+        "Projects -- Todo List",
+        "Projects",
+        "Outcomes that need more than one action step.",
+    )
+    .await
 }
 
 pub async fn get_waiting_for(
-    AuthenticatedUser(_user_id): AuthenticatedUser,
+    AuthenticatedUser(user_id): AuthenticatedUser,
+    State(pool): State<PgPool>,
 ) -> Result<impl IntoResponse, GtdPlaceholderError> {
-    let template = GtdPlaceholderTemplate {
-        current_page: "waiting_for",
-        page_title: "Waiting For -- Todo List",
-        heading: "Waiting For",
-        description: "Items you're waiting on from others.",
-        inbox_count: 0,
-    };
-    Ok(Html(template.render()?))
+    render_placeholder(
+        &user_id,
+        &pool,
+        "waiting_for",
+        "Waiting For -- Todo List",
+        "Waiting For",
+        "Items you're waiting on from others.",
+    )
+    .await
 }
 
 pub async fn get_someday_maybe(
-    AuthenticatedUser(_user_id): AuthenticatedUser,
+    AuthenticatedUser(user_id): AuthenticatedUser,
+    State(pool): State<PgPool>,
 ) -> Result<impl IntoResponse, GtdPlaceholderError> {
-    let template = GtdPlaceholderTemplate {
-        current_page: "someday_maybe",
-        page_title: "Someday/Maybe -- Todo List",
-        heading: "Someday/Maybe",
-        description: "Ideas and possibilities for the future.",
-        inbox_count: 0,
-    };
-    Ok(Html(template.render()?))
+    render_placeholder(
+        &user_id,
+        &pool,
+        "someday_maybe",
+        "Someday/Maybe -- Todo List",
+        "Someday/Maybe",
+        "Ideas and possibilities for the future.",
+    )
+    .await
 }
 
 pub async fn get_review(
-    AuthenticatedUser(_user_id): AuthenticatedUser,
+    AuthenticatedUser(user_id): AuthenticatedUser,
+    State(pool): State<PgPool>,
 ) -> Result<impl IntoResponse, GtdPlaceholderError> {
-    let template = GtdPlaceholderTemplate {
-        current_page: "review",
-        page_title: "Weekly Review -- Todo List",
-        heading: "Weekly Review",
-        description: "Keep your system current and trustworthy.",
-        inbox_count: 0,
-    };
-    Ok(Html(template.render()?))
+    render_placeholder(
+        &user_id,
+        &pool,
+        "review",
+        "Weekly Review -- Todo List",
+        "Weekly Review",
+        "Keep your system current and trustworthy.",
+    )
+    .await
 }

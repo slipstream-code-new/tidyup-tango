@@ -3,6 +3,7 @@ mod forgot_password;
 mod gtd_placeholders;
 mod health_check;
 mod helpers;
+mod inbox;
 mod index;
 mod login;
 mod register;
