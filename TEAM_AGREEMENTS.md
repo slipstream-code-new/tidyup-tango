@@ -153,6 +153,8 @@ A feature is **done** when ALL of the following are true:
       during development
 - [ ] All 9 team members have reviewed and consent to the completed work
 - [ ] Labels and copy follow the Copy Standards (see Section 3)
+- [ ] Progress markers updated in `docs/gtd-product-discovery.md` Implementation Order
+      (mark step `[x]`, move `<!-- NEXT -->` marker, update "Current step" summary)
 
 ---
 

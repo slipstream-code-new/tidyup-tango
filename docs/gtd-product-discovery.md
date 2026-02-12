@@ -480,21 +480,26 @@ Recommended build order, following the same incremental approach as the MVP. The
 clarify workflow (US-GTD-2) is split into sub-stories and interleaved with the lists
 it routes to, so each clarify path ships immediately after its destination exists:
 
-1. **Navigation + Dashboard** -- Multi-page structure, header nav, route skeleton
-2. **Inbox Capture** -- The new entry point (replaces direct todo add)
-3. **Contexts** -- Domain type + DB + default contexts for new users
-4. **Next Actions with Contexts** -- Core working list
-5. **Clarify as Next Action + Trash** -- First clarify paths
-6. **Projects** -- Multi-step outcome tracking
-7. **Clarify as Project** -- Inbox -> new project + first next action
-8. **Waiting For** -- Delegation tracking
-9. **Clarify as Waiting For** -- Inbox -> waiting for
-10. **Someday/Maybe** -- Idea parking
-11. **Clarify as Someday/Maybe** -- Inbox -> someday/maybe
-12. **Weekly Review** -- The glue that keeps it all trustworthy
-13. **Data Migration + Cleanup** -- Migrate old todos, remove legacy code
+> **Current step**: 4 -- Next Actions with Contexts
+
+1. [x] **Navigation + Dashboard** -- Multi-page structure, header nav, route skeleton
+2. [x] **Inbox Capture** -- The new entry point (replaces direct todo add)
+3. [x] **Contexts** -- Domain type + DB + default contexts for new users
+4. [ ] **Next Actions with Contexts** -- Core working list  <!-- NEXT -->
+5. [ ] **Clarify as Next Action + Trash** -- First clarify paths
+6. [ ] **Projects** -- Multi-step outcome tracking
+7. [ ] **Clarify as Project** -- Inbox -> new project + first next action
+8. [ ] **Waiting For** -- Delegation tracking
+9. [ ] **Clarify as Waiting For** -- Inbox -> waiting for
+10. [ ] **Someday/Maybe** -- Idea parking
+11. [ ] **Clarify as Someday/Maybe** -- Inbox -> someday/maybe
+12. [ ] **Weekly Review** -- The glue that keeps it all trustworthy
+13. [ ] **Data Migration + Cleanup** -- Migrate old todos, remove legacy code
 
 Each step follows the Atomic Green Step pipeline. Each step delivers a usable increment.
+When a step is completed (CI green + 9/9 consensus), the Driver marks it `[x]` and
+moves the `<!-- NEXT -->` marker to the next unchecked step. The "Current step" summary
+line at the top of this section is also updated.
 
 ---
 

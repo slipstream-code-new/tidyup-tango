@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `3a340d91-65ef-498c-9e4b-c55ea3bed926` |
-| **Date Range** | 2026-02-12 16:40 UTC -- 2026-02-12 20:34 UTC |
+| **Date Range** | 2026-02-12 16:40 UTC -- 2026-02-12 20:42 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -4996,5 +4996,268 @@ Heydon is in. 8 of 9 checked in. Just waiting on Kent Beck (Driver) to finish re
 ## 2026-02-12 20:34 UTC -- Assistant
 
 Waiting for Kent Beck (Driver) to check in. All 8 Reviewers are ready and idle.
+
+---
+
+## 2026-02-12 20:41 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="blue" summary="Process commit done; progress tracking proposal for consensus">
+Team, this is Kent Beck (Driver). Two updates:
+
+**1. Process commit done, CI green.**
+I committed and pushed the approved CLAUDE.md and TEAM_AGREEMENTS.md corrections (coordinator role boundaries, team ownership of retros). CI passed. Commit 53c65b5.
+
+**2. Progress tracking discussion -- resuming from last session.**
+
+The project owner asked: "If I were to start an entirely new claude session, how would the team know what to work on next? How could I see the status of the work directly without having to bother the team?"
+
+Here is my proposal. I am applying the simplest thing that could work:
+
+**A) Annotate the Implementation Order in `docs/gtd-product-discovery.md` with status markers.**
+
+The implementation order (Section 8, steps 1-13) already exists as the canonical sequence. I propose adding status markers directly:
+
+```
+1. [x] **Navigation + Dashboard** -- Multi-page structure, header nav, route skeleton
+2. [x] **Inbox Capture** -- The new entry point (replaces direct todo add)
+3. [x] **Contexts** -- Domain type + DB + default contexts for new users
+4. [ ] **Next Actions with Contexts** -- Core working list  <-- NEXT
+5-13. [ ] (remaining steps)
+```
+
+**B) Add "Update progress markers" to the Definition of Done.**
+
+After each feature completes (push + CI green + 9/9 consensus), the Driver marks the step as complete in `docs/gtd-product-discovery.md` before the team moves on.
+
+**Why this approach:**
+- No new files to drift out of sync
+- The implementation order is already the canonical source of "what comes next"
+- A new session reads one document and knows exactly where we are
+- Trivially simple -- just checkbox markers on existing content
+- GitHub Issues (already agreed in Section 7 of TEAM_AGREEMENTS.md) can be added later for more granular per-step tracking, but this solves the immediate problem
+
+**What I am NOT proposing:**
+- A separate progress.md file (duplication risk)
+- GitHub Issues right now (overhead for something this simple)
+- Any changes to the workflow beyond one checkbox update at completion
+
+I need 9/9 consensus before implementing. Please share your thoughts -- agreement, concerns, or alternatives.
+</teammate-message>
+
+---
+
+## 2026-02-12 20:41 UTC -- Assistant
+
+All 9 team members are active. Kent (Driver) has already committed the process changes (53c65b5, CI green) and proposed a progress tracking approach. Let me relay his proposal to the Reviewers for consensus.
+
+---
+
+## 2026-02-12 20:41 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 20:41 UTC -- Assistant
+
+Proposal broadcast to all 9 team members. Waiting for consensus responses.
+
+---
+
+## 2026-02-12 20:41 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="blue" summary="Commit done, CI green, awaiting consensus on progress tracking">
+Coordinator, status update:
+
+1. Process corrections committed and pushed (53c65b5). CI green.
+2. I've broadcast a progress tracking proposal to the team for consensus. The proposal is to annotate the existing implementation order in `docs/gtd-product-discovery.md` with status checkboxes and add "update progress markers" to the Definition of Done. Simple, no new files, no drift risk.
+
+Waiting for team responses to collect 9/9 consensus before implementing.
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="blue">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T20:41:50.852Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T20:41:52.139Z","idleReason":"available","summary":"[to kent-beck] Consent on progress tracking proposal"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T20:41:52.202Z","idleReason":"available","summary":"[to kent-beck] +1 on progress tracking proposal, no concerns"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="blue">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T20:41:52.375Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T20:41:52.910Z","idleReason":"available","summary":"[to kent-beck] Approve Kent's proposal, one minor suggestion"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T20:41:53.107Z","idleReason":"available","summary":"[to kent-beck] +1 on progress tracking, grug-brained simplicity"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="blue">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T20:41:53.703Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="green">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T20:41:53.856Z","idleReason":"available","summary":"[to kent-beck] +1 consent on progress tracking proposal"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T20:41:54.055Z","idleReason":"available","summary":"[to kent-beck] +1 on progress tracking proposal, no concerns"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T20:41:55.175Z","idleReason":"available","summary":"[to kent-beck] +1 on progress tracking proposal"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T20:41:55.386Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="yellow">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T20:41:55.501Z","idleReason":"available","summary":"[to kent-beck] +1 on progress tracking proposal, consent given"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="green">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T20:41:55.730Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple" summary="+1 on progress tracking proposal">
+Carson Gross: +1 on Kent's progress tracking proposal. Already sent my detailed response to Kent directly. 
+
+Summary: This is the simplest thing that could work -- annotating an existing document rather than creating new abstractions. The explicit `<-- NEXT` marker aids scanning. No concerns.
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan" summary="Consent on progress tracking proposal">
+I already sent my consent directly to Kent, but confirming here for your tracking: I approve the progress tracking proposal.
+
+The reasoning: it follows the same UX principle we apply to our product -- don't make the user think. One document, scannable checkboxes, a "NEXT" marker that answers the most important question immediately. No new files to wonder about.
+
+Steve Krug: CONSENT.
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red" summary="Confirming +1 on progress tracking proposal">
+Already sent my +1 to Kent directly. To confirm for your records:
+
+Approved on both parts (A and B). Only note: the status marker update should come after 9/9 consensus, not just after push. No other concerns.
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="blue">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T20:41:56.376Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T20:41:56.647Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="yellow">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T20:41:56.761Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue" summary="Approve Kent's progress tracking proposal">
+Marty Cagan — **Approve**.
+
+I already sent my detailed response to Kent. Summary: His approach is simpler and better than my original separate-file proposal. Annotating the existing implementation order avoids duplication drift and keeps one source of truth. Adding "Update progress markers" to the DoD ensures it stays current.
+
+I suggested a non-blocking minor addition: a one-line "Current step: 4 — Next Actions with Contexts" indicator at the top of the Implementation Order section for quick scanning. But the checkboxes alone solve the problem. I won't hold up consensus on this.
+
+Vote: Approve.
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T20:41:57.365Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T20:41:57.485Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="blue">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T20:41:57.848Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T20:41:58.022Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T20:41:58.145Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 20:42 UTC -- Assistant
+
+9/9 consensus reached on the progress tracking proposal. Let me notify Kent to proceed.
+
+---
+
+## 2026-02-12 20:42 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 20:42 UTC -- Assistant
+
+9/9 consensus reached on progress tracking. Kent Beck (Driver) is clear to implement the changes — annotating `docs/gtd-product-discovery.md` with status checkboxes and adding progress marker updates to the Definition of Done. Waiting for Kent to complete the implementation and push.
+
+---
+
+## 2026-02-12 20:42 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="blue">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T20:41:59.690Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="blue">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T20:42:01.123Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="blue">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T20:42:02.333Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="blue">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T20:42:03.449Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 20:42 UTC -- Assistant
+
+Kent appears to be idle without acting. Let me nudge him.
+
+---
+
+## 2026-02-12 20:42 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 20:42 UTC -- Assistant
+
+Nudged Kent with explicit step-by-step instructions. Waiting for him to act.
 
 ---
