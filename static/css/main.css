@@ -1213,6 +1213,37 @@
 
   .inbox-item__clarify {
     display: flex;
+    align-items: start;
+    gap: var(--space-xs);
+  }
+
+  .inbox-item__clarify-fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs) var(--space-sm);
+  }
+
+  .inbox-item__clarify-options {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .inbox-item__radio-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--font-size-sm);
+    color: var(--color-fg-muted);
+    cursor: pointer;
+  }
+
+  .inbox-item__radio {
+    accent-color: var(--color-primary);
+  }
+
+  .inbox-item__shared-fields {
+    display: flex;
     align-items: center;
     gap: var(--space-xs);
   }
@@ -1229,6 +1260,32 @@
     border-radius: var(--radius-sm);
     background: var(--color-bg);
     color: var(--color-fg);
+  }
+
+  /* Progressive disclosure: project fields hidden by default,
+     revealed when "Project" radio is selected via CSS :has() */
+  .inbox-item__project-fields {
+    display: none;
+    align-items: center;
+    gap: var(--space-xs);
+    inline-size: 100%;
+  }
+
+  .inbox-item__clarify-fieldset:has(input[value="project"]:checked) .inbox-item__project-fields {
+    display: flex;
+  }
+
+  .inbox-item__first-action-label {
+    font-size: var(--font-size-xs);
+    color: var(--color-fg-muted);
+    flex-shrink: 0;
+  }
+
+  .inbox-item__first-action-input {
+    flex: 1;
+    min-inline-size: 8rem;
+    font-size: var(--font-size-sm);
+    padding: var(--space-xs) var(--space-sm);
   }
 
   .inbox-item__clarify-button {

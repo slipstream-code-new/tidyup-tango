@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `0560b569-3212-4b1f-8ca0-cd4d1b2e2314` |
-| **Date Range** | 2026-02-12 22:57 UTC -- 2026-02-12 23:27 UTC |
+| **Date Range** | 2026-02-12 22:57 UTC -- 2026-02-12 23:37 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -935,5 +935,162 @@ Good. Here's a summary of both changes:
 - **Sub-questions**: Specific things to debate (e.g., "Is there a refactoring step, and is it mandatory or optional?")
 
 The SKILL.md now has a dedicated **Phase 5: Team Formation Session** where the coordinator spawns the team, presents each topic, the team debates, and the Driver records their actual consensus. No pre-filled answers — the team owns every word of their agreements.
+
+---
+
+## 2026-02-12 23:36 UTC -- User
+
+ok; let's also move this skill into ../agent-skills repo and commit and push that repo
+
+---
+
+## 2026-02-12 23:36 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Check if agent-skills repo exists
+
+</details>
+
+---
+
+## 2026-02-12 23:36 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Check agent-skills repo structure and git state
+
+</details>
+
+---
+
+## 2026-02-12 23:36 UTC -- Assistant
+
+Good, the repo exists with a `skills/` directory. Let me copy the skill over, then commit and push.
+
+---
+
+## 2026-02-12 23:36 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Copy ensemble-team skill to agent-skills repo
+
+</details>
+
+---
+
+## 2026-02-12 23:36 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Check git status after copy
+
+</details>
+
+---
+
+## 2026-02-12 23:36 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Check diff stats
+
+</details>
+
+---
+
+## 2026-02-12 23:36 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Recent commit messages for style
+
+</details>
+
+---
+
+## 2026-02-12 23:36 UTC -- Assistant
+
+Clean state, just the new skill directory to add. Let me commit and push.
+
+---
+
+## 2026-02-12 23:36 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Stage and commit ensemble-team skill
+
+</details>
+
+---
+
+## 2026-02-12 23:36 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Push to remote
+
+</details>
+
+---
+
+## 2026-02-12 23:37 UTC -- Assistant
+
+Done. The ensemble-team skill is now committed and pushed to `jwilger/agent-skills` on GitHub at `skills/ensemble-team/` (commit `fb4421f`).
+
+---
+
+## 2026-02-12 23:37 UTC -- User
+
+and now you can use skills.sh to install that skill globally
+
+---
+
+## 2026-02-12 23:37 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Check if skills.sh is available
+
+</details>
+
+---
+
+## 2026-02-12 23:37 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Check npx skills command
+
+</details>
+
+---
+
+## 2026-02-12 23:37 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Install ensemble-team skill globally
+
+</details>
+
+---
+
+## 2026-02-12 23:37 UTC -- Assistant
+
+Installed globally. The `ensemble-team` skill (along with the rest of your agent-skills) is now available across all 39 supported agents, including Claude Code, Codex, Gemini CLI, and others. It overwrote the local-only copy in `~/.claude/skills/` with a symlink to the global install at `~/.agents/skills/ensemble-team`.
 
 ---

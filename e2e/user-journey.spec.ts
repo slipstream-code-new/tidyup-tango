@@ -270,13 +270,13 @@ test.describe("Core user journey", () => {
     await page.locator("button.inbox-capture__submit").click();
 
     // Item should appear (via HTMX swap or page reload)
-    await expect(page.getByText("Call the dentist")).toBeVisible();
+    await expect(page.getByText("Call the dentist", { exact: true })).toBeVisible();
 
     // Delete the item
     await page.getByRole("button", { name: "Trash: Call the dentist" }).click();
 
     // Item should be gone
-    await expect(page.getByText("Call the dentist")).not.toBeVisible();
+    await expect(page.getByText("Call the dentist", { exact: true })).not.toBeVisible();
   });
 
   test("inbox page has no automatically detectable a11y violations", async ({
@@ -313,7 +313,7 @@ test.describe("Core user journey", () => {
     await expect(inboxInput).toBeVisible();
     await inboxInput.fill("Test a11y item");
     await page.locator("button.inbox-capture__submit").click();
-    await expect(page.getByText("Test a11y item")).toBeVisible();
+    await expect(page.getByText("Test a11y item", { exact: true })).toBeVisible();
 
     const withItemResults = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])

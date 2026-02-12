@@ -9,13 +9,40 @@
             hx-target="#inbox-item-{{ item.id }}"
             hx-swap="outerHTML"
         >
-            <label for="clarify-context-{{ item.id }}" class="inbox-item__context-label">Context</label>
-            <select id="clarify-context-{{ item.id }}" name="context_id" class="inbox-item__context-select">
-                {% for ctx in contexts %}
-                <option value="{{ ctx.id }}">{{ ctx.name }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="inbox-item__clarify-button" aria-label="Clarify as next action: {{ item.title }}">Next Action</button>
+            <fieldset class="inbox-item__clarify-fieldset">
+                <legend class="visually-hidden">Clarify: {{ item.title }}</legend>
+                <div class="inbox-item__clarify-options">
+                    <label class="inbox-item__radio-label">
+                        <input type="radio" name="clarify_type" value="next_action" checked class="inbox-item__radio">
+                        Next Action
+                    </label>
+                    <label class="inbox-item__radio-label">
+                        <input type="radio" name="clarify_type" value="project" class="inbox-item__radio">
+                        Project
+                    </label>
+                </div>
+                <div class="inbox-item__shared-fields">
+                    <label for="clarify-context-{{ item.id }}" class="inbox-item__context-label">Context</label>
+                    <select id="clarify-context-{{ item.id }}" name="context_id" class="inbox-item__context-select">
+                        {% for ctx in contexts %}
+                        <option value="{{ ctx.id }}">{{ ctx.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="inbox-item__project-fields">
+                    <label for="first-action-{{ item.id }}" class="inbox-item__first-action-label">First action</label>
+                    <input
+                        type="text"
+                        id="first-action-{{ item.id }}"
+                        name="first_action_title"
+                        placeholder="What's the first step?"
+                        maxlength="300"
+                        autocomplete="off"
+                        class="inbox-item__first-action-input"
+                    >
+                </div>
+                <button type="submit" class="inbox-item__clarify-button" aria-label="Clarify: {{ item.title }}">Clarify</button>
+            </fieldset>
         </form>
         <form
             method="post"

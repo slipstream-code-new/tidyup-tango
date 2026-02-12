@@ -11,8 +11,9 @@ use super::{htmx_response_with_announce, is_htmx_request};
 use crate::domain::{ContextId, InboxItem, InboxItemId};
 use crate::services::context_service;
 use crate::services::inbox_service::{
-    capture_inbox_item, clarify_as_next_action, delete_inbox_item, get_inbox_items,
-    CaptureInboxError, ClarifyAsNextActionError, DeleteInboxError,
+    capture_inbox_item, clarify_as_next_action, clarify_as_project, delete_inbox_item,
+    get_inbox_items, CaptureInboxError, ClarifyAsNextActionError, ClarifyAsProjectError,
+    DeleteInboxError,
 };
 
 pub struct InboxItemView {
@@ -206,6 +207,10 @@ pub async fn post_delete_inbox_item(
 #[derive(serde::Deserialize)]
 pub struct ClarifyForm {
     pub context_id: Uuid,
+    #[serde(default)]
+    pub clarify_type: String,
+    #[serde(default)]
+    pub first_action_title: String,
 }
 
 pub async fn post_clarify_inbox_item(
@@ -219,28 +224,67 @@ pub async fn post_clarify_inbox_item(
     let inbox_item_id = InboxItemId::from_uuid(item_id);
     let context_id = ContextId::from_uuid(form.context_id);
 
-    match clarify_as_next_action(&pool, &inbox_item_id, &user_id, context_id).await {
-        Ok(_action) => {
-            if htmx {
-                Ok(htmx_response_with_announce(
-                    Html(String::new()),
-                    "Clarified as next action",
-                ))
-            } else {
-                Ok(Redirect::to("/inbox").into_response())
+    if form.clarify_type == "project" {
+        match clarify_as_project(
+            &pool,
+            &inbox_item_id,
+            &user_id,
+            context_id,
+            form.first_action_title,
+        )
+        .await
+        {
+            Ok(_result) => {
+                if htmx {
+                    Ok(htmx_response_with_announce(
+                        Html(String::new()),
+                        "Clarified as project",
+                    ))
+                } else {
+                    Ok(Redirect::to("/inbox").into_response())
+                }
             }
+            Err(ClarifyAsProjectError::NotFound) => Ok((
+                StatusCode::NOT_FOUND,
+                Html("<h1>Inbox item not found</h1>".to_string()),
+            )
+                .into_response()),
+            Err(ClarifyAsProjectError::Unauthorized) => Ok((
+                StatusCode::FORBIDDEN,
+                Html("<h1>Not authorized</h1>".to_string()),
+            )
+                .into_response()),
+            Err(ClarifyAsProjectError::InvalidTitle(_)) => Ok((
+                StatusCode::UNPROCESSABLE_ENTITY,
+                Html("<h1>First action title is required for projects</h1>".to_string()),
+            )
+                .into_response()),
+            Err(ClarifyAsProjectError::Unexpected(err)) => Err(InboxError::Unexpected(err)),
         }
-        Err(ClarifyAsNextActionError::NotFound) => Ok((
-            StatusCode::NOT_FOUND,
-            Html("<h1>Inbox item not found</h1>".to_string()),
-        )
-            .into_response()),
-        Err(ClarifyAsNextActionError::Unauthorized) => Ok((
-            StatusCode::FORBIDDEN,
-            Html("<h1>Not authorized</h1>".to_string()),
-        )
-            .into_response()),
-        Err(ClarifyAsNextActionError::Unexpected(err)) => Err(InboxError::Unexpected(err)),
+    } else {
+        match clarify_as_next_action(&pool, &inbox_item_id, &user_id, context_id).await {
+            Ok(_action) => {
+                if htmx {
+                    Ok(htmx_response_with_announce(
+                        Html(String::new()),
+                        "Clarified as next action",
+                    ))
+                } else {
+                    Ok(Redirect::to("/inbox").into_response())
+                }
+            }
+            Err(ClarifyAsNextActionError::NotFound) => Ok((
+                StatusCode::NOT_FOUND,
+                Html("<h1>Inbox item not found</h1>".to_string()),
+            )
+                .into_response()),
+            Err(ClarifyAsNextActionError::Unauthorized) => Ok((
+                StatusCode::FORBIDDEN,
+                Html("<h1>Not authorized</h1>".to_string()),
+            )
+                .into_response()),
+            Err(ClarifyAsNextActionError::Unexpected(err)) => Err(InboxError::Unexpected(err)),
+        }
     }
 }
 

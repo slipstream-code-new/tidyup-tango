@@ -76,6 +76,9 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Invalid title (edit project) | `UpdateProjectTitleError::InvalidTitle(TodoTitleError)` | Title validation failure in update_project_title service |
 | Project not found (add action) | `AddProjectNextActionError::ProjectNotFound` | Referenced project does not exist |
 | Not authorized (add project action) | `AddProjectNextActionError::Unauthorized` | User does not own the project |
+| Inbox item not found (clarify as project) | `ClarifyAsProjectError::NotFound` | Referenced inbox item does not exist |
+| Not authorized (clarify as project) | `ClarifyAsProjectError::Unauthorized` | User does not own the inbox item |
+| Invalid first action title (clarify as project) | `ClarifyAsProjectError::InvalidTitle(TodoTitleError)` | First action title validation failure in clarify_as_project service |
 
 ## Error Copy Convention
 
@@ -181,7 +184,7 @@ implementation.*
 |-----------------|-------------------------------|-------|
 | Capture to inbox | `capture_to_inbox()` | Creates InboxItem from raw text |
 | Clarify as next action | `clarify_as_next_action()` | InboxItem -> NextAction (requires context). **Implemented.** |
-| Clarify as project | `clarify_as_project()` | InboxItem -> Project + first NextAction |
+| Clarify as project | `clarify_as_project()` | InboxItem -> Project + first NextAction. **Implemented.** |
 | Delegate | `delegate()` | InboxItem or NextAction -> WaitingForItem |
 | Defer | `defer()` | InboxItem or NextAction -> SomedayMaybeItem |
 | Trash | (delete) | InboxItem is permanently removed. **Implemented.** |

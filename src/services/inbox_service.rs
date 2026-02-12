@@ -1,10 +1,11 @@
 use sqlx::PgPool;
 
 use crate::domain::{
-    ContextId, InboxItem, InboxItemId, NextAction, TodoTitle, TodoTitleError, UserId,
+    ContextId, InboxItem, InboxItemId, NextAction, Project, TodoTitle, TodoTitleError, UserId,
 };
 use crate::infrastructure::inbox_repository;
 use crate::infrastructure::next_action_repository;
+use crate::infrastructure::project_repository;
 
 #[derive(Debug, thiserror::Error)]
 pub enum CaptureInboxError {
@@ -163,4 +164,88 @@ pub async fn clarify_as_next_action(
 
     tracing::info!("Inbox item clarified as next action");
     Ok(action)
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum ClarifyAsProjectError {
+    #[error("Inbox item not found")]
+    NotFound,
+    #[error("Not authorized to clarify this inbox item")]
+    Unauthorized,
+    #[error("Invalid first action title: {0}")]
+    InvalidTitle(#[from] TodoTitleError),
+    #[error(transparent)]
+    Unexpected(#[from] anyhow::Error),
+}
+
+pub struct ClarifyAsProjectResult {
+    pub project: Project,
+    pub first_action: NextAction,
+}
+
+#[tracing::instrument(
+    name = "clarify_as_project",
+    skip(pool, first_action_title),
+    fields(item_id = %item_id.as_uuid(), user_id = %user_id.as_uuid(), context_id = %context_id.as_uuid())
+)]
+pub async fn clarify_as_project(
+    pool: &PgPool,
+    item_id: &InboxItemId,
+    user_id: &UserId,
+    context_id: ContextId,
+    first_action_title: String,
+) -> Result<ClarifyAsProjectResult, ClarifyAsProjectError> {
+    let first_action_title = TodoTitle::parse(first_action_title)?;
+
+    let mut tx = pool.begin().await.map_err(|e| {
+        ClarifyAsProjectError::Unexpected(anyhow::anyhow!("Failed to begin transaction: {e}"))
+    })?;
+
+    let item = inbox_repository::find_inbox_item_by_id(&mut *tx, item_id)
+        .await
+        .map_err(|e| ClarifyAsProjectError::Unexpected(anyhow::anyhow!("Database error: {e}")))?
+        .ok_or(ClarifyAsProjectError::NotFound)?;
+
+    if item.user_id() != user_id {
+        return Err(ClarifyAsProjectError::Unauthorized);
+    }
+
+    let project = Project::new(user_id.clone(), item.title().clone());
+
+    project_repository::insert_project(&mut *tx, &project)
+        .await
+        .map_err(|e| {
+            ClarifyAsProjectError::Unexpected(anyhow::anyhow!("Failed to insert project: {e}"))
+        })?;
+
+    let first_action = NextAction::new_for_project(
+        user_id.clone(),
+        context_id,
+        project.id().clone(),
+        first_action_title,
+    );
+
+    next_action_repository::insert_next_action(&mut *tx, &first_action)
+        .await
+        .map_err(|e| {
+            ClarifyAsProjectError::Unexpected(anyhow::anyhow!(
+                "Failed to insert first next action: {e}"
+            ))
+        })?;
+
+    inbox_repository::delete_inbox_item(&mut *tx, item_id)
+        .await
+        .map_err(|e| {
+            ClarifyAsProjectError::Unexpected(anyhow::anyhow!("Failed to delete inbox item: {e}"))
+        })?;
+
+    tx.commit().await.map_err(|e| {
+        ClarifyAsProjectError::Unexpected(anyhow::anyhow!("Failed to commit transaction: {e}"))
+    })?;
+
+    tracing::info!("Inbox item clarified as project");
+    Ok(ClarifyAsProjectResult {
+        project,
+        first_action,
+    })
 }

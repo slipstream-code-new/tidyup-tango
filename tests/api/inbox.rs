@@ -783,7 +783,11 @@ async fn inbox_item_has_clarify_form_with_context_select() {
     );
     assert!(
         body.contains("Next Action"),
-        "Inbox item should have a 'Next Action' clarify button"
+        "Inbox item should have a 'Next Action' radio option"
+    );
+    assert!(
+        body.contains("Project"),
+        "Inbox item should have a 'Project' radio option"
     );
     assert!(
         body.contains("Trash"),
@@ -792,6 +796,10 @@ async fn inbox_item_has_clarify_form_with_context_select() {
     assert!(
         body.contains("inbox-item__context-select"),
         "Inbox item should have a context select for clarifying"
+    );
+    assert!(
+        body.contains("first_action_title"),
+        "Inbox item should have a first action title input for project clarification"
     );
 }
 
@@ -816,11 +824,319 @@ async fn inbox_item_clarify_button_has_accessible_label() {
     let body = response.text().await.unwrap();
 
     assert!(
-        body.contains("aria-label=\"Clarify as next action: A11y clarify test\""),
+        body.contains("aria-label=\"Clarify: A11y clarify test\""),
         "Clarify button should have aria-label including item title"
     );
     assert!(
         body.contains("aria-label=\"Trash: A11y clarify test\""),
         "Trash button should have aria-label including item title"
+    );
+}
+
+// ---- Clarify as Project ----
+
+#[tokio::test]
+async fn clarify_inbox_item_as_project_removes_from_inbox() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "projclarify1@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+
+    // Capture an item
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Build website")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    // Clarify as project
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .form(&[
+            ("clarify_type", "project"),
+            ("context_id", &context_id),
+            ("first_action_title", "Set up hosting"),
+        ])
+        .send()
+        .await
+        .expect("Failed to clarify as project");
+
+    assert_eq!(
+        response.status().as_u16(),
+        303,
+        "Clarify as project should redirect"
+    );
+
+    // Item should be gone from inbox
+    let response = client
+        .get(format!("{}/inbox", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /inbox");
+    let body = response.text().await.unwrap();
+    assert!(
+        !body.contains("Build website"),
+        "Clarified item should no longer appear in inbox"
+    );
+}
+
+#[tokio::test]
+async fn clarify_inbox_item_as_project_creates_project_and_first_action() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "projclarify2@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+
+    // Capture an item
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Plan vacation")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    // Clarify as project
+    client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .form(&[
+            ("clarify_type", "project"),
+            ("context_id", &context_id),
+            ("first_action_title", "Research destinations"),
+        ])
+        .send()
+        .await
+        .expect("Failed to clarify as project");
+
+    // Project should appear in projects list with inbox item's title
+    let response = client
+        .get(format!("{}/projects", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /projects");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Plan vacation"),
+        "Project should appear in projects list with the inbox item's title"
+    );
+
+    // First action should appear in next actions list
+    let response = client
+        .get(format!("{}/next-actions", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /next-actions");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Research destinations"),
+        "First action should appear in next actions list"
+    );
+}
+
+#[tokio::test]
+async fn clarify_as_project_with_empty_first_action_title_returns_422() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "projclarify3@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+
+    // Capture an item
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Needs first action")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    // Clarify as project with empty first action title
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .form(&[
+            ("clarify_type", "project"),
+            ("context_id", &context_id),
+            ("first_action_title", ""),
+        ])
+        .send()
+        .await
+        .expect("Failed to clarify as project");
+
+    assert_eq!(
+        response.status().as_u16(),
+        422,
+        "Empty first action title should return 422"
+    );
+
+    // Item should still be in inbox
+    let response = client
+        .get(format!("{}/inbox", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /inbox");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Needs first action"),
+        "Item should still be in inbox after failed clarify"
+    );
+}
+
+#[tokio::test]
+async fn clarify_nonexistent_inbox_item_as_project_returns_404() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "projclarify4@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+    let fake_id = uuid::Uuid::new_v4();
+
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, fake_id))
+        .form(&[
+            ("clarify_type", "project"),
+            ("context_id", &context_id),
+            ("first_action_title", "Some action"),
+        ])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    assert_eq!(response.status().as_u16(), 404);
+}
+
+#[tokio::test]
+async fn htmx_clarify_as_project_returns_empty_body_with_announce() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "projclarify5@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "HTMX project test")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .header("hx-request", "true")
+        .form(&[
+            ("clarify_type", "project"),
+            ("context_id", &context_id),
+            ("first_action_title", "First step"),
+        ])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    assert_eq!(response.status().as_u16(), 200);
+
+    let trigger = response
+        .headers()
+        .get("hx-trigger")
+        .expect("Missing HX-Trigger")
+        .to_str()
+        .unwrap();
+    assert!(
+        trigger.contains("Clarified as project"),
+        "HX-Trigger should contain 'Clarified as project' announce"
+    );
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.is_empty(),
+        "HTMX clarify as project should return empty body (item removed)"
+    );
+}
+
+#[tokio::test]
+async fn clarify_as_project_first_action_is_linked_to_project() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "projclarify6@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+
+    // Capture an item
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Organize garage")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    // Clarify as project
+    client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .form(&[
+            ("clarify_type", "project"),
+            ("context_id", &context_id),
+            ("first_action_title", "Buy storage bins"),
+        ])
+        .send()
+        .await
+        .expect("Failed to clarify as project");
+
+    // Find the project ID from the projects page
+    let response = client
+        .get(format!("{}/projects", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /projects");
+    let body = response.text().await.unwrap();
+
+    // Extract project ID from the project detail link
+    let link_prefix = "href=\"/projects/";
+    let start = body.find(link_prefix).expect("Missing project link") + link_prefix.len();
+    let end = body[start..].find('"').expect("Missing closing quote");
+    let project_id = &body[start..start + end];
+
+    // Project detail page should show the first action
+    let response = client
+        .get(format!("{}/projects/{}", &app.address, project_id))
+        .send()
+        .await
+        .expect("Failed to GET project detail");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Buy storage bins"),
+        "Project detail should show the first action created during clarify"
     );
 }
