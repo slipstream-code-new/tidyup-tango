@@ -536,8 +536,11 @@ Every commit must pass (in order):
 11. **Wait for CI green** — run `gh run list --limit 1` and WAIT for CI to complete
     green before beginning the next change. Never have more than 1 pending CI run. If
     CI fails, fix it before pushing anything else.
-12. **Mini-retrospective** (1-minute checkpoint) — Driver confirms: (a) Did we follow
-    the pipeline? (b) Was the commit atomic? (c) Any process improvements?
+12. **Mini-retrospective** (1-minute checkpoint) — The **team** (not the coordinator,
+    not the project owner) conducts this. The Driver initiates and all 9 agents
+    participate. Questions: (a) Did we follow the pipeline? (b) Was the commit
+    atomic? (c) Any process improvements? The project owner may offer suggestions as
+    an outside observer, but all process decisions are the team's to make.
 13. **Only then begin the next change.**
 
 Additional rules:
@@ -659,9 +662,12 @@ bi-weekly) do not apply. Instead, retros are triggered by events.
 - **Usability testing**: Aim for informal testing -- three users, 20 minutes each --
   at natural breakpoints. Even watching one person use the app for 5 minutes reveals
   more than a week of discussion.
-- **Post-CI checkpoint**: After each CI build (pass or fail), the Driver briefly
-  confirms: (a) Did we follow the pipeline? (b) Was the commit atomic? (c) Any
-  process improvements? This is a 1-minute checkpoint, not a full retro.
+- **Post-CI checkpoint**: After each CI build (pass or fail), the **team** conducts
+  this checkpoint — NOT the coordinator, NOT the project owner. The Driver initiates
+  and all 9 agents participate: (a) Did we follow the pipeline? (b) Was the commit
+  atomic? (c) Any process improvements? This is a 1-minute checkpoint, not a full
+  retro. The project owner may offer suggestions as an outside observer/consultant,
+  but all process decisions are the team's to make.
 - **Deferred items**: Non-blocking a11y, design, and UX items are tracked in
   `docs/deferred-items.md` and reviewed at each retrospective.
 

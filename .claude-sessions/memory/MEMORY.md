@@ -31,12 +31,13 @@
 - GTD Task #11: Navigation + Dashboard skeleton (gtd_nav, dashboard, placeholder pages)
 - GTD Task #15: Inbox Capture (US-GTD-1) — inbox_items table, domain type, CRUD routes, HTMX, live badge
 - GTD Task #18: Team Retrospective — 13 process improvements adopted (9/9 consensus)
-- Current state: 100 Rust tests + 9 Playwright e2e tests, all green
+- GTD Step 3: Contexts — ContextId, ContextName (@ prefix normalized), Context types, contexts table, CRUD routes, default seeding (@computer, @home, @errands, @phone, @anywhere), management UI, CSS, HTMX helpers extracted to routes/mod.rs
+- Current state: 166 Rust tests (48 unit + 118 integration) + 11 Playwright e2e tests, all green
 
 ## Next Implementation Steps (from docs/gtd-product-discovery.md)
-- Step 3: Contexts table + CRUD
-- Step 4: Next Actions (US-GTD-2a — clarify to Next Action)
-- Steps 5-13: Remaining clarify sub-stories, projects, waiting for, someday/maybe, weekly review, migration
+- Step 4: Next Actions with Contexts (US-GTD-2a — clarify to Next Action)
+- Step 5: Clarify as Next Action + Trash
+- Steps 6-13: Projects, clarify as project, waiting for, someday/maybe, weekly review, migration
 
 ## Key Process Rules (from Task #18 retro)
 - **CI wait rule**: Wait for CI green before pushing next commit, never queue multiple CI runs
@@ -48,11 +49,19 @@
 - **Deferred items**: Track in docs/deferred-items.md, review at retros and during discovery
 - **Session transcripts excluded from CI**: paths-ignore in .github/workflows/ci.yml
 
+## Coordinator Hard Rules
+- **NEVER perform project operations** — no git, cargo, file reads/writes, npm, etc. Only messaging and team management tools.
+- **NEVER decide what the team works on next** — relay project owner's needs, but team decides priorities via consensus
+- **NEVER run retrospectives** — mini-retros and full retros belong to the team; coordinator butts out
+- **Mini-retro is part of the pipeline, not a shutdown ceremony** — the same team that did the work holds the retro within the same session after CI green, then continues to the next task. Never spawn a separate retro team.
+
 ## Coordinator Lessons Learned
 - Driver agents frequently get stuck on completed tasks or terminate without doing work — need explicit, detailed spawn prompts focused on the NEW task
-- Drivers need multiple nudges to execute git operations — known persistent issue
-- When respawning driver, always verify clean working tree first
+- Drivers need multiple nudges to execute git operations — known persistent issue. Keep nudging via messages; do NOT push for them.
+- Drivers may also skip blocking review feedback items — always verify ALL blocking issues are addressed before re-requesting review
+- When respawning driver, always verify clean working tree by asking the driver to check (not by running git yourself)
 - Stale shutdown requests can be picked up by new sessions — instruct agents to reject unexpected shutdowns
 - Keep reviewers alive between tasks to preserve context; only rotate driver
 - Always broadcast review requests explicitly — don't assume agents will self-start
 - Session transcript commits were triggering CI unnecessarily — now excluded via paths-ignore
+- CSS is frequently omitted by backend-focused drivers — remind the team to check during review

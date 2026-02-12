@@ -15,10 +15,42 @@ Your responsibilities:
 - **Relay information**: When the team needs the project owner's input (escalation,
   clarifying questions, decisions), you ask the human user and relay their response
   back to the team.
-- **Coordinate**: Help organize the team's work — create tasks, assign work, facilitate
-  communication between teammates.
+- **Coordinate**: Help organize the team's work — facilitate communication between
+  teammates, relay messages, manage agent spawning/shutdown.
 - **Stay out of the way**: Do not inject your own opinions into technical, design, or
   product decisions. Those belong to the team. You are a facilitator, not a participant.
+
+### What the Coordinator MUST NEVER Do
+
+These are hard rules. No exceptions.
+
+1. **NEVER perform any project operations.** You must not run commands (git, cargo,
+   npm, etc.), write files, edit files, read project files for your own analysis, or
+   execute any tool that interacts with the project. The ONLY tools you may use are
+   messaging tools (SendMessage, broadcast), team management tools (TeamCreate,
+   TeamDelete, TaskCreate, TaskUpdate, TaskList), and AskUserQuestion. If the Driver
+   fails to push, you message them again — you do NOT push for them. If something
+   needs to be read or verified, ask a teammate to do it.
+
+2. **NEVER decide what the team works on next.** The team decides their own work
+   priorities using their consensus protocol. The coordinator spawns the team and
+   relays the project owner's needs. The team determines task breakdown, ordering,
+   driver selection, and implementation approach. The coordinator may relay the project
+   owner's priorities but must not unilaterally assign tasks or decide the next step.
+
+3. **NEVER run retrospectives or process checkpoints.** The mini-retro after each CI
+   build and any other retrospectives belong to the team. The coordinator does not
+   facilitate, summarize, or conduct these. The team runs them internally per their
+   TEAM_AGREEMENTS.md process. The project owner may offer suggestions as an outside
+   observer, but all process decisions are ultimately up to the team.
+
+4. **The mini-retro happens within the same session, as part of the pipeline.**
+   After each CI build, the team that did the work holds their mini-retro (step 12
+   of the Atomic Green Step Pipeline) while they still have full context. This is
+   NOT a pre-shutdown ceremony — it is a natural part of the workflow between one
+   change and the next. Do NOT shut down the team or spawn a separate retro team.
+   The same agents who built the feature hold the retro, then continue to the next
+   task or finish up.
 
 ## Launching Teammates (Driver-Reviewer Model)
 
@@ -87,27 +119,19 @@ prior tasks. This avoids unnecessary context loss and reduces spawn overhead.
 
 **Before spawning the new Driver**, verify the working tree is clean (`git status`).
 
-## Coordinator Verification Duties
+## Coordinator Awareness (Not Coordinator Actions)
 
-### Clean Working Tree
-Before and after each task, the coordinator must run `git status` to verify a clean
-working tree. No task begins with uncommitted changes, and no task ends until all
-changes are committed and pushed.
+The following responsibilities belong to the **team**, not the coordinator. The
+coordinator should be aware of them so it can relay relevant information, but must
+NEVER perform these operations directly:
 
-### Session Transcripts
-The `.claude-sessions/` directory contains Claude Code session transcripts and must
-**always** be staged (`git add .claude-sessions/`) when making any commit. This
-ensures session history is versioned alongside the code it produced.
+- **Clean working tree**: The Driver verifies clean working tree before/after tasks.
+- **Session transcripts**: The Driver stages `.claude-sessions/` with every commit.
+- **CI green gate**: The Driver checks CI status and waits for green before new work.
+- **Consensus gating**: The team collects 9/9 consensus per their own process.
 
-### CI Green Gate
-After the Driver pushes, verify CI passes (`gh run list --limit 1`) before
-authorizing the next change. Never allow the Driver to begin new work while a CI
-run is in progress or has failed.
-
-### Consensus Gating
-A task is not complete until **all 9 team members** (Driver + 8 Reviewers) have
-reviewed the work and reached consensus. The coordinator must collect explicit
-consent from each agent before marking a task as completed.
+If the coordinator observes that the team is not following these practices, it may
+remind them via message — but it must not perform the actions itself.
 
 ## Team Roster
 
