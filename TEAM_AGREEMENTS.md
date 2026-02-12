@@ -537,7 +537,9 @@ Every commit must pass (in order):
 10. **Once 9/9 consensus → `git push`.**
 11. **Wait for CI green** — run `gh run list --limit 1` and WAIT for CI to complete
     green before beginning the next change. Never have more than 1 pending CI run. If
-    CI fails, fix it before pushing anything else.
+    CI fails, fix it before pushing anything else. If CI was skipped because only
+    non-code files changed (per `paths-ignore` in the workflow), treat that push as
+    implicitly green and proceed.
 12. **Mini-retrospective** (1-minute checkpoint) — The **team** (not the coordinator,
     not the project owner) conducts this. The Driver initiates and all 9 agents
     participate. Questions: (a) Did we follow the pipeline? (b) Was the commit
