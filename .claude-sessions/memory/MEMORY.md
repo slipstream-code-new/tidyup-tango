@@ -31,13 +31,19 @@
 - GTD Task #11: Navigation + Dashboard skeleton (gtd_nav, dashboard, placeholder pages)
 - GTD Task #15: Inbox Capture (US-GTD-1) — inbox_items table, domain type, CRUD routes, HTMX, live badge
 - GTD Task #18: Team Retrospective — 13 process improvements adopted (9/9 consensus)
-- GTD Step 3: Contexts — ContextId, ContextName (@ prefix normalized), Context types, contexts table, CRUD routes, default seeding (@computer, @home, @errands, @phone, @anywhere), management UI, CSS, HTMX helpers extracted to routes/mod.rs
-- Current state: 166 Rust tests (48 unit + 118 integration) + 11 Playwright e2e tests, all green
+- GTD Step 3: Contexts — CRUD, default seeding, management UI, CSS
+- GTD Step 4: Next Actions with Contexts (US-GTD-3) — 9/9 consensus
+- GTD Step 5: Clarify as Next Action + Trash (US-GTD-2a) — 9/9 consensus
+- GTD Step 6: Projects (US-GTD-4) — in review, 5 blocking items being fixed
 
 ## Next Implementation Steps (from docs/gtd-product-discovery.md)
-- Step 4: Next Actions with Contexts (US-GTD-2a — clarify to Next Action)
-- Step 5: Clarify as Next Action + Trash
-- Steps 6-13: Projects, clarify as project, waiting for, someday/maybe, weekly review, migration
+- Step 7: Clarify as Project
+- Step 8: Waiting For
+- Step 9: Clarify as Waiting For
+- Step 10: Someday/Maybe
+- Step 11: Clarify as Someday/Maybe
+- Step 12: Weekly Review
+- Step 13: Data Migration + Cleanup
 
 ## Key Process Rules (from Task #18 retro)
 - **CI wait rule**: Wait for CI green before pushing next commit, never queue multiple CI runs
@@ -55,10 +61,16 @@
 - **NEVER run retrospectives** — mini-retros and full retros belong to the team; coordinator butts out
 - **Mini-retro is part of the pipeline, not a shutdown ceremony** — the same team that did the work holds the retro within the same session after CI green, then continues to the next task. Never spawn a separate retro team.
 
+## Coordinator Communication Rules
+- **Send instructions ONCE.** Do not repeat yourself. If a teammate doesn't respond immediately, they are busy working — not ignoring you.
+- **Idle notifications are automatic system events, NOT requests for action.** A teammate going idle means their turn ended; it does NOT mean they are stuck, confused, or need re-prompting. Do not react to idle notifications by re-sending instructions.
+- **Never send the same instruction more than once** unless the teammate explicitly says they didn't receive it or asks for clarification.
+- **Wait patiently.** Teammates process messages in order. If you send 5 copies of the same message, they waste time reading all 5. Silence from the coordinator is fine — it means "keep working."
+- **Only follow up if the teammate explicitly asks a question or reports being blocked.** Time passing is not a reason to re-send.
+
 ## Coordinator Lessons Learned
 - Driver agents frequently get stuck on completed tasks or terminate without doing work — need explicit, detailed spawn prompts focused on the NEW task
-- Drivers need multiple nudges to execute git operations — known persistent issue. Keep nudging via messages; do NOT push for them.
-- Drivers may also skip blocking review feedback items — always verify ALL blocking issues are addressed before re-requesting review
+- Drivers may skip blocking review feedback items — always verify ALL blocking issues are addressed before re-requesting review
 - When respawning driver, always verify clean working tree by asking the driver to check (not by running git yourself)
 - Stale shutdown requests can be picked up by new sessions — instruct agents to reject unexpected shutdowns
 - Keep reviewers alive between tasks to preserve context; only rotate driver

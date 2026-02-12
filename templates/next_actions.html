@@ -14,13 +14,15 @@
     <div class="next-actions__error" role="alert">{{ error }}</div>
     {% endif %}
 
+    <div id="next-actions-content">
     <nav class="next-actions__filters" aria-label="Filter by context">
         <ul class="next-actions__filter-list" role="list">
             <li>
                 <a href="/next-actions"
                     hx-get="/next-actions"
-                    hx-target="#next-actions-list"
-                    hx-swap="innerHTML"
+                    hx-target="#next-actions-content"
+                    hx-select="#next-actions-content"
+                    hx-swap="outerHTML"
                     hx-push-url="true"
                     {% if selected_context.is_none() %}aria-current="true" class="next-actions__filter-link next-actions__filter-link--active"{% else %}class="next-actions__filter-link"{% endif %}>All</a>
             </li>
@@ -28,8 +30,9 @@
             <li>
                 <a href="/next-actions?context={{ ctx.id }}"
                     hx-get="/next-actions?context={{ ctx.id }}"
-                    hx-target="#next-actions-list"
-                    hx-swap="innerHTML"
+                    hx-target="#next-actions-content"
+                    hx-select="#next-actions-content"
+                    hx-swap="outerHTML"
                     hx-push-url="true"
                     {% if selected_context.as_deref() == Some(ctx.id.as_str()) %}aria-current="true" class="next-actions__filter-link next-actions__filter-link--active"{% else %}class="next-actions__filter-link"{% endif %}>{{ ctx.name }}</a>
             </li>
@@ -95,6 +98,7 @@
             {% endfor %}
         </ul>
         {% endif %}
+    </div>
     </div>
 </div>
 {% endblock %}

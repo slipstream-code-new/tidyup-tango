@@ -53,13 +53,6 @@ struct NextActionItemTemplate {
 }
 
 #[derive(Template)]
-#[template(path = "next_action_list.html")]
-struct NextActionListTemplate {
-    groups: Vec<ContextGroup>,
-    show_headings: bool,
-}
-
-#[derive(Template)]
 #[template(path = "next_action_edit.html")]
 struct NextActionEditTemplate {
     action: NextActionView,
@@ -157,11 +150,8 @@ pub struct ContextFilter {
 pub async fn get_next_actions(
     AuthenticatedUser(user_id): AuthenticatedUser,
     State(pool): State<PgPool>,
-    headers: HeaderMap,
     Query(filter): Query<ContextFilter>,
 ) -> Result<Response, NextActionError> {
-    let htmx = is_htmx_request(&headers);
-
     let contexts = context_service::list_contexts(&pool, &user_id)
         .await
         .map_err(NextActionError::Unexpected)?;
@@ -181,18 +171,7 @@ pub async fn get_next_actions(
         .await
         .map_err(NextActionError::Unexpected)?;
 
-    let show_headings = filter.context.is_none();
     let groups = build_context_groups(&actions, &contexts, &projects, filter.context.is_some());
-
-    // HTMX filter requests: return just the action list fragment
-    if htmx {
-        let template = NextActionListTemplate {
-            groups,
-            show_headings,
-        };
-        let body = template.render().map_err(NextActionError::Render)?;
-        return Ok(Html(body).into_response());
-    }
 
     let inbox_count = inbox_service::get_inbox_count(&pool, &user_id)
         .await

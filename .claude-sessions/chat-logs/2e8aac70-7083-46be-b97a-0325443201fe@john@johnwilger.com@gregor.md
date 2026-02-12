@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `2e8aac70-7083-46be-b97a-0325443201fe` |
-| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-12 23:09 UTC |
+| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-12 23:20 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -3200,5 +3200,409 @@ This should reduce message noise significantly and let Luca focus on coding inst
 ## 2026-02-12 23:09 UTC -- User
 
 yes, do that, but to be clear, it's not just Luca, and also, you need to update your instructions so that you don't just forget this later
+
+---
+
+## 2026-02-12 23:09 UTC -- Assistant
+
+Good point — this applies to all teammates, and I need to persist this lesson. Let me update my memory.
+
+---
+
+## 2026-02-12 23:10 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/.claude/projects/-home-jwilger-projects-todo-list/memory/MEMORY.md
+
+</details>
+
+---
+
+## 2026-02-12 23:10 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Edit: /home/jwilger/.claude/projects/-home-jwilger-projects-todo-list/memory/MEMORY.md
+
+</details>
+
+---
+
+## 2026-02-12 23:10 UTC -- Assistant
+
+Also updating the completed tasks and next steps to reflect current progress.
+
+---
+
+## 2026-02-12 23:10 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Edit: /home/jwilger/.claude/projects/-home-jwilger-projects-todo-list/memory/MEMORY.md
+
+</details>
+
+---
+
+## 2026-02-12 23:10 UTC -- Assistant
+
+Done. I've added a new **Coordinator Communication Rules** section to my memory with clear rules:
+
+1. Send instructions once — never repeat
+2. Idle notifications are not requests for action
+3. Never send the same instruction more than once
+4. Wait patiently — silence is fine
+5. Only follow up if a teammate explicitly asks or reports being blocked
+
+I also removed the old "keep nudging" lesson that was actively encouraging the wrong behavior. This applies to all teammates, not just the Driver. I'll apply this immediately for the rest of this session.
+
+---
+
+## 2026-02-12 23:17 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="All 5 blocking review fixes committed, CI green">
+All 5 blocking review items are fixed, committed at 24428d1, pushed, and CI run 21967862642 is green.
+
+Summary of fixes:
+
+1. **Project name on Next Actions page**: Added `project_name: Option<String>` to `NextActionView`, look up project names from active projects list, display as a badge in `next_action_item.html`. Added CSS for `.next-action-item__project`.
+
+2. **Complete action on project detail page**: Changed the complete button in `project_next_action_item.html` to use `hx-swap="none"` with `hx-on::after-request` that calls `window.location.reload()`. This causes the page to reload after completing an action, so the completed action correctly moves to the "Completed Actions" section.
+
+3. **Focus management on project detail page**: Created `static/js/project-detail-focus.js` that hides the empty state message and stalled notice after adding an action via HTMX. Updated `project_detail.html` to always render the stalled notice and empty state in the DOM (using `hidden` attribute) so they can be toggled by JS. Added the script to the `{% block scripts %}` block.
+
+4. **Stalled flag text contrast**: Changed `.project-item__stalled-flag` from `color: var(--color-warning)` to `color: var(--color-fg)` for WCAG AA compliance. The warning background (`color-warning-light`) is preserved for visual indication.
+
+5. **Inline SQL in service layer**: Moved the `UPDATE projects SET title` query from `project_service::update_project_title` to a new `project_repository::update_project_title` function. The service now calls the repository function.
+
+Files changed:
+- `src/infrastructure/project_repository.rs` -- added `update_project_title`
+- `src/services/project_service.rs` -- use repo function instead of inline SQL
+- `src/routes/next_actions.rs` -- added project_name to NextActionView, pass projects to build functions
+- `templates/next_action_item.html` -- display project name badge when present
+- `templates/project_detail.html` -- always render stalled/empty elements with hidden attr, added script block
+- `templates/project_next_action_item.html` -- complete button reloads page instead of swapping item
+- `static/css/main.css` -- added .next-action-item__project, fixed stalled flag contrast
+- `static/js/project-detail-focus.js` -- new focus management script for project detail
+
+Pipeline: fmt, clippy, 183 Rust tests (70 unit + 113 integration) + 11 Playwright e2e tests -- all green. CI run 21967862642 passed.
+</teammate-message>
+
+---
+
+## 2026-02-12 23:17 UTC -- Assistant
+
+All 5 blocking items fixed, CI green. Let me notify the reviewers who had blocking items to re-review.
+
+---
+
+## 2026-02-12 23:17 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 23:17 UTC -- Assistant
+
+Waiting for re-reviews.
+
+---
+
+## 2026-02-12 23:17 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:17:03.512Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="All 5 fixes already done, CI green at 24428d1">
+This was already done before your message arrived. All 5 blocking items are fixed at commit 24428d1, pushed to main, CI run 21967862642 passed. I sent you the detailed breakdown in my previous message. Ready for re-review.
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:17:07.570Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:17 UTC -- Assistant
+
+Understood — Luca processed a stale message. The re-review broadcast is already sent. Waiting patiently for reviewer responses.
+
+---
+
+## 2026-02-12 23:17 UTC -- User
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T23:17:11.855Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Fixes already committed at 24428d1, CI green, need re-review broadcast">
+I understand you want the fixes done -- they ARE done. Commit 24428d1 (on top of 0143878) contains all 5 fixes. CI run 21967862642 passed. Here is the proof:
+
+```
+$ git log --oneline -2
+24428d1 Fix 5 blocking review items for Step 6 (Projects)
+0143878 Add Projects feature (Step 6): domain types, CRUD, detail page, dashboard
+
+$ gh run list --limit 1
+conclusion: success, headSha: 24428d1
+```
+
+The fixes are already on main. Please broadcast the re-review request to the team so they can verify the 5 blocking items are resolved.
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T23:17:16.666Z","idleReason":"available","summary":"[to luca-palmieri] No re-review needed, approval stands for consensus"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:17:16.957Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:18 UTC -- Assistant
+
+Kent confirmed his approval stands. Waiting for the other reviewers with blocking items (Marty, Carson, Heydon, Scott) to re-review.
+
+---
+
+## 2026-02-12 23:18 UTC -- User
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T23:17:50.933Z","idleReason":"available","summary":"[to luca-palmieri] Confirmed: stalled flag contrast fix resolves my concern, approval stands"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red" summary="CONSENSUS APPROVED for Step 6">
+**CONSENSUS APPROVED** from Heydon Pickering (Accessibility) for Step 6 at commit 24428d1.
+
+Both my blocking items are resolved:
+1. Focus management on project detail -- smart use of `hx-swap="none"` + `window.location.reload()` avoids the focus-loss problem entirely
+2. Stalled flag contrast -- now uses `color: var(--color-fg)`, well above 4.5:1
+
+Minor items M2 (empty state pattern) also fixed as a bonus.
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T23:18:15.981Z","idleReason":"available","summary":"[to luca-palmieri] Stalled flag contrast fix verified, consensus confirmed"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T23:18:32.574Z","idleReason":"available","summary":"[to luca-palmieri] CONSENSUS APPROVED -- both blocking items resolved"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T23:18:34.148Z","idleReason":"available","summary":"[to luca-palmieri] CONSENSUS APPROVED for Step 6 Projects"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:19 UTC -- Assistant
+
+Approvals rolling in fast:
+
+1. Kent Beck — APPROVED
+2. Lea Verou — APPROVED
+3. Steve Schoger — APPROVED
+4. Steve Krug — APPROVED
+5. Heydon Pickering — APPROVED
+6. Marty Cagan — APPROVED
+7. Luca Palmieri — (Driver)
+
+Waiting on **Scott Wlaschin** and **Carson Gross**.
+
+---
+
+## 2026-02-12 23:19 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T23:19:27.915Z","idleReason":"available","summary":"[to luca-palmieri] BLOCKING resolved, consensus approved"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:19 UTC -- Assistant
+
+8 of 9. Just waiting on **Carson Gross**.
+
+---
+
+## 2026-02-12 23:19 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="All 5 fixes proven in diff, CI green, requesting re-review broadcast">
+I believe your messages are arriving out of order. The fixes were completed before any of your "fix them now" messages arrived. Here is definitive proof -- the diff between the original commit (0143878) and the fix commit (24428d1):
+
+```
+ src/infrastructure/project_repository.rs | 15 +++  (Fix #5: update_project_title added)
+ src/routes/next_actions.rs               | 55 +++  (Fix #1: project_name in NextActionView)
+ src/services/project_service.rs          | 18 +--  (Fix #5: removed inline SQL)
+ static/css/main.css                      | 10 ++-  (Fix #1: .next-action-item__project, Fix #4: color-fg)
+ static/js/project-detail-focus.js        | 40 +++  (Fix #3: new focus management script)
+ templates/next_action_item.html          |  3 ++  (Fix #1: project name badge)
+ templates/project_detail.html            | 12 +-- (Fix #3: hidden attrs + script block)
+ templates/project_next_action_item.html  |  4 +-- (Fix #2: hx-swap=none + reload)
+ 8 files changed, 127 insertions(+), 30 deletions(-)
+```
+
+CI run 21967862642: SUCCESS. All 183 Rust tests + 11 Playwright e2e pass.
+
+The work is done. Please broadcast a re-review request to the 4 blocking reviewers (Marty, Carson, Heydon, Scott) so they can verify their items are resolved.
+</teammate-message>
+
+---
+
+## 2026-02-12 23:19 UTC -- Assistant
+
+Luca processed another stale message. The re-review broadcast was already sent and approvals are coming in — 8 of 9 approved, just waiting on Carson.
+
+---
+
+## 2026-02-12 23:19 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:19:44.581Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:19 UTC -- Assistant
+
+Waiting for Carson's re-review.
+
+---
+
+## 2026-02-12 23:19 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:19:48.231Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T23:19:48.932Z","idleReason":"available","summary":"[to luca-palmieri] APPROVED -- blocking item resolved, consensus given for Step 6"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:19 UTC -- Assistant
+
+**9/9 consensus achieved for Step 6: Projects!**
+
+---
+
+## 2026-02-12 23:19 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 23:19 UTC -- Assistant
+
+Three steps complete (4, 5, 6). Waiting for the team's mini-retro and transition to Step 7: Clarify as Project.
+
+---
+
+## 2026-02-12 23:20 UTC -- User
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T23:20:17.473Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro: UX clean, 5 blockers suggest scope was large, Step 7 UX preview"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:20 UTC -- Assistant
+
+Mini-retro starting. Waiting for the rest of the team.
+
+---
+
+## 2026-02-12 23:20 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T23:20:19.108Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro: good domain design, self-review checklist needed"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:20 UTC -- Assistant
+
+Retro contributions coming in. Waiting patiently for the team to complete and move to Step 7.
+
+---
+
+## 2026-02-12 23:20 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T23:20:21.016Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro: contrast threshold adjustment, Tidy First candidates"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T23:20:22.453Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro done, Step 7 product requirements for clarify-as-project"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:20 UTC -- Assistant
+
+Retro feedback continuing to flow. Waiting for the rest of the team.
+
+---
+
+## 2026-02-12 23:20 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T23:20:25.754Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro + Step 7 type sketch with FK policy"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:20 UTC -- Assistant
+
+Waiting for the remaining retro contributions and Step 7 transition.
+
+---
+
+## 2026-02-12 23:20 UTC -- User
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T23:20:27.348Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro + Step 7 design considerations for clarify-as-project form"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T23:20:27.863Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro: reload pattern as tech debt, recommend clarify page for Step 7"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:20 UTC -- Assistant
+
+Waiting for Heydon's retro contribution, then the team can proceed to Step 7.
+
+---
+
+## 2026-02-12 23:20 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T23:20:40.656Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro observations and Step 7 a11y notes"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:20 UTC -- Assistant
+
+All 9 have contributed to the mini-retro. The team should now be transitioning to Step 7: Clarify as Project. Waiting for Luca to update docs and begin.
 
 ---

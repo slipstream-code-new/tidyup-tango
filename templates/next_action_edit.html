@@ -21,6 +21,7 @@
         <a
             href="/next-actions/{{ action.id }}"
             class="next-action-item__edit-cancel"
+            aria-label="Cancel editing {{ action.title }}"
             hx-get="/next-actions/{{ action.id }}"
             hx-target="#next-action-{{ action.id }}"
             hx-swap="outerHTML"
