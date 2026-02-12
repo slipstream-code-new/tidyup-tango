@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `2e8aac70-7083-46be-b97a-0325443201fe` |
-| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-12 22:44 UTC |
+| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-12 23:09 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -2690,5 +2690,515 @@ Good, docs are updated. The team already agreed Luca continues driving.
 ## 2026-02-12 22:44 UTC -- Assistant
 
 Waiting for Luca to begin Step 6 implementation.
+
+---
+
+## 2026-02-12 22:57 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 6 Projects committed and pushed, ready for review">
+Step 6 (Projects, US-GTD-4) implementation is committed and pushed.
+
+**Commit:** `0143878` on `main`
+**CI:** Waiting for green.
+
+**What was implemented:**
+- `Project` domain type as enum state machine (Active/Completed/Dropped) with 13 unit tests
+- `ProjectId` newtype wrapper
+- Migration: `projects` table with FK from `next_actions.project_id`
+- `NextAction` updated with `project_id: Option<ProjectId>` and `new_for_project()` constructor
+- Project repository: full CRUD + stalled project detection + project next action count
+- Project service: add, list, complete, delete, edit title, get detail, add next action to project
+- Routes: `/projects` (list + add), `/projects/{id}` (detail), `/projects/{id}/complete`, `/projects/{id}/delete`, `/projects/{id}/edit`, `/projects/{id}/next-actions` (add action to project), `/projects/{id}/item` (HTMX fragment)
+- Templates: projects list, project item, project edit, project detail, project next action item
+- CSS: full project component styles following existing patterns
+- Focus management JS: `project-focus.js` following HTMX focus protocol
+- Dashboard: now shows real projects count and stalled projects count
+- Glossary: Project types and error types marked as Implemented
+- 28 new integration tests covering all CRUD, HTMX, accessibility labels, semantic markup, auth isolation, dashboard integration
+
+**Pipeline results (local):**
+- `cargo fmt`: clean
+- `cargo clippy`: clean  
+- 183 Rust tests (70 unit + 113 integration): all green
+- 11 Playwright e2e tests: all green
+
+**Acceptance criteria addressed (US-GTD-4):**
+- [x] Projects list shows all active projects
+- [x] Each project shows title and active next action count
+- [x] Stalled projects flagged with "No next actions" label (text, not color alone)
+- [x] Project detail page with linked next actions (active and completed)
+- [x] Add project directly (not through inbox)
+- [x] Add next action to project with context selection
+- [x] Complete a project
+- [x] Drop a project (delete removes from DB)
+- [x] Edit project title
+- [x] Delete project
+- [x] Works without JavaScript; HTMX enhances
+- [x] All interactive elements keyboard operable
+- [x] Semantic `<ul>` with `role="list"` for screen readers
+- [x] Heading hierarchy: `<h1>` project title, `<h2>` sections
+- [x] Accessible labels including project title on all actions
+
+Please review at commit `0143878`.
+</teammate-message>
+
+---
+
+## 2026-02-12 22:57 UTC -- Assistant
+
+Impressive — Luca implemented all of Step 6 in one pass, including focus management and accessible labels from day one (retro lessons applied). Let me wait for CI to confirm green, then broadcast the review request.
+
+---
+
+## 2026-02-12 22:57 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 22:59 UTC -- User
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T22:59:05.119Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:59 UTC -- Assistant
+
+Waiting for Luca to confirm CI green for Step 6.
+
+---
+
+## 2026-02-12 22:59 UTC -- User
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T22:59:56.650Z","idleReason":"available","summary":"[to luca-palmieri] Product review Step 6: 1 blocking (project name on next actions), 1 minor"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:00 UTC -- Assistant
+
+Marty has already started reviewing — he found 1 blocking item (project name on next actions). Reviews are flowing even before my broadcast. Let me go ahead and broadcast now since reviewers are already picking up the code.
+
+---
+
+## 2026-02-12 23:00 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 23:00 UTC -- Assistant
+
+Reviewers are starting their Step 6 reviews. Marty already has 1 blocking item. Waiting for the rest.
+
+---
+
+## 2026-02-12 23:00 UTC -- User
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T23:00:33.849Z","idleReason":"available","summary":"[to luca-palmieri] Step 6 review: 1 BLOCKING (complete action doesn't update project detail), 2 minor"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T23:00:34.542Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T23:00:38.806Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T23:00:39.419Z","idleReason":"available","summary":"[to luca-palmieri] Step 6 CSS review: no blocking, 4 minor (contrast issues), approved"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:00 UTC -- Assistant
+
+Reviews coming in for Step 6:
+
+- **Marty Cagan** — 1 BLOCKING (project name on next actions)
+- **Carson Gross** — 1 BLOCKING (completing action doesn't update project detail)
+- **Lea Verou** — APPROVED (4 minor contrast issues)
+
+Waiting for Kent, Scott, Steve Schoger, Steve Krug, and Heydon.
+
+---
+
+## 2026-02-12 23:00 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T23:00:42.978Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T23:00:46.964Z","idleReason":"available","summary":"[to luca-palmieri] APPROVED — no blocking, 3 minor (contrast on stalled flag most important)"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:00 UTC -- Assistant
+
+- **Steve Schoger** — APPROVED (3 minor, contrast on stalled flag noted)
+
+Still waiting on Kent, Scott, Steve Krug, and Heydon.
+
+---
+
+## 2026-02-12 23:01 UTC -- User
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T23:00:50.819Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red" summary="Step 6 a11y: 2 blocking (detail focus, contrast), 2 minor">
+Accessibility review for Step 6 complete, sent to Luca. Summary:
+
+**2 BLOCKING:**
+1. Focus management missing on project detail page -- completing a next action from within a project view removes the `<li>` and focus falls to body. The projects list page has `project-focus.js` but the detail page has nothing.
+2. Stalled flag text contrast fails WCAG AA -- `color: var(--color-warning)` (oklch 0.75) on `background: var(--color-warning-light)` (oklch 0.93) gives roughly 1.5-2:1 ratio. Needs 4.5:1. Fix: use `var(--color-fg)` for the text color, which the detail page stalled notice already does correctly.
+
+**2 Minor:** Empty state on detail page not always-in-DOM; Save/Cancel buttons lack unique names (deferred from Step 4).
+
+**1 Nice-to-have:** More descriptive link text on project titles.
+
+Lots of positives: heading hierarchy, section landmarks, accessible names, visible labels, stalled indicator using text (not color alone), forced-colors support, progressive enhancement -- all correct from the initial commit. Significant improvement from earlier steps.
+</teammate-message>
+
+---
+
+## 2026-02-12 23:01 UTC -- Assistant
+
+- **Heydon Pickering** — 2 BLOCKING (detail page focus management, stalled flag contrast)
+
+Waiting for Kent, Scott, and Steve Krug. Then Luca can address all blocking items together.
+
+---
+
+## 2026-02-12 23:01 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T23:01:08.850Z","idleReason":"available","summary":"[to luca-palmieri] BLOCKING: inline SQL in service layer, otherwise excellent"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T23:01:13.030Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan" summary="CONSENSUS APPROVED from Steve Krug (UX) — Step 6">
+Steve Krug here. UX review for Step 6 (Projects) is complete. No BLOCKING items -- the projects implementation is solid and teaches GTD concepts through its labels, placeholders, and empty states.
+
+**CONSENSUS: APPROVED** from Steve Krug (UX).
+
+Key highlights: Trunk test passes on both projects list and detail pages. Breadcrumb navigation is clean. Stalled projects use text flagging (not color alone). "What outcome are you working toward?" placeholder teaches GTD framing. Minor items: Complete vs Delete distinction could cause hesitation (suggested "Drop"), context label pattern inconsistency. Nice-to-haves: stalled projects filter link, smarter Getting Started condition.
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T23:01:25.664Z","idleReason":"available","summary":"[to luca-palmieri] UX review Step 6: No BLOCKING, CONSENSUS APPROVED. 2 Minor, 2 Nice-to-have."}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:01 UTC -- Assistant
+
+Almost all reviews in. Still waiting on **Kent Beck**.
+
+Current status:
+- **APPROVED**: Lea Verou, Steve Schoger, Steve Krug (3)
+- **BLOCKING**: Marty (project name on next actions), Carson (completing action doesn't update project detail), Heydon (detail page focus + stalled contrast), Scott (inline SQL in service layer)
+- **PENDING**: Kent Beck
+
+---
+
+## 2026-02-12 23:02 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T23:02:31.389Z","idleReason":"available","summary":"[to luca-palmieri] Step 6 Projects review: APPROVE, no blocking items"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green" summary="Step 6 review already submitted: APPROVE">
+My Step 6 review is already submitted to luca-palmieri. Verdict: APPROVE, no blocking items. 4 Minor (inline SQL in project_service, service-layer bypass in routes, ContextOption duplication x3, silently discarded TooLong error), 2 Nice-to-have (in-memory action filtering, no drop UI yet). Ready for consensus when the other 7 reviewers weigh in.
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T23:02:40.975Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:02 UTC -- Assistant
+
+All 8 reviews are in. Kent approved with no blocking items.
+
+**Summary:**
+- **APPROVED**: Kent Beck, Lea Verou, Steve Schoger, Steve Krug (4)
+- **BLOCKING**: Marty (1), Carson (1), Heydon (2), Scott (1) — total 5 blocking items
+- **Driver**: Luca (1)
+
+---
+
+## 2026-02-12 23:02 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 23:02 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red" summary="Step 6 blocking items still unresolved, awaiting fixes">
+Heydon here — context was compacted and I have re-verified the current state of the code. Both BLOCKING items from my Step 6 review are still unresolved:
+
+1. **Focus management on project detail page** — `templates/project_detail.html` has no focus management script. Completing a next action via HTMX removes the `<li>` and focus falls to `<body>`.
+
+2. **Stalled flag contrast** — `static/css/main.css` line 1803 still uses `color: var(--color-warning)` (oklch 0.75) on `background-color: var(--color-warning-light)` (oklch 0.93), giving ~1.5–2:1 contrast ratio, failing WCAG AA's 4.5:1 requirement. Fix: change to `color: var(--color-fg)`.
+
+I am ready to re-review as soon as Luca commits fixes for both items.
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T23:02:49.814Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:02 UTC -- Assistant
+
+Heydon re-confirmed his blocking items with specific details. Luca has clear instructions for all 5 blockers. Waiting for him to implement the fixes.
+
+---
+
+## 2026-02-12 23:03 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red" summary="Already reviewed Step 6, 2 blocking items pending fixes">
+Thanks — I have already completed my initial review of Step 6 at commit 0143878 and sent detailed feedback to Luca. No new commits have landed since then.
+
+My review found **2 BLOCKING items** that must be fixed before I can give consensus:
+
+1. **Focus management missing on project detail page** — `templates/project_detail.html` loads no focus management script. `project-focus.js` only covers the projects list page. When a user completes a next action on the detail page, the `<li>` is removed via HTMX outerHTML swap and focus falls to `<body>`. A `project-detail-focus.js` (or equivalent) is needed, scoped to `.project-action-item`, falling back to `#project-action-title`.
+
+2. **Stalled flag text color fails WCAG AA contrast** — `.project-item__stalled-flag` in `static/css/main.css` (line 1803) uses `color: var(--color-warning)` (oklch 0.75) on `background: var(--color-warning-light)` (oklch 0.93), giving approximately 1.5–2:1 contrast ratio. WCAG AA requires 4.5:1 for text. Fix: change to `color: var(--color-fg)`.
+
+I am standing by for re-review once Luca commits fixes for both.
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T23:03:10.161Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:03 UTC -- Assistant
+
+Heydon has provided very specific fix guidance. Waiting for Luca to implement all 5 blocking fixes.
+
+---
+
+## 2026-02-12 23:03 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="CI green for Step 6, requesting reviews">
+CI green for Step 6 commit `0143878` (run 21967506510). All checks passed.
+
+Ready for review -- please check the implementation at commit `0143878` and provide your feedback.
+</teammate-message>
+
+---
+
+## 2026-02-12 23:03 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 23:04 UTC -- Assistant
+
+Waiting for Luca to fix the 5 blocking items.
+
+---
+
+## 2026-02-12 23:04 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T23:03:54.994Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T23:03:55.468Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T23:03:55.749Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T23:03:56.213Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T23:03:57.726Z","idleReason":"available","summary":"[to luca-palmieri] Acknowledged CI green, review already sent"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T23:04:00.324Z","idleReason":"available","summary":"[to luca-palmieri] Review already sent, waiting on BLOCKING fix"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:04:00.413Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:04 UTC -- Assistant
+
+All reviewers are idle waiting for Luca's fixes. Luca should be working on the 5 blocking items now.
+
+---
+
+## 2026-02-12 23:04 UTC -- User
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T23:04:01.823Z","idleReason":"available","summary":"[to luca-palmieri] Review already sent, one blocker: project name on next actions"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:04 UTC -- Assistant
+
+Waiting for Luca to implement the fixes.
+
+---
+
+## 2026-02-12 23:04 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 6 already done, waiting for reviews">
+This message appears to be stale. Step 6 (Projects, US-GTD-4) is already fully implemented, committed, pushed, and CI is green.
+
+Evidence:
+- Commit `0143878` on `main`: "Add Projects feature (Step 6): domain types, CRUD, detail page, dashboard"
+- CI run `21967506510`: completed with success
+- 183 Rust tests (70 unit + 113 integration) + 11 Playwright e2e: all green
+- Review broadcast already sent to all 9 team members
+
+I am currently waiting for team reviews. Please ask the reviewers to check commit `0143878`.
+</teammate-message>
+
+---
+
+## 2026-02-12 23:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 23:04 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:04:10.565Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T23:04:12.111Z","idleReason":"available","summary":"[to luca-palmieri] Step 6 review: 2 BLOCKING items need fixing"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="CI already green, reviews already requested">
+CI has been green for a while now. Run `21967506510` completed with success.
+
+I already broadcast the review request to all 9 team members myself. Please ask reviewers to proceed with their reviews of commit `0143878`.
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:04:16.354Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:04 UTC -- Assistant
+
+Luca seems stuck in a loop thinking he's waiting for reviews. Let me try once more very directly.
+
+---
+
+## 2026-02-12 23:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 23:04 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:04:18.601Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:04 UTC -- Assistant
+
+Waiting for Luca to start fixing the blocking items. The repeated stale messages suggest he may be processing delayed context. The clear list of 5 fixes has been sent multiple times now.
+
+---
+
+## 2026-02-12 23:08 UTC -- User
+
+observation for the team (or maybe just the team-lead?):
+
+You aren't being patient enough sometimes. For example, Luca is often in the middle of working on something, and you tell him to do something else, then when he doesn't respond (because he's clearly busy with something), you keep telling him to do it again and again. And then when he's finally freed up, he processes *all* of the queued up messages, so he gets told to do the same thing 10 times. It's wasteful. How can we fix this?
+
+---
+
+## 2026-02-12 23:08 UTC -- Assistant
+
+You're absolutely right. I've been way too aggressive with nudging, especially when Luca is clearly working. The pattern is:
+
+1. I send a message with instructions
+2. Luca is busy implementing (idle notifications are just heartbeats, not "I'm done")
+3. I interpret the idle notification as "he's not doing it" and resend
+4. This compounds — by the time he finishes, he has 5-10 copies of the same instruction
+
+**What I'll change:**
+- **Send the instruction once.** If Luca doesn't respond, assume he's working on it.
+- **Don't interpret idle notifications as requests for action.** They're automatic system events, not signals that he's stuck.
+- **Wait longer before following up.** Only re-send if Luca explicitly asks a question or says he's blocked.
+- **Never send the same instruction more than twice** max, and the second time only after significant time has passed and he's explicitly asked.
+
+This should reduce message noise significantly and let Luca focus on coding instead of processing duplicate messages. Thanks for the feedback — I'll apply this immediately.
+
+---
+
+## 2026-02-12 23:09 UTC -- User
+
+yes, do that, but to be clear, it's not just Luca, and also, you need to update your instructions so that you don't just forget this later
 
 ---

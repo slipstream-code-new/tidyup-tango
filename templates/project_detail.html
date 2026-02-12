@@ -6,16 +6,18 @@
 {% include "gtd_nav.html" %}
 {% endblock %}
 
+{% block scripts %}
+<script src="/static/js/project-detail-focus.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="project-detail">
     <p class="project-detail__breadcrumb"><a href="/projects">Projects</a></p>
     <h1>{{ project.title }}</h1>
 
-    {% if project.is_stalled %}
-    <div class="project-detail__stalled-notice" role="status">
+    <div class="project-detail__stalled-notice" role="status" id="project-stalled-notice"{% if !project.is_stalled %} hidden{% endif %}>
         <p>This project has no next actions. Add one to keep it moving forward.</p>
     </div>
-    {% endif %}
 
     {% if let Some(error) = error_message %}
     <div class="project-detail__error" role="alert">{{ error }}</div>
@@ -56,9 +58,7 @@
         </form>
         {% endif %}
 
-        {% if active_actions.is_empty() %}
-        <p class="project-detail__empty">No active next actions.</p>
-        {% endif %}
+        <p class="project-detail__empty" id="project-empty-state"{% if !active_actions.is_empty() %} hidden{% endif %}>No active next actions.</p>
         <ul class="project-detail__action-list" role="list" id="project-active-actions">
             {% for action in active_actions %}
             {% include "project_next_action_item.html" %}

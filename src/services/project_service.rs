@@ -191,17 +191,13 @@ pub async fn update_project_title(
 
     let title = TodoTitle::parse(new_title)?;
 
-    // We need an update_project_title repo function
-    sqlx::query!(
-        r#"UPDATE projects SET title = $1 WHERE id = $2"#,
-        title.as_str(),
-        project_id.as_uuid(),
-    )
-    .execute(pool)
-    .await
-    .map_err(|e| {
-        UpdateProjectTitleError::Unexpected(anyhow::anyhow!("Failed to update project title: {e}"))
-    })?;
+    project_repository::update_project_title(pool, project_id, &title)
+        .await
+        .map_err(|e| {
+            UpdateProjectTitleError::Unexpected(anyhow::anyhow!(
+                "Failed to update project title: {e}"
+            ))
+        })?;
 
     tracing::info!("Project title updated");
     Ok(())

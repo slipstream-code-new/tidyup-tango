@@ -10,6 +10,9 @@
         <button type="submit" class="next-action-item__complete-button" aria-label="Complete: {{ action.title }}">&#x2610;</button>
     </form>
     <span class="next-action-item__title">{{ action.title }}</span>
+    {% if let Some(pname) = action.project_name %}
+    <span class="next-action-item__project">{{ pname }}</span>
+    {% endif %}
     <span class="next-action-item__context">{{ action.context_name }}</span>
     <a
         href="/next-actions/{{ action.id }}/edit"

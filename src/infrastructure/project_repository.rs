@@ -153,6 +153,21 @@ pub async fn count_stalled_projects(pool: &PgPool, user_id: &UserId) -> Result<i
     Ok(record.count)
 }
 
+pub async fn update_project_title(
+    pool: &PgPool,
+    project_id: &ProjectId,
+    title: &TodoTitle,
+) -> Result<(), sqlx::Error> {
+    sqlx::query!(
+        r#"UPDATE projects SET title = $1 WHERE id = $2"#,
+        title.as_str(),
+        project_id.as_uuid(),
+    )
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
 /// Count active next actions for a specific project
 pub async fn count_project_next_actions(
     pool: &PgPool,

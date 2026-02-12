@@ -8,18 +8,20 @@ use uuid::Uuid;
 
 use super::auth::AuthenticatedUser;
 use super::{htmx_response_with_announce, is_htmx_request};
-use crate::domain::{Context, ContextId, NextAction, NextActionId, TodoTitleError};
+use crate::domain::{Context, ContextId, NextAction, NextActionId, Project, TodoTitleError};
 use crate::services::context_service;
 use crate::services::inbox_service;
 use crate::services::next_action_service::{
     self, AddNextActionError, CompleteNextActionError, DeleteNextActionError,
     UpdateNextActionTitleError,
 };
+use crate::services::project_service;
 
 pub struct NextActionView {
     pub id: String,
     pub title: String,
     pub context_name: String,
+    pub project_name: Option<String>,
 }
 
 pub struct ContextOption {
@@ -63,23 +65,36 @@ struct NextActionEditTemplate {
     action: NextActionView,
 }
 
-fn build_action_view(action: &NextAction, contexts: &[Context]) -> NextActionView {
+fn build_action_view(
+    action: &NextAction,
+    contexts: &[Context],
+    projects: &[Project],
+) -> NextActionView {
     let context_name = contexts
         .iter()
         .find(|c| c.id() == action.context_id())
         .map(|c| c.name().as_str().to_string())
         .unwrap_or_else(|| "Unknown".to_string());
 
+    let project_name = action.project_id().and_then(|pid| {
+        projects
+            .iter()
+            .find(|p| p.id() == pid)
+            .map(|p| p.title().as_str().to_string())
+    });
+
     NextActionView {
         id: action.id().as_uuid().to_string(),
         title: action.title().as_str().to_string(),
         context_name,
+        project_name,
     }
 }
 
 fn build_context_groups(
     actions: &[NextAction],
     contexts: &[Context],
+    projects: &[Project],
     single_context: bool,
 ) -> Vec<ContextGroup> {
     if single_context {
@@ -102,7 +117,7 @@ fn build_context_groups(
 
         let action_views = actions
             .iter()
-            .map(|a| build_action_view(a, contexts))
+            .map(|a| build_action_view(a, contexts, projects))
             .collect();
 
         return vec![ContextGroup {
@@ -119,7 +134,7 @@ fn build_context_groups(
         let ctx_actions: Vec<NextActionView> = actions
             .iter()
             .filter(|a| a.context_id() == ctx.id())
-            .map(|a| build_action_view(a, contexts))
+            .map(|a| build_action_view(a, contexts, projects))
             .collect();
 
         if !ctx_actions.is_empty() {
@@ -162,8 +177,12 @@ pub async fn get_next_actions(
             .map_err(NextActionError::Unexpected)?
     };
 
+    let projects = project_service::list_active_projects(&pool, &user_id)
+        .await
+        .map_err(NextActionError::Unexpected)?;
+
     let show_headings = filter.context.is_none();
-    let groups = build_context_groups(&actions, &contexts, filter.context.is_some());
+    let groups = build_context_groups(&actions, &contexts, &projects, filter.context.is_some());
 
     // HTMX filter requests: return just the action list fragment
     if htmx {
@@ -232,7 +251,7 @@ pub async fn post_next_action(
         Ok(action) => {
             if htmx {
                 let template = NextActionItemTemplate {
-                    action: build_action_view(&action, &contexts),
+                    action: build_action_view(&action, &contexts, &[]),
                 };
                 let body = template.render().map_err(NextActionError::Render)?;
                 Ok(htmx_response_with_announce(Html(body), "Next action added"))
@@ -276,7 +295,11 @@ async fn render_next_actions_with_error(
         .await
         .map_err(NextActionError::Unexpected)?;
 
-    let groups = build_context_groups(&actions, &contexts, false);
+    let projects = project_service::list_active_projects(pool, user_id)
+        .await
+        .map_err(NextActionError::Unexpected)?;
+
+    let groups = build_context_groups(&actions, &contexts, &projects, false);
 
     let context_options: Vec<ContextOption> = contexts
         .iter()
@@ -394,8 +417,12 @@ pub async fn get_edit_next_action(
     let htmx = is_htmx_request(&headers);
 
     if htmx {
+        let projects = project_service::list_active_projects(&pool, &user_id)
+            .await
+            .map_err(NextActionError::Unexpected)?;
+
         let template = NextActionEditTemplate {
-            action: build_action_view(&action, &contexts),
+            action: build_action_view(&action, &contexts, &projects),
         };
         let body = template.render().map_err(NextActionError::Render)?;
         Ok(Html(body).into_response())
@@ -435,8 +462,12 @@ pub async fn post_edit_next_action(
                     .await
                     .map_err(NextActionError::Unexpected)?;
 
+                let projects = project_service::list_active_projects(&pool, &user_id)
+                    .await
+                    .map_err(NextActionError::Unexpected)?;
+
                 let template = NextActionItemTemplate {
-                    action: build_action_view(&action, &contexts),
+                    action: build_action_view(&action, &contexts, &projects),
                 };
                 let body = template.render().map_err(NextActionError::Render)?;
                 Ok(htmx_response_with_announce(Html(body), "Action updated"))
@@ -491,8 +522,12 @@ pub async fn get_next_action_item(
         .await
         .map_err(NextActionError::Unexpected)?;
 
+    let projects = project_service::list_active_projects(&pool, &user_id)
+        .await
+        .map_err(NextActionError::Unexpected)?;
+
     let template = NextActionItemTemplate {
-        action: build_action_view(&action, &contexts),
+        action: build_action_view(&action, &contexts, &projects),
     };
     let body = template.render().map_err(NextActionError::Render)?;
     Ok(Html(body).into_response())

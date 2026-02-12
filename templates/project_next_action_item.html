@@ -5,8 +5,8 @@
         action="/next-actions/{{ action.id }}/complete"
         class="project-action-item__complete"
         hx-post="/next-actions/{{ action.id }}/complete"
-        hx-target="#project-action-{{ action.id }}"
-        hx-swap="outerHTML"
+        hx-swap="none"
+        hx-on::after-request="if(event.detail.successful) { window.location.reload(); }"
     >
         <button type="submit" class="project-action-item__complete-button" aria-label="Complete: {{ action.title }}">&#x2610;</button>
     </form>
