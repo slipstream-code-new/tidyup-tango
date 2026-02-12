@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `0560b569-3212-4b1f-8ca0-cd4d1b2e2314` |
-| **Date Range** | 2026-02-12 22:57 UTC -- 2026-02-12 23:06 UTC |
+| **Date Range** | 2026-02-12 22:57 UTC -- 2026-02-12 23:27 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -729,5 +729,211 @@ ensemble-team/
 - Glossary compliance, deferred items tracking, and more
 
 The skill is language-agnostic — it works for Rust, Python, TypeScript, Go, Java, or any stack. It adapts the team composition, expert selection, pipeline commands, and code conventions to whatever project it's setting up.
+
+---
+
+## 2026-02-12 23:26 UTC -- User
+
+Does the skill select profiles from a fixed list, or is it going out and researching the person that should be put in each role as needed? I'm looking for the latter.
+
+Also, for things like the team agreements, rather than having pre-canned "this is what you should do" agreements, I think it would be better to have a list of "topics that should be covered" (non-exhaustive) and have the team debate and come to consensus on how *they* think they should deal with each topic. For the agreements in place in the current project, what is the *problem* each agreement is addressing?
+
+---
+
+## 2026-02-12 23:26 UTC -- Assistant
+
+Great feedback on both points. Let me rework both the role catalog and the team agreements approach.
+
+First, let me map out the problems each current agreement solves, then rewrite the files.
+
+---
+
+## 2026-02-12 23:26 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/.claude/skills/ensemble-team/references/role-catalog.md
+
+</details>
+
+---
+
+## 2026-02-12 23:26 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/.claude/skills/ensemble-team/references/team-agreements-template.md
+
+</details>
+
+---
+
+## 2026-02-12 23:26 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/.claude/skills/ensemble-team/SKILL.md
+
+</details>
+
+---
+
+## 2026-02-12 23:26 UTC -- Assistant
+
+Good, I have the full picture. Now let me rewrite both files — the role catalog to be research-driven rather than a fixed list, and the team agreements template to be a problem-driven discussion guide rather than prescriptive answers. I'll also update the SKILL.md to reflect the new approach.
+
+---
+
+## 2026-02-12 23:26 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Write: /home/jwilger/.claude/skills/ensemble-team/references/role-catalog.md
+
+</details>
+
+---
+
+## 2026-02-12 23:26 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Write: /home/jwilger/.claude/skills/ensemble-team/references/team-agreements-template.md
+
+</details>
+
+---
+
+## 2026-02-12 23:26 UTC -- Assistant
+
+Now let me update SKILL.md to reflect both changes — research-driven expert selection and team-driven agreements.
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Edit: /home/jwilger/.claude/skills/ensemble-team/SKILL.md
+
+</details>
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Edit: /home/jwilger/.claude/skills/ensemble-team/SKILL.md
+
+</details>
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Edit: /home/jwilger/.claude/skills/ensemble-team/SKILL.md
+
+</details>
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/.claude/skills/ensemble-team/SKILL.md
+
+</details>
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+I see the duplicate "Phase 6" issue. Let me fix the numbering.
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Edit: /home/jwilger/.claude/skills/ensemble-team/SKILL.md
+
+</details>
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+Now let me re-package to validate the updated skill.
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Bash: Re-package updated ensemble-team skill
+
+</details>
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+Let me verify the final SKILL.md reads correctly end-to-end.
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/.claude/skills/ensemble-team/SKILL.md
+
+</details>
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+Good. Here's a summary of both changes:
+
+### 1. Expert Selection: Research-Driven, Not Fixed List
+
+**Before**: The role catalog had hardcoded names (e.g., "Rust: Luca Palmieri", "Python: Raymond Hettinger"). It was essentially a lookup table.
+
+**After**: The role catalog now has:
+- A table of roles with "Purpose" and "What Goes Wrong Without It" — no names
+- A **Research Process** section that instructs the agent to actively WebSearch for candidates based on the project's specific tech/domain
+- Evaluation criteria: published authority, distinctive voice, practical experience, complementary perspective, searchable body of work
+- Instructions to verify credentials before proposing
+- The SKILL.md Phase 2 now explicitly says "do NOT pick from a memorized list" and walks through the 4-step research process
+
+### 2. Team Agreements: Problem-Driven Discussion, Not Pre-Canned Answers
+
+**Before**: A fill-in-the-blanks template with prescriptive answers already written ("MVP discipline is sacred", the full pipeline spelled out, etc.).
+
+**After**: A list of **10 problems** the team must discuss, each with:
+- **Problem**: What goes wrong without an agreement (e.g., "Without a defined pipeline, steps get skipped. Refactoring gets deferred.")
+- **Context**: Why it matters
+- **Sub-questions**: Specific things to debate (e.g., "Is there a refactoring step, and is it mandatory or optional?")
+
+The SKILL.md now has a dedicated **Phase 5: Team Formation Session** where the coordinator spawns the team, presents each topic, the team debates, and the Driver records their actual consensus. No pre-filled answers — the team owns every word of their agreements.
 
 ---

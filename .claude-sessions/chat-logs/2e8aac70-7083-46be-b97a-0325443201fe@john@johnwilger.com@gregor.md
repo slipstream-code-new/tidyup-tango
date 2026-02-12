@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `2e8aac70-7083-46be-b97a-0325443201fe` |
-| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-12 23:20 UTC |
+| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-12 23:34 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -3604,5 +3604,374 @@ Waiting for Heydon's retro contribution, then the team can proceed to Step 7.
 ## 2026-02-12 23:20 UTC -- Assistant
 
 All 9 have contributed to the mini-retro. The team should now be transitioning to Step 7: Clarify as Project. Waiting for Luca to update docs and begin.
+
+---
+
+## 2026-02-12 23:27 UTC -- User
+
+observation for the team:
+
+you don't seem to be switching drivers between tasks like you are supposed to; include this topic in next retrospective
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+Good catch. Let me relay this to the team.
+
+---
+
+## 2026-02-12 23:27 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 23:28 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red" summary="Proposed Carson as Step 7 driver for rotation">
+I have raised the driver rotation topic in the retro discussion with Luca and proposed **Carson Gross** as Driver for Step 7 (Clarify as Project). Rationale: Step 7 is fundamentally a hypermedia interaction design problem -- an inbox item needs to expand into a multi-field clarify form (project title, first next action, context), submit, and disappear. That is Carson's specialty. Luca would move to Reviewer and provide Rust/SQLx oversight from that seat.
+
+Waiting for team consensus on this before we proceed.
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T23:28:06.347Z","idleReason":"available","summary":"[to luca-palmieri] Retro: propose Carson as Step 7 driver"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:29 UTC -- Assistant
+
+Good — Heydon proposed Carson as Driver for Step 7, which makes sense given the hypermedia interaction design focus. Waiting for the team to reach consensus on the rotation.
+
+---
+
+## 2026-02-12 23:30 UTC -- User
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T23:28:09.145Z","idleReason":"available","summary":"[to luca-palmieri] Supports driver rotation, suggests Carson for Step 7"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T23:28:43.488Z","idleReason":"available","summary":"[to luca-palmieri] Driver rotation: recommend Carson for Step 7 (HTMX expertise)"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T23:28:43.914Z","idleReason":"available","summary":"[to luca-palmieri] Vote Carson as Step 7 driver for HTMX expertise"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T23:29:10.693Z","idleReason":"available","summary":"[to luca-palmieri] Propose Carson as Step 7 driver for rotation"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T23:29:12.075Z","idleReason":"available","summary":"[to luca-palmieri] Support driver rotation: Carson for Step 7 HTMX clarify form"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T23:29:13.698Z","idleReason":"available","summary":"[to luca-palmieri] Driver rotation: propose Carson for Step 7 (HTMX-heavy clarify page)"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:30 UTC -- Assistant
+
+Strong consensus forming for Carson as Step 7 Driver. Waiting for Kent and Luca to weigh in.
+
+---
+
+## 2026-02-12 23:30 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green" summary="Recommend Carson as Step 7 driver, sent for discussion">
+Addressed the driver rotation topic in the retro. My recommendation is **Carson Gross for Step 7 driver**. Rationale: the backend transaction pattern is established from Step 5, and Step 7's interesting work is on the HTMX/hypermedia side (clarify form with multiple destinations). Luca moves to primary Rust reviewer. Sent to luca-palmieri for team discussion -- awaiting consensus on driver selection.
+</teammate-message>
+
+---
+
+## 2026-02-12 23:30 UTC -- User
+
+[Request interrupted by user]
+
+---
+
+## 2026-02-12 23:30 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T23:30:28.298Z","idleReason":"available","summary":"[to luca-palmieri] Driver rotation: recommend Carson for Step 7"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:30 UTC -- Assistant
+
+All 8 reviewers have voted for Carson as Step 7 Driver. Waiting for Luca to confirm, then I'll need to handle the driver rotation — shut down Carson (reviewer) and Luca (driver), respawn Carson as Driver and Luca as Reviewer.
+
+---
+
+## 2026-02-12 23:30 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Carson's extra blocking item fixed at 237fe82, CI green">
+Carson had an additional blocking item beyond the original 5 -- context filter links on the Next Actions page were doing full-page reloads instead of partial swaps, and the filter pill active states weren't updating. This is now fixed at commit 237fe82, CI run 21968188539 green.
+
+Changes:
+- Wrapped filter nav + list in `<div id="next-actions-content">`, filter links now use `hx-select="#next-actions-content"` + `hx-swap="outerHTML"` for instant filter switching with updated active states
+- Removed the now-unnecessary `NextActionListTemplate` HTMX fragment path
+- Also fixed Carson's minor: added `aria-label` to cancel link in `next_action_edit.html`
+
+Current commit status on main:
+- 0143878: Original Step 6 implementation
+- 24428d1: Fix 5 original blocking items
+- 237fe82: Fix Carson's additional blocking + minor items
+
+Still waiting for consensus from the team. Please let me know if any other reviewers have new blocking items to address.
+</teammate-message>
+
+---
+
+## 2026-02-12 23:30 UTC -- Assistant
+
+Luca fixed an additional item from Carson. The team has reached consensus on Carson as Step 7 Driver. Now I need to handle the driver rotation.
+
+Per the CLAUDE.md driver rotation protocol, I need to:
+1. Shut down Luca (current Driver) — respawn as Reviewer
+2. Shut down Carson (current Reviewer) — respawn as Driver
+
+---
+
+## 2026-02-12 23:30 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 23:30 UTC -- Assistant
+
+Waiting for Luca to update the docs before the driver rotation.
+
+---
+
+## 2026-02-12 23:30 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:30:46.516Z","idleReason":"available","summary":"[to carson-gross] Both items fixed: filter partial swap + cancel aria-label"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:30 UTC -- Assistant
+
+Waiting for Luca to update the docs and confirm.
+
+---
+
+## 2026-02-12 23:33 UTC -- User
+
+<teammate-message teammate_id="carson-gross" color="purple" summary="Status check: approved 237fe82, asking about Step 7 driver">
+Carson here, back after context compaction. Quick status check:
+
+1. **Commit 237fe82 (deferred fixes)**: I verified the filter partial swap changes (hx-select with #next-actions-content wrapper) and the cancel aria-label fix on next_action_edit.html. Both look correct from an HTMX perspective. Approved.
+
+2. **Step 7 driver selection**: Before compaction, I proposed myself as Driver for Step 7 (Clarify as Project) since it's primarily an HTMX/hypermedia interaction design problem — the clarify page with progressive disclosure using CSS `:has()` + `:checked`. Has the team reached consensus on the driver selection? I'm ready to start if selected.
+</teammate-message>
+
+---
+
+## 2026-02-12 23:33 UTC -- Assistant
+
+Carson is ready to drive. Waiting for Luca to update the docs, then I'll execute the rotation.
+
+---
+
+## 2026-02-12 23:33 UTC -- User
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T23:33:11.015Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:33 UTC -- Assistant
+
+Waiting patiently for Luca to update the docs and confirm.
+
+---
+
+## 2026-02-12 23:33 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Mini-retro for Step 6 and Step 7 plan">
+## Mini-Retro: Step 6 (Projects)
+
+### What went well
+- **Comprehensive feature delivery**: Projects CRUD, detail page, stalled detection, dashboard integration all landed in one commit + review fixes.
+- **Review process effective**: The 5 blocking items caught real issues — inline SQL in the service layer, WCAG contrast failure, missing project names on next actions, and HTMX swap problems.
+- **Carson's additional review** caught the context filter partial swap issue (filter pills not updating). The `hx-select` pattern elegantly solved it by extracting the right portion from a full page response, eliminating the need for a separate fragment template.
+
+### What could improve
+- **First commit was too large**: 14 files changed across domain, repo, service, routes, templates, CSS, and JS. Smaller commits per layer (e.g., domain+repo first, then routes+templates) would have made review easier and caught issues earlier.
+- **Focus management and HTMX swap patterns** were under-specified up front. Both needed review-round fixes. We should discuss interaction patterns earlier in the task, before writing code.
+
+### Action items
+- For Step 7, propose interaction design (HTMX attributes, swap targets) in the review before writing code.
+- Keep commits scoped: domain+repo layer, then service, then routes+templates+CSS.
+
+---
+
+## Step 7 Plan: Clarify as Project (US-GTD-2 sub-story)
+
+### Scope
+Add a "Clarify as Project" path to the inbox item UI. When a user clarifies an inbox item as a project, it:
+1. Creates a new `Project` (Active) using the inbox item's title
+2. Creates a first `NextAction` (Active) linked to that project, with a user-specified title and context
+3. Deletes the inbox item
+4. All three operations happen in a single transaction
+
+### What needs to be built
+
+**Service layer** (`inbox_service.rs`):
+- New function `clarify_as_project()` — takes inbox item ID, user ID, context ID, and first action title
+- New error type `ClarifyAsProjectError` (NotFound, Unauthorized, InvalidTitle, Unexpected)
+- Transaction: find inbox item -> verify ownership -> create project (title from inbox item) -> create next action (user-provided title, context, linked to project) -> delete inbox item -> commit
+
+**Route** (`inbox.rs`):
+- New handler `post_clarify_as_project` at `POST /inbox/{id}/clarify-as-project`
+- Accepts form with `context_id` and `first_action_title`
+- On success: HTMX removes the inbox item (same pattern as clarify-as-next-action), non-HTMX redirects to `/inbox`
+
+**Template** (`inbox_item.html`):
+- Add a "Project" clarify button/form alongside the existing "Next Action" button
+- The project clarify form needs: context select + first action title input + submit button
+- Challenge: keeping the UI clean. This is where I need the team's input — specifically Carson, Steve S., and Steve K. on interaction design.
+
+**Glossary** (`docs/glossary.md`):
+- Add `clarify_as_project()` to GTD Actions table
+- Add `ClarifyAsProjectError` to Domain Errors table
+
+**Tests**:
+- Unit test: `clarify_as_project` service function (happy path, not found, unauthorized, invalid title)
+- Integration test: POST endpoint (happy path, error cases)
+- Verify inbox item is deleted and project + action are created
+
+### Questions for the team
+1. **UI pattern**: Should the "Clarify as Project" form be inline (expanding in the inbox item) or should it navigate to a separate clarify page (`/inbox/{id}/clarify`)? The inline approach is simpler but the project form needs more fields (first action title + context).
+2. **Form layout**: The existing "Next Action" clarify is a single-line form (context select + button). The "Project" clarify needs context select + first action title text input + button. How do we keep this compact?
+
+### Updated docs
+I've already marked Step 6 as `[x]` and moved `<!-- NEXT -->` to Step 7 in `docs/gtd-product-discovery.md`. Current step is now 7.
+
+I have the doc changes ready to commit. Should I commit and push this doc update now, or wait until the team discusses the Step 7 plan?
+</teammate-message>
+
+---
+
+## 2026-02-12 23:34 UTC -- Assistant
+
+Excellent — Luca has done the retro, planned Step 7, and has the doc update ready. The team unanimously chose Carson as Driver. Let me tell Luca to push the docs and then execute the rotation.
+
+---
+
+## 2026-02-12 23:34 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 23:34 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:34:02.894Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:34 UTC -- Assistant
+
+Waiting for Luca to push the doc update.
+
+---
+
+## 2026-02-12 23:34 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Retro: Driver rotation discussion for Step 7">
+## Retro Topic: Driver Rotation
+
+The project owner has flagged that we haven't been rotating the Driver role between tasks as required by TEAM_AGREEMENTS.md. I (Luca) have driven Steps 4, 5, and 6 consecutively. This needs to be addressed.
+
+### Discussion points
+
+1. **Why did this happen?** Likely because Rust backend work dominated Steps 4-6, and I was the path of least resistance. But the Driver-Reviewer model explicitly calls for rotation based on expertise needed per task, not defaulting to one person.
+
+2. **What expertise does Step 7 need?** "Clarify as Project" is a cross-cutting feature:
+   - **Service/domain layer**: New `clarify_as_project()` function with transaction (Rust backend)
+   - **UI/interaction design**: The inbox item template needs a new "Project" clarify form with more fields than the existing "Next Action" button. This is primarily a **hypermedia interaction design** problem — how does the form expand, what HTMX attributes are needed, where does the response go?
+   - **CSS/layout**: Making the expanded project clarify form fit cleanly within the inbox item
+
+3. **My recommendation for Step 7 Driver**: **Carson** would be the strongest fit. The hardest part of Step 7 is the interaction design — the backend service follows the exact same pattern as `clarify_as_next_action()` (transaction, find item, verify ownership, create entities, delete inbox item). The real challenge is designing the UI flow for a form that needs context select + first action title + submit within/alongside the existing inbox item. That's Carson's wheelhouse.
+
+   Alternatively, if Carson prefers to stay in Reviewer, **Lea** could drive with a focus on the HTML structure and CSS, with Carson guiding the HTMX patterns from review.
+
+4. **Standing retro item**: Going forward, we should discuss Driver selection at the start of each task as part of our planning, not assume the previous Driver continues.
+
+What does the team think? Carson, Lea — would either of you be willing to drive Step 7?
+</teammate-message>
+
+---
+
+## 2026-02-12 23:34 UTC -- Assistant
+
+Luca has discussed the rotation and recommended Carson — which aligns with the team's earlier unanimous vote. Waiting for Luca to push the doc update so we can execute the rotation.
+
+---
+
+## 2026-02-12 23:34 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T23:34:22.405Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T23:34:22.508Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T23:34:23.388Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T23:34:25.434Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 23:34 UTC -- Assistant
+
+Waiting for Luca to confirm the doc update is pushed.
+
+---
+
+## 2026-02-12 23:34 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T23:34:28.317Z","idleReason":"available","summary":"[to luca-palmieri] +1 Carson for Step 7 driver"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T23:34:30.264Z","idleReason":"available","summary":"[to luca-palmieri] +1 Carson, align on domain sketch first"}
+</teammate-message>
 
 ---
