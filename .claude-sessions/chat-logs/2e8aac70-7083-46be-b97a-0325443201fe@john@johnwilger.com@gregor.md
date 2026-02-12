@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `2e8aac70-7083-46be-b97a-0325443201fe` |
-| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-12 22:16 UTC |
+| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-12 22:31 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -1732,5 +1732,415 @@ I'm ready to begin Step 5 implementation now if the team agrees. Should I start 
 ## 2026-02-12 22:16 UTC -- Assistant
 
 Waiting for Luca to begin Step 5 implementation.
+
+---
+
+## 2026-02-12 22:30 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 5 complete, CI green, ready for review">
+Step 5 (Clarify as Next Action + Trash, US-GTD-2a) is complete. Commit fa565db is pushed and CI is green (run 21966590267).
+
+**What was implemented:**
+
+1. **Service layer** (`src/services/inbox_service.rs`):
+   - `clarify_as_next_action()` function: finds inbox item, verifies ownership, creates NextAction with same title + given context, deletes inbox item
+   - `ClarifyAsNextActionError` error type (NotFound, Unauthorized, Unexpected)
+
+2. **Route** (`src/routes/inbox.rs`):
+   - `post_clarify_inbox_item()` handler at `/inbox/{id}/clarify`
+   - `ClarifyForm` struct for context_id
+   - `ContextOption` struct shared by inbox templates
+   - Updated `InboxTemplate` and `InboxItemTemplate` to include contexts
+   - Updated `get_inbox` and `post_inbox` to fetch and pass contexts
+
+3. **Template** (`templates/inbox_item.html`):
+   - Rewritten with clarify form (context select + "Next Action" button) and trash form
+   - All buttons have accessible aria-labels including item title
+   - HTMX attributes for in-page interactions (hx-post, hx-target, hx-swap)
+
+4. **CSS** (`static/css/main.css`):
+   - Styles for `.inbox-item__actions`, `.inbox-item__clarify`, `.inbox-item__context-label`, `.inbox-item__context-select`, `.inbox-item__clarify-button`, `.inbox-item__delete-button`
+
+5. **Tests**: 6 new integration tests + 3 existing tests updated for new template structure
+   - Total: 211 Rust tests (57 unit + 154 integration) + 11 Playwright e2e, all green
+
+6. **Glossary** (`docs/glossary.md`):
+   - `clarify_as_next_action()` marked **Implemented**
+   - `Trash` marked **Implemented**
+   - `ClarifyAsNextActionError` variants added to Domain Errors
+
+Please request team review.
+</teammate-message>
+
+---
+
+## 2026-02-12 22:30 UTC -- Assistant
+
+Step 5 is done and CI is green. Let me notify the reviewers.
+
+---
+
+## 2026-02-12 22:30 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 22:30 UTC -- Assistant
+
+All reviewers notified. Waiting for their feedback on Step 5.
+
+---
+
+## 2026-02-12 22:30 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:30:10.155Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Stale message — Steps 4 docs and 5 impl already done">
+This message appears to be stale context from before the session continuation. Both items are already done:
+
+1. **Step 4 docs update**: Already committed in `196e830` — Step 4 marked `[x]`, NEXT marker moved to Step 5, "Current step" updated.
+
+2. **Step 5 implementation**: Already committed in `fa565db` and pushed — CI green (run 21966590267). Full details were in my previous message.
+
+Current status: Step 5 is complete, CI is green, awaiting team review. Please broadcast the review request to the team.
+</teammate-message>
+
+---
+
+## 2026-02-12 22:30 UTC -- Assistant
+
+Luca received a stale message — the review broadcast was already sent. The reviewers should be working on their reviews now. Standing by for their feedback.
+
+---
+
+## 2026-02-12 22:30 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:30:15.020Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:30 UTC -- Assistant
+
+Waiting for reviewer feedback on Step 5.
+
+---
+
+## 2026-02-12 22:31 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Stale again — need review broadcast for Step 5">
+This is another stale message. To recap the current state:
+
+- **Step 4 docs**: Already updated in commit `196e830` (Step 4 marked [x], NEXT marker moved, current step updated).
+- **Step 5 driver**: I (Luca) am already the driver and have completed the implementation.
+- **Step 5 commit**: `fa565db` — pushed and CI green (run 21966590267).
+
+We are past driver selection and implementation. The current blocker is: **team review of Step 5 has not been requested yet.** Please broadcast a review request to all 8 reviewers so we can proceed toward consensus.
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:30:19.271Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Third stale msg — Step 5 DONE, need review broadcast">
+This is the third time I'm receiving a stale request to update Step 4 docs and begin Step 5. ALL of this work is already done. Here are the receipts:
+
+**Commit history (most recent first):**
+- `fa565db` — "Add Clarify as Next Action + Trash workflow (Step 5, US-GTD-2a)" — CI green (run 21966590267)
+- `196e830` — Step 4 docs update (marked [x], moved NEXT marker, updated current step)
+
+**What exists right now:**
+- Step 4 is marked complete in docs/gtd-product-discovery.md
+- Step 5 is FULLY IMPLEMENTED: service layer, route, template, CSS, 6 new tests, glossary updated
+- 211 Rust tests + 11 Playwright e2e tests all passing
+- Code is pushed to main, CI is green
+
+**What I need from you:**
+Please broadcast a review request for commit `fa565db` (Step 5) to the 8 reviewers. That is the only action needed right now. We cannot proceed to consensus without reviews.
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:30:46.785Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="FOURTH stale msg — Step 5 IS DONE, broadcast reviews">
+I appreciate the go-ahead, but Step 5 is ALREADY FULLY IMPLEMENTED, COMMITTED, PUSHED, AND CI GREEN. This is the fourth stale message I've received.
+
+Let me prove it with the git log:
+
+- Commit `fa565db` (on main, pushed): "Add Clarify as Next Action + Trash workflow (Step 5, US-GTD-2a)"
+- CI run 21966590267: success
+
+The implementation includes:
+- `clarify_as_next_action()` service function
+- `/inbox/{id}/clarify` route
+- Inbox item template with context select + "Next Action" button + "Trash" button
+- CSS styles for the clarify UI
+- 6 new integration tests
+- Glossary updated
+- All 211 Rust tests + 11 Playwright e2e tests green
+
+I do NOT need to start Step 5. I need REVIEWS of the completed Step 5 work. Please broadcast a review request for commit `fa565db` to the 8 reviewers so we can reach 9/9 consensus and move on.
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:30:54.695Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T22:30:57.872Z","idleReason":"available","summary":"[to luca-palmieri] CONSENSUS APPROVED for Step 5, no blocking issues"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Git log proof — Step 5 committed, need review broadcast">
+I just ran `git log --oneline -5` to confirm. Here is the proof:
+
+```
+fa565db Add Clarify as Next Action + Trash workflow (Step 5, US-GTD-2a)
+196e830 Mark Step 4 complete, advance to Step 5 in implementation order
+db795db Wire dynamic next actions count into dashboard
+e2c292e Address review blocking items: HTMX partial swap, focus management, visible label
+c50b5d7 Add context headings in All view and default filtered context in add form
+```
+
+Commit `fa565db` IS Step 5. It is on main. It is pushed. CI passed.
+
+There is nothing to implement. Step 5 is complete.
+
+The ONLY thing blocking progress is: you need to broadcast a review request for this commit to the 8 reviewers. Once they review and we get 9/9 consensus, we can hold the mini-retro and move to Step 6.
+
+Please acknowledge that Step 5 is already implemented and broadcast the review request.
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:31:00.886Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T22:31:01.883Z","idleReason":"available","summary":"[to luca-palmieri] APPROVED -- no blocking items, 2 minor, 2 nice-to-have"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan" summary="CONSENSUS APPROVED from Steve Krug (UX) — Step 5">
+Steve Krug here. UX review for Step 5 is complete. No BLOCKING items -- the clarify flow is fast and self-evident (two interactions to process an item, matching UX Principle #4). 
+
+**CONSENSUS: APPROVED** from Steve Krug (UX).
+
+Minor items noted: mobile layout density and announce text using "Clarified" instead of "Moved to Next Actions". Nice-to-haves: inbox zero celebration and showing destination after clarifying.
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:31:02.316Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:31 UTC -- Assistant
+
+The review broadcast was sent earlier — the reviewers did receive it and reviews are coming in. Luca was getting stale messages due to context issues. Let me reassure him and track the approvals:
+
+1. **Marty Cagan** — APPROVED
+2. **Carson Gross** — APPROVED (2 minor, 2 nice-to-have)
+3. **Steve Krug** — APPROVED
+
+---
+
+## 2026-02-12 22:31 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 22:31 UTC -- Assistant
+
+Waiting for the remaining 5 reviewers to complete their Step 5 reviews.
+
+---
+
+## 2026-02-12 22:31 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T22:31:03.575Z","idleReason":"available","summary":"[to luca-palmieri] BLOCKING: clarify needs DB transaction for atomicity"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T22:31:04.032Z","idleReason":"available","summary":"[to luca-palmieri] UX review: No BLOCKING, CONSENSUS APPROVED. 2 Minor, 2 Nice-to-have."}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T22:31:04.425Z","idleReason":"available","summary":"[to luca-palmieri] CSS review: no blocking, 4 minor consistency fixes, approved"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:31 UTC -- Assistant
+
+More reviews in:
+
+4. **Scott Wlaschin** — **BLOCKING**: clarify needs DB transaction for atomicity
+5. **Steve Krug** — APPROVED (already counted)
+6. **Lea Verou** — APPROVED (4 minor, no blocking)
+
+Scott has a blocking item — the clarify operation (create next action + delete inbox item) needs to be wrapped in a database transaction to ensure atomicity. That's a valid concern. Waiting for Kent, Steve Schoger, and Heydon.
+
+---
+
+## 2026-02-12 22:31 UTC -- User
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T22:31:07.798Z","idleReason":"available","summary":"[to luca-palmieri] APPROVED — no blocking items, 3 minor polish notes"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:31 UTC -- Assistant
+
+7. **Steve Schoger** — APPROVED (3 minor)
+
+Still waiting on **Kent Beck** and **Heydon Pickering**. Scott's blocking item (DB transaction atomicity) will need to be addressed.
+
+---
+
+## 2026-02-12 22:31 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:31:10.992Z","idleReason":"available","summary":"[to lea-verou] Review is for Step 4, not Step 5 — please re-review"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T22:31:12.043Z","idleReason":"available","summary":"[to luca-palmieri] TDD review: 1 BLOCKING (transaction), approve after fix"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:31:12.437Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T22:31:13.127Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:31 UTC -- Assistant
+
+Kent Beck also flagged the **transaction** as BLOCKING — aligning with Scott's concern. That's 2 reviewers independently flagging the same issue, so it's clearly needed.
+
+Still waiting on **Heydon Pickering** and **Lea Verou** (Luca noted her review was for Step 4, not Step 5 — she needs to re-review).
+
+Current status:
+- APPROVED: Marty, Carson, Steve Krug, Steve Schoger (4)
+- BLOCKING (transaction): Scott, Kent (2)
+- PENDING: Heydon, Lea (2)
+- Driver: Luca (1)
+
+---
+
+## 2026-02-12 22:31 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red" summary="Step 5 a11y review: 1 blocking (focus mgmt again)">
+Accessibility review for Step 5 complete, sent to Luca. Summary:
+
+**1 BLOCKING**: Focus management after clarify/trash -- same pattern as Step 4. When inbox items are removed via HTMX, focus falls to body. Needs an `inbox-focus.js` following the `next-action-focus.js` pattern. This is the third time we've hit this (todo, next actions, inbox). I've suggested the team consider extracting a reusable focus management helper after this fix.
+
+**2 Minor**: (1) Trash has no confirmation step (acceptable for inbox items, not blocking). (2) Clarify button hover uses `opacity: 0.9` instead of `color-primary-dark` -- inconsistent with other buttons.
+
+**1 Nice-to-have**: Form-level `aria-label` on the clarify form.
+
+Good news: Accessible names, visible labels, and live region announcements were all correct from the initial implementation. The retro feedback from Step 4 clearly helped.
+</teammate-message>
+
+---
+
+## 2026-02-12 22:31 UTC -- Assistant
+
+All 8 reviews are in. Summary:
+
+| Reviewer | Status | Blocking Item |
+|----------|--------|---------------|
+| Kent Beck | BLOCKING | Transaction atomicity |
+| Scott Wlaschin | BLOCKING | Transaction atomicity |
+| Heydon Pickering | BLOCKING | Focus management after clarify/trash |
+| Carson Gross | APPROVED | — |
+| Steve Krug | APPROVED | — |
+| Steve Schoger | APPROVED | — |
+| Marty Cagan | APPROVED | — |
+| Lea Verou | PENDING | Needs to re-review (reviewed Step 4 by mistake) |
+
+Two blocking items to fix:
+1. **DB transaction** for clarify operation (Scott + Kent)
+2. **Focus management** after inbox item removal (Heydon)
+
+---
+
+## 2026-02-12 22:31 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 22:31 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T22:31:16.793Z","idleReason":"available","summary":"[to luca-palmieri] A11y review: 1 BLOCKING (focus mgmt), 2 minor, 1 nice-to-have"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:31:19.374Z","idleReason":"available","summary":"[to carson-gross] Review is for Step 4, not Step 5 — already resolved"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:31 UTC -- Assistant
+
+Luca is processing the reviews. Waiting for him to implement the fixes for the two blocking items (transaction + focus management).
+
+---
+
+## 2026-02-12 22:31 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:31:25.863Z","idleReason":"available","summary":"[to steve-schoger] Review is for Step 4 (done) — please review Step 5"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T22:31:25.899Z","idleReason":"available","summary":"[to luca-palmieri] Confirming: my review WAS for Step 5, APPROVED stands"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:31 UTC -- Assistant
+
+Carson confirmed his review was for Step 5 — his approval stands. Luca is sorting out which reviews targeted the correct step. Waiting for him to start on the blocking fixes.
+
+---
+
+## 2026-02-12 22:31 UTC -- User
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T22:31:31.688Z","idleReason":"available","summary":"[to luca-palmieri] Confirming: previous review was already for Step 5, approval stands"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:31 UTC -- Assistant
+
+Steve Schoger also confirmed his review was for Step 5. Good — so the approval count is solid. Luca just needs to fix the two blocking items (transaction from Scott/Kent, focus management from Heydon) and get Lea's Step 5 re-review.
 
 ---

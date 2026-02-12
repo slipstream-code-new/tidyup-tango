@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use sqlx::PgPool;
+use sqlx::{PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::domain::{ContextId, NextAction, NextActionId, TodoTitle, UserId};
@@ -31,7 +31,10 @@ impl NextActionRecord {
     }
 }
 
-pub async fn insert_next_action(pool: &PgPool, action: &NextAction) -> Result<(), sqlx::Error> {
+pub async fn insert_next_action(
+    executor: impl PgExecutor<'_>,
+    action: &NextAction,
+) -> Result<(), sqlx::Error> {
     let completed_at: Option<&DateTime<Utc>> = match action {
         NextAction::Completed { completed_at, .. } => Some(completed_at),
         NextAction::Active { .. } => None,
@@ -47,7 +50,7 @@ pub async fn insert_next_action(pool: &PgPool, action: &NextAction) -> Result<()
         action.created_at() as &DateTime<Utc>,
         completed_at as Option<&DateTime<Utc>>,
     )
-    .execute(pool)
+    .execute(executor)
     .await?;
     Ok(())
 }

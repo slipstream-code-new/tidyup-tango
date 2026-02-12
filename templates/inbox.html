@@ -32,11 +32,9 @@
         <button type="submit" class="inbox-capture__submit">Capture</button>
     </form>
 
-    {% if items.is_empty() %}
-    <div class="inbox__empty-state" id="inbox-empty-state">
+    <div class="inbox__empty-state" id="inbox-empty-state"{% if !items.is_empty() %} hidden{% endif %}>
         <p>Inbox zero -- nothing to process. <a href="#inbox-title">Capture something new</a> or start your <a href="/review">weekly review</a>.</p>
     </div>
-    {% endif %}
     <ul class="inbox__list" role="list" id="inbox-list"{% if items.is_empty() %} hidden{% endif %}>
         {% for item in items %}
         {% include "inbox_item.html" %}
@@ -46,24 +44,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-// Hide empty state and show list when items are added via HTMX
-document.getElementById('inbox-list').addEventListener('htmx:afterSwap', function() {
-    var list = document.getElementById('inbox-list');
-    var emptyState = document.getElementById('inbox-empty-state');
-    if (list && list.children.length > 0) {
-        list.hidden = false;
-        if (emptyState) emptyState.hidden = true;
-    }
-});
-// Show empty state when list becomes empty after HTMX delete
-document.body.addEventListener('htmx:afterSettle', function() {
-    var list = document.getElementById('inbox-list');
-    var emptyState = document.getElementById('inbox-empty-state');
-    if (list && list.children.length === 0 && emptyState) {
-        list.hidden = true;
-        emptyState.hidden = false;
-    }
-});
-</script>
+<script src="/static/js/inbox-focus.js"></script>
 {% endblock %}

@@ -402,6 +402,25 @@ async fn delete_button_has_accessible_label_with_item_title() {
     );
 }
 
+#[tokio::test]
+async fn inbox_page_includes_focus_management_script() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "inboxfocus@example.com", "securepassword123").await;
+
+    let response = client
+        .get(format!("{}/inbox", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /inbox");
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("inbox-focus.js"),
+        "Inbox page should include focus management script"
+    );
+}
+
 // ---- HTMX Fragment Responses ----
 
 #[tokio::test]

@@ -126,7 +126,11 @@ pub async fn clarify_as_next_action(
     user_id: &UserId,
     context_id: ContextId,
 ) -> Result<NextAction, ClarifyAsNextActionError> {
-    let item = inbox_repository::find_inbox_item_by_id(pool, item_id)
+    let mut tx = pool.begin().await.map_err(|e| {
+        ClarifyAsNextActionError::Unexpected(anyhow::anyhow!("Failed to begin transaction: {e}"))
+    })?;
+
+    let item = inbox_repository::find_inbox_item_by_id(&mut *tx, item_id)
         .await
         .map_err(|e| ClarifyAsNextActionError::Unexpected(anyhow::anyhow!("Database error: {e}")))?
         .ok_or(ClarifyAsNextActionError::NotFound)?;
@@ -137,7 +141,7 @@ pub async fn clarify_as_next_action(
 
     let action = NextAction::new(user_id.clone(), context_id, item.title().clone());
 
-    next_action_repository::insert_next_action(pool, &action)
+    next_action_repository::insert_next_action(&mut *tx, &action)
         .await
         .map_err(|e| {
             ClarifyAsNextActionError::Unexpected(anyhow::anyhow!(
@@ -145,13 +149,17 @@ pub async fn clarify_as_next_action(
             ))
         })?;
 
-    inbox_repository::delete_inbox_item(pool, item_id)
+    inbox_repository::delete_inbox_item(&mut *tx, item_id)
         .await
         .map_err(|e| {
             ClarifyAsNextActionError::Unexpected(anyhow::anyhow!(
                 "Failed to delete inbox item: {e}"
             ))
         })?;
+
+    tx.commit().await.map_err(|e| {
+        ClarifyAsNextActionError::Unexpected(anyhow::anyhow!("Failed to commit transaction: {e}"))
+    })?;
 
     tracing::info!("Inbox item clarified as next action");
     Ok(action)

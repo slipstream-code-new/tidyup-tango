@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use sqlx::PgPool;
+use sqlx::{PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::domain::{InboxItem, InboxItemId, TodoTitle, UserId};
@@ -66,18 +66,21 @@ pub async fn count_inbox_items(pool: &PgPool, user_id: &UserId) -> Result<i64, s
     Ok(record.count)
 }
 
-pub async fn delete_inbox_item(pool: &PgPool, item_id: &InboxItemId) -> Result<(), sqlx::Error> {
+pub async fn delete_inbox_item(
+    executor: impl PgExecutor<'_>,
+    item_id: &InboxItemId,
+) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"DELETE FROM inbox_items WHERE id = $1"#,
         item_id.as_uuid(),
     )
-    .execute(pool)
+    .execute(executor)
     .await?;
     Ok(())
 }
 
 pub async fn find_inbox_item_by_id(
-    pool: &PgPool,
+    executor: impl PgExecutor<'_>,
     item_id: &InboxItemId,
 ) -> Result<Option<InboxItem>, sqlx::Error> {
     let record: Option<InboxRecord> = sqlx::query_as!(
@@ -87,7 +90,7 @@ pub async fn find_inbox_item_by_id(
            FROM inbox_items WHERE id = $1"#,
         item_id.as_uuid(),
     )
-    .fetch_optional(pool)
+    .fetch_optional(executor)
     .await?;
 
     Ok(record.map(|r: InboxRecord| r.into_domain()))
