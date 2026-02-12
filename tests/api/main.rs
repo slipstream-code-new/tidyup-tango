@@ -1,3 +1,4 @@
+mod contexts;
 mod dashboard;
 mod forgot_password;
 mod gtd_placeholders;

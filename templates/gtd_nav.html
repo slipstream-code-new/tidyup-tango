@@ -34,6 +34,7 @@
             <button type="submit" class="quick-capture__submit">Capture</button>
         </form>
         {% endif %}
+        <a href="/contexts"{% if current_page == "contexts" %} aria-current="page"{% endif %} class="gtd-header__settings-link">Contexts</a>
         <form method="post" action="/logout" class="nav-logout" hx-boost="false">
             <button type="submit" class="nav-logout__button">Sign out</button>
         </form>

@@ -14,3 +14,4 @@ each retrospective.
 | Rename `TodoTitle` to `ItemTitle` (shared by todo and inbox items) | Domain | Task #15 (Scott) | Refinement | Open |
 | CSS gaps: `todo-add__error`, `nav-logout`, `auth-form__message :empty`, `auth-form__cancel` lack styles | Design | Task #11 (Steve Schoger) | Refinement | Open |
 | Password toggle: confirm field removal needs hidden input mirror for no-JS fallback | A11y | Task #11 (Heydon) | Refinement | Open |
+| Focus management after HTMX delete (inbox + contexts): focus should move to a logical target after item removal | A11y | Step 3 (Heydon) | Refinement | Open |

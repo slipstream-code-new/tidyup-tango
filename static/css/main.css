@@ -1229,6 +1229,174 @@
     text-align: center;
     padding-block: var(--space-xl);
   }
+
+  /* ---- Contexts ---- */
+  .contexts {
+    padding-block-start: var(--space-lg);
+  }
+
+  .contexts h1 {
+    margin-block-end: var(--space-sm);
+  }
+
+  .contexts__description {
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    margin-block-end: var(--space-lg);
+  }
+
+  .contexts__error {
+    background-color: var(--color-danger-light);
+    color: var(--color-danger);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    margin-block-end: var(--space-md);
+  }
+
+  .contexts__empty-state {
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    text-align: center;
+    padding-block: var(--space-xl);
+  }
+
+  /* Context add form -- input + button row */
+  .context-add {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--space-sm);
+    margin-block-end: var(--space-lg);
+  }
+
+  .context-add label {
+    inline-size: 100%;
+    margin-block-end: var(--space-xs);
+  }
+
+  .context-add__input {
+    flex: 1;
+    min-inline-size: 10rem;
+  }
+
+  .context-add__submit {
+    flex-shrink: 0;
+  }
+
+  /* Context item list */
+  .contexts__list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .context-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding-block: var(--space-sm);
+    padding-inline: var(--space-sm);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .context-item:first-child {
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .context-item__name {
+    flex: 1;
+    min-inline-size: 0;
+    overflow-wrap: break-word;
+  }
+
+  .context-item__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+  }
+
+  .context-item__edit-link {
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    text-decoration: none;
+  }
+
+  .context-item__edit-link:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .context-item__delete-button {
+    background: none;
+    border: none;
+    padding: var(--space-xs);
+    cursor: pointer;
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+  }
+
+  .context-item__delete-button:hover {
+    background: none;
+    color: var(--color-danger);
+  }
+
+  /* Context inline edit form */
+  .context-edit-form {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-inline-size: 0;
+  }
+
+  .context-edit-form__input {
+    flex: 1;
+    min-inline-size: 0;
+    font-size: var(--font-size-base);
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .context-edit-form__save {
+    font-size: var(--font-size-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    flex-shrink: 0;
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .context-edit-form__cancel {
+    font-size: var(--font-size-xs);
+    color: var(--color-fg-muted);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .context-edit-form__cancel:hover {
+    color: var(--color-fg);
+    text-decoration: underline;
+  }
+
+  /* GTD header settings link */
+  .gtd-header__settings-link {
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    text-decoration: none;
+  }
+
+  .gtd-header__settings-link:hover {
+    color: var(--color-fg);
+    text-decoration: underline;
+  }
+
+  .gtd-header__settings-link[aria-current="page"] {
+    color: var(--color-fg);
+    font-weight: var(--font-semibold);
+  }
 }
 
 /* ==========================================================================

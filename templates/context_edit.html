@@ -1,0 +1,33 @@
+<li class="context-item context-item--editing" id="context-item-{{ context.id }}">
+    <form
+        method="post"
+        action="/contexts/{{ context.id }}/edit"
+        class="context-edit-form"
+        hx-post="/contexts/{{ context.id }}/edit"
+        hx-target="#context-item-{{ context.id }}"
+        hx-swap="outerHTML"
+    >
+        <label for="edit-context-name-{{ context.id }}" class="visually-hidden">Context name</label>
+        <input
+            type="text"
+            id="edit-context-name-{{ context.id }}"
+            name="name"
+            value="{{ context.name }}"
+            maxlength="50"
+            autocomplete="off"
+            class="context-edit-form__input"
+            autofocus
+        >
+        <button type="submit" class="context-edit-form__save">Save</button>
+        <a
+            href="/contexts"
+            class="context-edit-form__cancel"
+            aria-label="Cancel editing {{ context.name }}"
+            hx-get="/contexts"
+            hx-target="main"
+            hx-swap="innerHTML"
+            hx-select="main > *"
+            hx-push-url="true"
+        >Cancel</a>
+    </form>
+</li>

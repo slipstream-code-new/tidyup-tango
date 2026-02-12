@@ -2,6 +2,7 @@ use sqlx::PgPool;
 
 use crate::domain::{EmailValidationError, Password, PasswordError, UserId, ValidatedEmail};
 use crate::infrastructure::user_repository;
+use crate::services::context_service;
 
 #[derive(Debug, thiserror::Error)]
 pub enum RegistrationError {
@@ -53,6 +54,12 @@ pub async fn register_user(
         })?;
 
     tracing::info!("New user registered");
+
+    context_service::seed_default_contexts(pool, &user_id)
+        .await
+        .map_err(|e| {
+            RegistrationError::Unexpected(anyhow::anyhow!("Failed to seed default contexts: {e}"))
+        })?;
 
     Ok(user_id)
 }

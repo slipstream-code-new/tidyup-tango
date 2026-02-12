@@ -7,26 +7,11 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use super::auth::AuthenticatedUser;
+use super::{htmx_response_with_announce, is_htmx_request};
 use crate::domain::{InboxItem, InboxItemId};
 use crate::services::inbox_service::{
     capture_inbox_item, delete_inbox_item, get_inbox_items, CaptureInboxError, DeleteInboxError,
 };
-
-fn is_htmx_request(headers: &HeaderMap) -> bool {
-    headers.contains_key("hx-request")
-}
-
-fn htmx_response_with_announce(body: Html<String>, message: &str) -> Response {
-    let trigger_json = format!(r#"{{"announce":"{}"}}"#, message);
-    (
-        [(
-            axum::http::header::HeaderName::from_static("hx-trigger"),
-            axum::http::HeaderValue::from_str(&trigger_json).unwrap(),
-        )],
-        body,
-    )
-        .into_response()
-}
 
 pub struct InboxItemView {
     pub id: String,

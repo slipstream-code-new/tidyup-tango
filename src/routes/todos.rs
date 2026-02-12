@@ -7,29 +7,12 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use super::auth::AuthenticatedUser;
+use super::{htmx_response_with_announce, is_htmx_request};
 use crate::domain::{TodoItem, TodoItemId};
 use crate::services::todo_service::{
     add_todo, delete_todo, get_todos, toggle_todo_completion, update_todo_title, AddTodoError,
     DeleteTodoError, ToggleTodoError, UpdateTitleError,
 };
-
-fn is_htmx_request(headers: &HeaderMap) -> bool {
-    headers.contains_key("hx-request")
-}
-
-/// Build an HTMX response with an HX-Trigger header that fires an "announce" event
-/// for screen reader live regions.
-fn htmx_response_with_announce(body: Html<String>, message: &str) -> Response {
-    let trigger_json = format!(r#"{{"announce":"{}"}}"#, message);
-    (
-        [(
-            axum::http::header::HeaderName::from_static("hx-trigger"),
-            axum::http::HeaderValue::from_str(&trigger_json).unwrap(),
-        )],
-        body,
-    )
-        .into_response()
-}
 
 /// View model for a single todo item in the template.
 pub struct TodoItemView {

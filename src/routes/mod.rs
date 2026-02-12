@@ -1,4 +1,8 @@
+use axum::http::HeaderMap;
+use axum::response::{Html, IntoResponse, Response};
+
 mod auth;
+mod contexts;
 mod dashboard;
 mod forgot_password;
 mod gtd_placeholders;
@@ -9,6 +13,25 @@ mod login;
 mod register;
 mod todos;
 
+fn is_htmx_request(headers: &HeaderMap) -> bool {
+    headers.contains_key("hx-request")
+}
+
+fn htmx_response_with_announce(body: Html<String>, message: &str) -> Response {
+    let trigger_json = format!(r#"{{"announce":"{}"}}"#, message);
+    (
+        [(
+            axum::http::header::HeaderName::from_static("hx-trigger"),
+            axum::http::HeaderValue::from_str(&trigger_json).unwrap(),
+        )],
+        body,
+    )
+        .into_response()
+}
+
+pub use contexts::{
+    get_contexts, get_edit_context, post_context, post_delete_context, post_edit_context,
+};
 pub use dashboard::get_dashboard;
 pub use forgot_password::get_forgot_password;
 pub use gtd_placeholders::{

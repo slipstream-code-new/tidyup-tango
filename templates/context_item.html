@@ -1,0 +1,23 @@
+<li class="context-item" id="context-item-{{ context.id }}">
+    <span class="context-item__name">{{ context.name }}</span>
+    <div class="context-item__actions">
+        <a
+            href="/contexts/{{ context.id }}/edit"
+            class="context-item__edit-link"
+            aria-label="Edit: {{ context.name }}"
+            hx-get="/contexts/{{ context.id }}/edit"
+            hx-target="#context-item-{{ context.id }}"
+            hx-swap="outerHTML"
+        >Edit</a>
+        <form
+            method="post"
+            action="/contexts/{{ context.id }}/delete"
+            class="context-item__delete"
+            hx-post="/contexts/{{ context.id }}/delete"
+            hx-target="#context-item-{{ context.id }}"
+            hx-swap="outerHTML"
+        >
+            <button type="submit" class="context-item__delete-button" aria-label="Delete: {{ context.name }}">Delete</button>
+        </form>
+    </div>
+</li>

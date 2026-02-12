@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Contexts -- Todo List{% endblock %}
+
+{% block nav %}
+{% include "gtd_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="contexts">
+    <h1>Contexts</h1>
+    <p class="contexts__description">Contexts describe where or how you can do an action (e.g., @computer, @home, @errands).</p>
+
+    {% if let Some(msg) = error_message %}
+    <div class="contexts__error" role="alert">
+        <p>{{ msg }}</p>
+    </div>
+    {% endif %}
+
+    <form
+        method="post"
+        action="/contexts"
+        class="context-add"
+        hx-post="/contexts"
+        hx-target="#context-list"
+        hx-swap="beforeend"
+        hx-on::after-request="if(event.detail.successful) this.reset(); this.querySelector('#context-name').focus();"
+    >
+        <label for="context-name">Add context</label>
+        <input
+            type="text"
+            id="context-name"
+            name="name"
+            placeholder="e.g., @office"
+            maxlength="50"
+            autocomplete="off"
+            class="context-add__input"
+        >
+        <button type="submit" class="context-add__submit">Add</button>
+    </form>
+
+    {% if contexts.is_empty() %}
+    <div class="contexts__empty-state" id="contexts-empty-state">
+        <p>No contexts. Add one above — you'll need at least one context to organize your next actions.</p>
+    </div>
+    {% endif %}
+    <ul class="contexts__list" role="list" id="context-list"{% if contexts.is_empty() %} hidden{% endif %}>
+        {% for context in contexts %}
+        {% include "context_item.html" %}
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('context-list').addEventListener('htmx:afterSwap', function() {
+    var list = document.getElementById('context-list');
+    var emptyState = document.getElementById('contexts-empty-state');
+    if (list && list.children.length > 0) {
+        list.hidden = false;
+        if (emptyState) emptyState.hidden = true;
+    }
+});
+document.body.addEventListener('htmx:afterSettle', function() {
+    var list = document.getElementById('context-list');
+    var emptyState = document.getElementById('contexts-empty-state');
+    if (list && list.children.length === 0 && emptyState) {
+        list.hidden = true;
+        emptyState.hidden = false;
+    }
+});
+</script>
+{% endblock %}

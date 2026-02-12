@@ -325,6 +325,74 @@ test.describe("Core user journey", () => {
     ).toEqual([]);
   });
 
+  test("context management: view defaults, add, edit, delete", async ({
+    page,
+  }) => {
+    const email = `e2e-ctx-${Date.now()}@example.com`;
+
+    // Register and login
+    await page.goto("/register");
+    await fillRegistrationForm(page, email, testPassword);
+    await page.goto("/login");
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password").fill(testPassword);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/dashboard/);
+
+    // Navigate to contexts page
+    await page.goto("/contexts");
+    await expect(
+      page.getByRole("heading", { name: "Contexts" })
+    ).toBeVisible();
+
+    // Default contexts should be present (use exact match to avoid matching description text)
+    await expect(page.getByText("@computer", { exact: true })).toBeVisible();
+    await expect(page.getByText("@home", { exact: true })).toBeVisible();
+    await expect(page.getByText("@errands", { exact: true })).toBeVisible();
+    await expect(page.getByText("@phone", { exact: true })).toBeVisible();
+    await expect(page.getByText("@anywhere", { exact: true })).toBeVisible();
+
+    // Add a new context
+    const addInput = page.locator("#context-name");
+    await expect(addInput).toBeVisible();
+    await addInput.fill("@office");
+    await page.getByRole("button", { name: "Add" }).click();
+
+    // New context should appear
+    await expect(page.getByText("@office")).toBeVisible();
+
+    // Delete the new context
+    await page.getByRole("button", { name: "Delete: @office" }).click();
+    await expect(page.getByText("@office")).not.toBeVisible();
+  });
+
+  test("contexts page has no automatically detectable a11y violations", async ({
+    page,
+  }) => {
+    const email = `e2e-axe-ctx-${Date.now()}@example.com`;
+
+    // Register and login
+    await page.goto("/register");
+    await fillRegistrationForm(page, email, testPassword);
+    await page.goto("/login");
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password").fill(testPassword);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/dashboard/);
+
+    // Navigate to contexts page
+    await page.goto("/contexts");
+
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    expect(
+      results.violations,
+      JSON.stringify(results.violations, null, 2)
+    ).toEqual([]);
+  });
+
   test("authenticated user is redirected from index to dashboard", async ({
     page,
   }) => {

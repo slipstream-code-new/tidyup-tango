@@ -54,6 +54,8 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Todo not found (edit) | `UpdateTitleError::NotFound` | Referenced todo does not exist |
 | Not authorized (edit) | `UpdateTitleError::Unauthorized` | User does not own the todo |
 | Invalid title (edit) | `UpdateTitleError::InvalidTitle(TodoTitleError)` | Title validation failure in update_todo_title service |
+| Context name empty | `ContextNameError::Empty` | Context name cannot be blank |
+| Context name too long | `ContextNameError::TooLong { max, actual }` | Context name exceeds 50 character limit |
 
 ## Error Copy Convention
 
@@ -140,11 +142,12 @@ implementation.*
 | Inbox item | `InboxItem` | Raw, unclarified capture. Has title and created_at. No context, no project link. |
 | Next action | `NextAction` (enum: Active, Completed) | A concrete, physical action ready to do. Has context and optional project link. |
 | Project | `Project` (enum: Active, Completed, Dropped) | An outcome requiring 2+ actions. Has title and linked next actions. |
-| Context | `Context` | Where/how an action can be performed. User-defined. Defaults: @computer, @home, @errands, @phone, @anywhere |
+| Context | `Context` | Where/how an action can be performed. User-defined. Defaults: @computer, @home, @errands, @phone, @anywhere. **Implemented.** |
+| Context ID | `ContextId(Uuid)` | Newtype wrapper; uniquely identifies a context. **Implemented.** |
 | Waiting For item | `WaitingForItem` | Delegated/blocked item. Has title, waiting_on (text), and date added. |
 | Someday/Maybe item | `SomedayMaybeItem` | Parked idea. Has title and created_at. Not committed to. |
 | Item title | `ItemTitle` | Replaces `TodoTitle`. Non-empty, max 300 chars, trimmed. Same validation. |
-| Context name | `ContextName` | Non-empty, max 50 chars, trimmed. Validated at construction. |
+| Context name | `ContextName` | Non-empty, max 50 chars, trimmed. Validated at construction via `ContextName::parse()`. **Implemented.** |
 
 ### GTD Actions (Ubiquitous Language)
 
