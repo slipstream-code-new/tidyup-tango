@@ -948,7 +948,7 @@ async fn clarify_inbox_item_as_project_creates_project_and_first_action() {
 }
 
 #[tokio::test]
-async fn clarify_as_project_with_empty_first_action_title_returns_422() {
+async fn clarify_as_project_with_empty_first_action_title_redirects_to_inbox() {
     let app = spawn_app().await;
     let client = register_and_login(
         &app.address,
@@ -969,7 +969,7 @@ async fn clarify_as_project_with_empty_first_action_title_returns_422() {
 
     let item_id = get_first_inbox_item_id(&client, &app.address).await;
 
-    // Clarify as project with empty first action title
+    // Clarify as project with empty first action title (non-HTMX redirects to /inbox)
     let response = client
         .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
         .form(&[
@@ -983,8 +983,8 @@ async fn clarify_as_project_with_empty_first_action_title_returns_422() {
 
     assert_eq!(
         response.status().as_u16(),
-        422,
-        "Empty first action title should return 422"
+        303,
+        "Non-HTMX empty first action should redirect to inbox"
     );
 
     // Item should still be in inbox
@@ -997,6 +997,56 @@ async fn clarify_as_project_with_empty_first_action_title_returns_422() {
     assert!(
         body.contains("Needs first action"),
         "Item should still be in inbox after failed clarify"
+    );
+}
+
+#[tokio::test]
+async fn htmx_clarify_as_project_with_empty_first_action_returns_422_with_error() {
+    let app = spawn_app().await;
+    let client = register_and_login(
+        &app.address,
+        "projclarify3h@example.com",
+        "securepassword123",
+    )
+    .await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "HTMX project error test")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .header("hx-request", "true")
+        .form(&[
+            ("clarify_type", "project"),
+            ("context_id", &context_id),
+            ("first_action_title", ""),
+        ])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    assert_eq!(
+        response.status().as_u16(),
+        422,
+        "HTMX empty first action should return 422"
+    );
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Enter a first action for this project"),
+        "Should contain inline error message, got: {body}"
+    );
+    assert!(
+        body.contains("HTMX project error test"),
+        "Should re-render the inbox item"
     );
 }
 

@@ -42,6 +42,7 @@ struct InboxTemplate {
     inbox_count: i64,
     items: Vec<InboxItemView>,
     contexts: Vec<ContextOption>,
+    error: Option<String>,
 }
 
 #[derive(Template)]
@@ -49,6 +50,7 @@ struct InboxTemplate {
 struct InboxItemTemplate {
     item: InboxItemView,
     contexts: Vec<ContextOption>,
+    error: Option<String>,
 }
 
 pub async fn get_inbox(
@@ -79,6 +81,7 @@ pub async fn get_inbox(
         inbox_count,
         items: item_views,
         contexts: context_options,
+        error: None,
     };
     Ok(Html(template.render()?))
 }
@@ -120,6 +123,7 @@ pub async fn post_inbox(
                 let template = InboxItemTemplate {
                     item: InboxItemView::from(&item),
                     contexts: context_options,
+                    error: None,
                 };
                 let body = template.render().map_err(InboxError::Render)?;
                 Ok(htmx_response_with_announce(Html(body), "Captured to inbox"))
@@ -161,6 +165,7 @@ pub async fn post_inbox(
                 inbox_count,
                 items: item_views,
                 contexts: context_options,
+                error: None,
             };
             let _ = user_facing; // Title too long error is shown via template if needed
             let body = template.render().map_err(InboxError::Render)?;
@@ -254,11 +259,42 @@ pub async fn post_clarify_inbox_item(
                 Html("<h1>Not authorized</h1>".to_string()),
             )
                 .into_response()),
-            Err(ClarifyAsProjectError::InvalidTitle(_)) => Ok((
-                StatusCode::UNPROCESSABLE_ENTITY,
-                Html("<h1>First action title is required for projects</h1>".to_string()),
-            )
-                .into_response()),
+            Err(ClarifyAsProjectError::InvalidTitle(_)) => {
+                if htmx {
+                    let item = get_inbox_items(&pool, &user_id)
+                        .await
+                        .map_err(InboxError::Unexpected)?
+                        .into_iter()
+                        .find(|i| *i.id() == inbox_item_id);
+                    if let Some(item) = item {
+                        let contexts = context_service::list_contexts(&pool, &user_id)
+                            .await
+                            .map_err(InboxError::Unexpected)?;
+                        let context_options: Vec<ContextOption> = contexts
+                            .iter()
+                            .map(|c| ContextOption {
+                                id: c.id().as_uuid().to_string(),
+                                name: c.name().as_str().to_string(),
+                            })
+                            .collect();
+                        let template = InboxItemTemplate {
+                            item: InboxItemView::from(&item),
+                            contexts: context_options,
+                            error: Some("Enter a first action for this project".to_string()),
+                        };
+                        let body = template.render().map_err(InboxError::Render)?;
+                        Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(body)).into_response())
+                    } else {
+                        Ok((
+                            StatusCode::NOT_FOUND,
+                            Html("<h1>Inbox item not found</h1>".to_string()),
+                        )
+                            .into_response())
+                    }
+                } else {
+                    Ok(Redirect::to("/inbox").into_response())
+                }
+            }
             Err(ClarifyAsProjectError::Unexpected(err)) => Err(InboxError::Unexpected(err)),
         }
     } else {

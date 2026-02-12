@@ -1288,6 +1288,13 @@
     padding: var(--space-xs) var(--space-sm);
   }
 
+  .inbox-item__error {
+    color: var(--color-error, #b91c1c);
+    font-size: var(--font-size-sm);
+    margin: 0;
+    width: 100%;
+  }
+
   .inbox-item__clarify-button {
     background: var(--color-primary);
     color: var(--color-bg);

@@ -41,6 +41,9 @@
                         class="inbox-item__first-action-input"
                     >
                 </div>
+                {% if let Some(msg) = error %}
+                <p class="inbox-item__error" role="alert">{{ msg }}</p>
+                {% endif %}
                 <button type="submit" class="inbox-item__clarify-button" aria-label="Clarify: {{ item.title }}">Clarify</button>
             </fieldset>
         </form>
