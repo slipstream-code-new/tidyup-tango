@@ -58,21 +58,6 @@ async fn render_placeholder(
     Ok(Html(template.render()?))
 }
 
-pub async fn get_next_actions(
-    AuthenticatedUser(user_id): AuthenticatedUser,
-    State(pool): State<PgPool>,
-) -> Result<impl IntoResponse, GtdPlaceholderError> {
-    render_placeholder(
-        &user_id,
-        &pool,
-        "next_actions",
-        "Next Actions -- Todo List",
-        "Next Actions",
-        "Concrete actions you can do right now, organized by context.",
-    )
-    .await
-}
-
 pub async fn get_projects(
     AuthenticatedUser(user_id): AuthenticatedUser,
     State(pool): State<PgPool>,

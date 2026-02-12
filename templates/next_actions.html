@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Next Actions -- Todo List{% endblock %}
+
+{% block nav %}
+{% include "gtd_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="next-actions">
+    <h1>Next Actions</h1>
+
+    {% if let Some(error) = error_message %}
+    <div class="next-actions__error" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <nav class="next-actions__filters" aria-label="Filter by context">
+        <ul class="next-actions__filter-list" role="list">
+            <li>
+                <a href="/next-actions"{% if selected_context.is_none() %} aria-current="true" class="next-actions__filter-link next-actions__filter-link--active"{% else %} class="next-actions__filter-link"{% endif %}>All</a>
+            </li>
+            {% for ctx in contexts %}
+            <li>
+                <a href="/next-actions?context={{ ctx.id }}"{% if selected_context.as_deref() == Some(ctx.id.as_str()) %} aria-current="true" class="next-actions__filter-link next-actions__filter-link--active"{% else %} class="next-actions__filter-link"{% endif %}>{{ ctx.name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+    {% if !contexts.is_empty() %}
+    <form
+        method="post"
+        action="/next-actions"
+        class="next-actions__add"
+        hx-post="/next-actions"
+        hx-target="#next-actions-list"
+        hx-swap="beforeend"
+        hx-on::after-request="if(event.detail.successful) { this.querySelector('#next-action-title').value = ''; this.querySelector('#next-action-title').focus(); }"
+    >
+        <label for="next-action-title">Add next action</label>
+        <div class="next-actions__add-row">
+            <input
+                type="text"
+                id="next-action-title"
+                name="title"
+                placeholder="What's the next action?"
+                maxlength="300"
+                autocomplete="off"
+                class="next-actions__add-input"
+            >
+            <select id="next-action-context" name="context_id" class="next-actions__add-context" aria-label="Context">
+                {% for ctx in contexts %}
+                <option value="{{ ctx.id }}">{{ ctx.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="next-actions__add-submit">Add</button>
+        </div>
+    </form>
+    {% endif %}
+
+    {% if actions.is_empty() %}
+    <div class="next-actions__empty-state" id="next-actions-empty-state">
+        <p>No next actions yet. Process your <a href="/inbox">inbox</a> to find things to do.</p>
+    </div>
+    {% endif %}
+    <ul class="next-actions__list" role="list" id="next-actions-list"{% if actions.is_empty() %} hidden{% endif %}>
+        {% for action in actions %}
+        {% include "next_action_item.html" %}
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('next-actions-list').addEventListener('htmx:afterSwap', function() {
+    var list = document.getElementById('next-actions-list');
+    var emptyState = document.getElementById('next-actions-empty-state');
+    if (list && list.children.length > 0) {
+        list.hidden = false;
+        if (emptyState) emptyState.hidden = true;
+    }
+});
+document.body.addEventListener('htmx:afterSettle', function() {
+    var list = document.getElementById('next-actions-list');
+    var emptyState = document.getElementById('next-actions-empty-state');
+    if (list && list.children.length === 0 && emptyState) {
+        list.hidden = true;
+        emptyState.hidden = false;
+    }
+});
+</script>
+{% endblock %}

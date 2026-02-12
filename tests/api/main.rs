@@ -7,5 +7,6 @@ mod helpers;
 mod inbox;
 mod index;
 mod login;
+mod next_actions;
 mod register;
 mod todos;

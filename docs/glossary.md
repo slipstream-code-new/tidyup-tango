@@ -56,6 +56,14 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Invalid title (edit) | `UpdateTitleError::InvalidTitle(TodoTitleError)` | Title validation failure in update_todo_title service |
 | Context name empty | `ContextNameError::Empty` | Context name cannot be blank |
 | Context name too long | `ContextNameError::TooLong { max, actual }` | Context name exceeds 50 character limit |
+| Invalid title (add next action) | `AddNextActionError::InvalidTitle(TodoTitleError)` | Title validation failure in add_next_action service |
+| Next action not found (complete) | `CompleteNextActionError::NotFound` | Referenced next action does not exist |
+| Not authorized (complete next action) | `CompleteNextActionError::Unauthorized` | User does not own the next action |
+| Next action not found (delete) | `DeleteNextActionError::NotFound` | Referenced next action does not exist |
+| Not authorized (delete next action) | `DeleteNextActionError::Unauthorized` | User does not own the next action |
+| Next action not found (edit) | `UpdateNextActionTitleError::NotFound` | Referenced next action does not exist |
+| Not authorized (edit next action) | `UpdateNextActionTitleError::Unauthorized` | User does not own the next action |
+| Invalid title (edit next action) | `UpdateNextActionTitleError::InvalidTitle(TodoTitleError)` | Title validation failure in update_next_action_title service |
 
 ## Error Copy Convention
 
@@ -79,6 +87,10 @@ call `error.to_string()` on a domain error.
 | `TodoTitleError::Empty` (add) | (silently ignored per US-5 -- empty submissions are not errors) |
 | `TodoTitleError::Empty` (edit) | "Title cannot be empty" |
 | `TodoTitleError::TooLong` | "That title is too long (max 300 characters)" |
+
+| `TodoTitleError::Empty` (add next action) | (silently ignored -- empty submissions are not errors) |
+| `TodoTitleError::Empty` (edit next action) | "Title cannot be empty" |
+| `TodoTitleError::TooLong` (next action) | "That title is too long (max 300 characters)" |
 
 *Copy reviewed by Steve Krug. Update this table when adding new error types.*
 
@@ -140,7 +152,8 @@ implementation.*
 | Domain Term | Proposed Rust Type | Notes |
 |-------------|-------------------|-------|
 | Inbox item | `InboxItem` | Raw, unclarified capture. Has title and created_at. No context, no project link. |
-| Next action | `NextAction` (enum: Active, Completed) | A concrete, physical action ready to do. Has context and optional project link. |
+| Next action | `NextAction` (enum: Active, Completed) | A concrete, physical action ready to do. Has context and optional project link. **Implemented.** |
+| Next action ID | `NextActionId(Uuid)` | Newtype wrapper; uniquely identifies a next action. **Implemented.** |
 | Project | `Project` (enum: Active, Completed, Dropped) | An outcome requiring 2+ actions. Has title and linked next actions. |
 | Context | `Context` | Where/how an action can be performed. User-defined. Defaults: @computer, @home, @errands, @phone, @anywhere. **Implemented.** |
 | Context ID | `ContextId(Uuid)` | Newtype wrapper; uniquely identifies a context. **Implemented.** |
@@ -159,7 +172,10 @@ implementation.*
 | Delegate | `delegate()` | InboxItem or NextAction -> WaitingForItem |
 | Defer | `defer()` | InboxItem or NextAction -> SomedayMaybeItem |
 | Trash | (delete) | InboxItem is permanently removed |
-| Complete action | `NextAction::complete()` | Active -> Completed; records completion time |
+| Add next action | `add_next_action()` | Service: creates NextAction (Active) with title and context. **Implemented.** |
+| Complete action | `NextAction::complete()` | Active -> Completed; records completion time. **Implemented.** |
+| Delete next action | `delete_next_action()` | Service: verifies ownership, permanently removes. **Implemented.** |
+| Edit next action title | `update_next_action_title()` | Service: verifies ownership, parses new title, persists. **Implemented.** |
 | Complete project | `Project::complete()` | Active -> Completed; records completion time |
 | Drop project | `Project::drop()` | Active -> Dropped; project abandoned |
 | Activate someday/maybe | `activate()` | SomedayMaybeItem -> InboxItem (for re-clarification) |

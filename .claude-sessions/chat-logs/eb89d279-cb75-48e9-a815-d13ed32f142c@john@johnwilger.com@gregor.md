@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `eb89d279-cb75-48e9-a815-d13ed32f142c` |
-| **Date Range** | 2026-02-12 20:53 UTC -- 2026-02-12 20:55 UTC |
+| **Date Range** | 2026-02-12 20:53 UTC -- 2026-02-12 21:04 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -852,5 +852,375 @@ Good — Luca has the implementation done and all checks passing. Now we need 9/
 ## 2026-02-12 20:55 UTC -- Assistant
 
 9/9 consensus confirmed. All reviewers have consented. Let me tell Luca to commit and push.
+
+---
+
+## 2026-02-12 20:55 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 20:55 UTC -- Assistant
+
+9/9 confirmed — Luca is committing and pushing now. Waiting for CI result.
+
+---
+
+## 2026-02-12 20:55 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T20:55:55.656Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 20:55 UTC -- Assistant
+
+Standing by for Luca's commit and push confirmation.
+
+---
+
+## 2026-02-12 21:03 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="CI green, initiating mini-retro">
+CI is green. Commit `84cccec` ("Expand CI paths-ignore to skip non-code file changes") passed in 5m53s.
+
+Summary of what was delivered:
+1. `.github/workflows/ci.yml` — expanded `paths-ignore` with 5 new entries (`.claude/**`, `.team/**`, `docs/**`, `*.md`, `LICENSE`)
+2. `TEAM_AGREEMENTS.md` — step 11 updated to document "skipped CI = implicitly green"
+
+Pipeline complete. Time for mini-retro (step 12):
+(a) Did we follow the pipeline? Yes — fmt, clippy, test, Playwright all green before commit, 9/9 consensus before push, CI green after push.
+(b) Was the commit atomic? Yes — two directly related changes (CI config + corresponding process documentation).
+(c) Any process improvements? This change IS a process improvement. Going forward, docs-only commits will skip CI entirely, reducing unnecessary wait time.
+
+Anyone want to raise anything for the mini-retro?
+</teammate-message>
+
+---
+
+## 2026-02-12 21:03 UTC -- Assistant
+
+CI green on commit `84cccec`. Luca is running the mini-retro with the team now — that's their process, so I'll stay out of it. Waiting for them to wrap up.
+
+---
+
+## 2026-02-12 21:03 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:03:55.403Z","idleReason":"available","summary":"[to heydon-pickering] Acknowledging Heydon's review, 9/9 reached"}
+</teammate-message>
+
+---
+
+## 2026-02-12 21:03 UTC -- Assistant
+
+Luca's wrapping up acknowledgments. Waiting for the mini-retro to conclude.
+
+---
+
+## 2026-02-12 21:04 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Commit already pushed, CI green, mini-retro in progress">
+Already complete. Commit `84cccec` was pushed and CI passed green in 5m53s. I've broadcast the results and initiated the mini-retro with the team. Waiting for any mini-retro feedback before we wrap up.
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:03:58.551Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T21:03:59.089Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro: clean execution, nothing to raise"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T21:03:59.264Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro: clean pipeline, good review pattern"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T21:03:59.467Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro: clean execution, no concerns"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T21:03:59.602Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro: all good, no items to raise"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T21:03:59.684Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro: all good, nothing to flag"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:04:01.047Z","idleReason":"available","summary":"[to kent-beck] Confirming done, asking for mini-retro input"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T21:04:01.299Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T21:04:01.493Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro: clean execution, no concerns"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T21:04:01.646Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro: pipeline followed, atomic commit, no issues"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:04:02.607Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T21:04:03.029Z","idleReason":"available","summary":"[to luca-palmieri] Mini-retro input: pipeline followed, atomic, good pattern"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:04:03.996Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+Mini-retro complete — all 9 confirmed clean execution, no issues raised. Task is done. Let me shut down the team.
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+Shutdown requests sent to all 9 teammates. Waiting for confirmations.
+
+---
+
+## 2026-02-12 21:04 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:04:05.279Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:04:06.677Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:04:08.111Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+Luca's still idle — he may not have picked up the shutdown request yet. Waiting for confirmations to come through.
+
+---
+
+## 2026-02-12 21:04 UTC -- User
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"scott-wlaschin has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"kent-beck has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"lea-verou has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"luca-palmieri has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"steve-schoger has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"marty-cagan has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"heydon-pickering has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"steve-krug has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"carson-gross has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"shutdown_approved","requestId":"shutdown-1770930248017@scott-wlaschin","from":"scott-wlaschin","timestamp":"2026-02-12T21:04:09.942Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"shutdown_approved","requestId":"shutdown-1770930247775@kent-beck","from":"kent-beck","timestamp":"2026-02-12T21:04:10.108Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"shutdown_approved","requestId":"shutdown-1770930248474@lea-verou","from":"lea-verou","timestamp":"2026-02-12T21:04:10.220Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"shutdown_approved","requestId":"shutdown-1770930247589@luca-palmieri","from":"luca-palmieri","timestamp":"2026-02-12T21:04:10.237Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"shutdown_approved","requestId":"shutdown-1770930248663@steve-schoger","from":"steve-schoger","timestamp":"2026-02-12T21:04:10.453Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"shutdown_approved","requestId":"shutdown-1770930249235@marty-cagan","from":"marty-cagan","timestamp":"2026-02-12T21:04:10.534Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"shutdown_approved","requestId":"shutdown-1770930249001@heydon-pickering","from":"heydon-pickering","timestamp":"2026-02-12T21:04:10.733Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"shutdown_approved","requestId":"shutdown-1770930248824@steve-krug","from":"steve-krug","timestamp":"2026-02-12T21:04:11.528Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"shutdown_approved","requestId":"shutdown-1770930248366@carson-gross","from":"carson-gross","timestamp":"2026-02-12T21:04:11.643Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+All 9 teammates shut down cleanly. Let me clean up.
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- TeamDelete
+
+</details>
+
+---
+
+## 2026-02-12 21:04 UTC -- Assistant
+
+Done. Here's the summary:
+
+**Commit `84cccec`** — CI path filtering implemented and pushed, CI green in 5m53s.
+
+**What changed:**
+1. **`.github/workflows/ci.yml`** — added 5 new `paths-ignore` entries: `.claude/**`, `.team/**`, `docs/**`, `*.md`, `LICENSE`
+2. **`TEAM_AGREEMENTS.md`** — step 11 updated: "skipped CI = implicitly green"
+
+**Result:** Doc-only commits will no longer trigger the full CI pipeline (Postgres, Rust build, Playwright, etc.), saving ~6 minutes per push. If a commit touches both docs and code, CI still runs as normal.
 
 ---

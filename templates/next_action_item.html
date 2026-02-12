@@ -1,0 +1,32 @@
+<li class="next-action-item" id="next-action-{{ action.id }}">
+    <form
+        method="post"
+        action="/next-actions/{{ action.id }}/complete"
+        class="next-action-item__complete"
+        hx-post="/next-actions/{{ action.id }}/complete"
+        hx-target="#next-action-{{ action.id }}"
+        hx-swap="outerHTML"
+    >
+        <button type="submit" class="next-action-item__complete-button" aria-label="Complete: {{ action.title }}">&#x2610;</button>
+    </form>
+    <span class="next-action-item__title">{{ action.title }}</span>
+    <span class="next-action-item__context">{{ action.context_name }}</span>
+    <a
+        href="/next-actions/{{ action.id }}/edit"
+        class="next-action-item__edit"
+        aria-label="Edit: {{ action.title }}"
+        hx-get="/next-actions/{{ action.id }}/edit"
+        hx-target="#next-action-{{ action.id }}"
+        hx-swap="outerHTML"
+    >Edit</a>
+    <form
+        method="post"
+        action="/next-actions/{{ action.id }}/delete"
+        class="next-action-item__delete"
+        hx-post="/next-actions/{{ action.id }}/delete"
+        hx-target="#next-action-{{ action.id }}"
+        hx-swap="outerHTML"
+    >
+        <button type="submit" class="next-action-item__delete-button" aria-label="Delete: {{ action.title }}">Delete</button>
+    </form>
+</li>

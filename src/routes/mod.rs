@@ -10,6 +10,7 @@ mod health_check;
 mod inbox;
 mod index;
 mod login;
+mod next_actions;
 mod register;
 mod todos;
 
@@ -34,13 +35,15 @@ pub use contexts::{
 };
 pub use dashboard::get_dashboard;
 pub use forgot_password::get_forgot_password;
-pub use gtd_placeholders::{
-    get_next_actions, get_projects, get_review, get_someday_maybe, get_waiting_for,
-};
+pub use gtd_placeholders::{get_projects, get_review, get_someday_maybe, get_waiting_for};
 pub use health_check::health_check;
 pub use inbox::{get_inbox, post_delete_inbox_item, post_inbox};
 pub use index::index;
 pub use login::{get_login, post_login, post_logout};
+pub use next_actions::{
+    get_edit_next_action, get_next_action_item, get_next_actions, post_complete_next_action,
+    post_delete_next_action, post_edit_next_action, post_next_action,
+};
 pub use register::{get_register, post_register};
 pub use todos::{
     get_edit_todo, get_todo_item, get_todos_page, post_delete_todo, post_edit_todo, post_todo,

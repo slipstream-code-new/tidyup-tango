@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO next_actions (id, user_id, context_id, title, created_at, completed_at)\n           VALUES ($1, $2, $3, $4, $5 :: timestamptz, $6 :: timestamptz)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4d21500d1a1bf0a7ab2de006a5df1bf7d4483e04e05ac00f72b1ec54972639d1"
+}

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE next_actions SET completed_at = $1 :: timestamptz WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ec90adb1634801ba9c059a00e91664a006535d8ffc42e5f9a460a3c9a283a617"
+}

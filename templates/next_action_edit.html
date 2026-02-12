@@ -1,0 +1,29 @@
+<li class="next-action-item" id="next-action-{{ action.id }}">
+    <form
+        method="post"
+        action="/next-actions/{{ action.id }}/edit"
+        class="next-action-item__edit-form"
+        hx-post="/next-actions/{{ action.id }}/edit"
+        hx-target="#next-action-{{ action.id }}"
+        hx-swap="outerHTML"
+    >
+        <label for="edit-title-{{ action.id }}" class="visually-hidden">Edit title</label>
+        <input
+            type="text"
+            id="edit-title-{{ action.id }}"
+            name="title"
+            value="{{ action.title }}"
+            maxlength="300"
+            class="next-action-item__edit-input"
+            autofocus
+        >
+        <button type="submit" class="next-action-item__edit-save">Save</button>
+        <a
+            href="/next-actions/{{ action.id }}"
+            class="next-action-item__edit-cancel"
+            hx-get="/next-actions/{{ action.id }}"
+            hx-target="#next-action-{{ action.id }}"
+            hx-swap="outerHTML"
+        >Cancel</a>
+    </form>
+</li>
