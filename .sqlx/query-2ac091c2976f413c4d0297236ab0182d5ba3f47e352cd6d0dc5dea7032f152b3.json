@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, user_id, context_id, title,\n           created_at as \"created_at: DateTime<Utc>\",\n           completed_at as \"completed_at: DateTime<Utc>\"\n           FROM next_actions WHERE id = $1",
+  "query": "SELECT id, user_id, context_id, project_id, title,\n           created_at as \"created_at: DateTime<Utc>\",\n           completed_at as \"completed_at: DateTime<Utc>\"\n           FROM next_actions\n           WHERE project_id = $1\n           ORDER BY completed_at NULLS FIRST, created_at ASC",
   "describe": {
     "columns": [
       {
@@ -20,16 +20,21 @@
       },
       {
         "ordinal": 3,
+        "name": "project_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
         "name": "title",
         "type_info": "Text"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "created_at: DateTime<Utc>",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "completed_at: DateTime<Utc>",
         "type_info": "Timestamptz"
       }
@@ -43,10 +48,11 @@
       false,
       false,
       false,
+      true,
       false,
       false,
       true
     ]
   },
-  "hash": "2e22fdd8aa51a2a0ba62d2f0b8d919406705f5638ca008ae1eed1ee1ad2e3ca9"
+  "hash": "2ac091c2976f413c4d0297236ab0182d5ba3f47e352cd6d0dc5dea7032f152b3"
 }

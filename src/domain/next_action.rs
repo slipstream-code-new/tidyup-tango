@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use super::context::ContextId;
+use super::project::ProjectId;
 use super::todo_title::TodoTitle;
 use super::user::UserId;
 
@@ -42,6 +43,7 @@ pub enum NextAction {
         id: NextActionId,
         user_id: UserId,
         context_id: ContextId,
+        project_id: Option<ProjectId>,
         title: TodoTitle,
         created_at: DateTime<Utc>,
     },
@@ -49,6 +51,7 @@ pub enum NextAction {
         id: NextActionId,
         user_id: UserId,
         context_id: ContextId,
+        project_id: Option<ProjectId>,
         title: TodoTitle,
         created_at: DateTime<Utc>,
         completed_at: DateTime<Utc>,
@@ -61,6 +64,23 @@ impl NextAction {
             id: NextActionId::new(),
             user_id,
             context_id,
+            project_id: None,
+            title,
+            created_at: Utc::now(),
+        }
+    }
+
+    pub fn new_for_project(
+        user_id: UserId,
+        context_id: ContextId,
+        project_id: ProjectId,
+        title: TodoTitle,
+    ) -> Self {
+        Self::Active {
+            id: NextActionId::new(),
+            user_id,
+            context_id,
+            project_id: Some(project_id),
             title,
             created_at: Utc::now(),
         }
@@ -70,6 +90,7 @@ impl NextAction {
         id: NextActionId,
         user_id: UserId,
         context_id: ContextId,
+        project_id: Option<ProjectId>,
         title: TodoTitle,
         created_at: DateTime<Utc>,
         completed_at: Option<DateTime<Utc>>,
@@ -79,6 +100,7 @@ impl NextAction {
                 id,
                 user_id,
                 context_id,
+                project_id,
                 title,
                 created_at,
                 completed_at,
@@ -87,6 +109,7 @@ impl NextAction {
                 id,
                 user_id,
                 context_id,
+                project_id,
                 title,
                 created_at,
             },
@@ -108,6 +131,14 @@ impl NextAction {
     pub fn context_id(&self) -> &ContextId {
         match self {
             Self::Active { context_id, .. } | Self::Completed { context_id, .. } => context_id,
+        }
+    }
+
+    pub fn project_id(&self) -> Option<&ProjectId> {
+        match self {
+            Self::Active { project_id, .. } | Self::Completed { project_id, .. } => {
+                project_id.as_ref()
+            }
         }
     }
 
@@ -139,12 +170,14 @@ impl NextAction {
                 id,
                 user_id,
                 context_id,
+                project_id,
                 title,
                 created_at,
             } => Self::Completed {
                 id,
                 user_id,
                 context_id,
+                project_id,
                 title,
                 created_at,
                 completed_at: Utc::now(),
@@ -250,6 +283,7 @@ mod tests {
             id.clone(),
             user_id.clone(),
             context_id.clone(),
+            None,
             title,
             now,
             None,
@@ -275,6 +309,7 @@ mod tests {
             id.clone(),
             user_id.clone(),
             context_id.clone(),
+            None,
             title,
             created,
             Some(completed),

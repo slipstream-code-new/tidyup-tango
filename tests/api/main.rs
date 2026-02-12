@@ -8,5 +8,6 @@ mod inbox;
 mod index;
 mod login;
 mod next_actions;
+mod projects;
 mod register;
 mod todos;

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE projects SET completed_at = $1 :: timestamptz WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "eec1efe9500f83ced2acd014bce49bd60ad07e3c661e0c2506861dfaa8261ca6"
+}

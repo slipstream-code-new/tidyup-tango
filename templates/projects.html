@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Projects -- Todo List{% endblock %}
+
+{% block nav %}
+{% include "gtd_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="projects">
+    <h1>Projects</h1>
+
+    {% if let Some(error) = error_message %}
+    <div class="projects__error" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <form
+        method="post"
+        action="/projects"
+        class="projects__add"
+        hx-post="/projects"
+        hx-target="#projects-list"
+        hx-swap="beforeend"
+        hx-on::after-request="if(event.detail.successful) { this.querySelector('#project-title').value = ''; this.querySelector('#project-title').focus(); }"
+    >
+        <label for="project-title">Add project</label>
+        <div class="projects__add-row">
+            <input
+                type="text"
+                id="project-title"
+                name="title"
+                placeholder="What outcome are you working toward?"
+                maxlength="300"
+                autocomplete="off"
+                class="projects__add-input"
+            >
+            <button type="submit" class="projects__add-submit">Add</button>
+        </div>
+    </form>
+
+    {% if projects.is_empty() %}
+    <div class="projects__empty-state" id="projects-empty-state">
+        <p>No projects yet. Projects are outcomes that need more than one step. You can create one here or during inbox processing.</p>
+    </div>
+    {% endif %}
+    <ul class="projects__list" role="list" id="projects-list"{% if projects.is_empty() %} hidden{% endif %}>
+        {% for project in projects %}
+        {% include "project_item.html" %}
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/project-focus.js"></script>
+{% endblock %}

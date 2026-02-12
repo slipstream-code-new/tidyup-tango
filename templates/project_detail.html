@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} -- Projects -- Todo List{% endblock %}
+
+{% block nav %}
+{% include "gtd_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="project-detail">
+    <p class="project-detail__breadcrumb"><a href="/projects">Projects</a></p>
+    <h1>{{ project.title }}</h1>
+
+    {% if project.is_stalled %}
+    <div class="project-detail__stalled-notice" role="status">
+        <p>This project has no next actions. Add one to keep it moving forward.</p>
+    </div>
+    {% endif %}
+
+    {% if let Some(error) = error_message %}
+    <div class="project-detail__error" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <section aria-labelledby="active-actions-heading">
+        <h2 id="active-actions-heading">Next Actions</h2>
+
+        {% if !contexts.is_empty() %}
+        <form
+            method="post"
+            action="/projects/{{ project.id }}/next-actions"
+            class="project-detail__add-action"
+            hx-post="/projects/{{ project.id }}/next-actions"
+            hx-target="#project-active-actions"
+            hx-swap="beforeend"
+            hx-on::after-request="if(event.detail.successful) { this.querySelector('#project-action-title').value = ''; this.querySelector('#project-action-title').focus(); }"
+        >
+            <label for="project-action-title">Add next action</label>
+            <div class="project-detail__add-row">
+                <input
+                    type="text"
+                    id="project-action-title"
+                    name="title"
+                    placeholder="What's the next action?"
+                    maxlength="300"
+                    autocomplete="off"
+                    class="project-detail__add-input"
+                >
+                <label for="project-action-context" class="project-detail__context-label">Context</label>
+                <select id="project-action-context" name="context_id" class="project-detail__add-context">
+                    {% for ctx in contexts %}
+                    <option value="{{ ctx.id }}">{{ ctx.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="project-detail__add-submit">Add</button>
+            </div>
+        </form>
+        {% endif %}
+
+        {% if active_actions.is_empty() %}
+        <p class="project-detail__empty">No active next actions.</p>
+        {% endif %}
+        <ul class="project-detail__action-list" role="list" id="project-active-actions">
+            {% for action in active_actions %}
+            {% include "project_next_action_item.html" %}
+            {% endfor %}
+        </ul>
+    </section>
+
+    {% if !completed_actions.is_empty() %}
+    <section aria-labelledby="completed-actions-heading">
+        <h2 id="completed-actions-heading">Completed Actions</h2>
+        <ul class="project-detail__action-list project-detail__action-list--completed" role="list">
+            {% for action in completed_actions %}
+            {% include "project_next_action_item.html" %}
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

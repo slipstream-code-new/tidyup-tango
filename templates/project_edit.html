@@ -1,0 +1,29 @@
+<li class="project-item" id="project-{{ project.id }}">
+    <form
+        method="post"
+        action="/projects/{{ project.id }}/edit"
+        class="project-item__edit-form"
+        hx-post="/projects/{{ project.id }}/edit"
+        hx-target="#project-{{ project.id }}"
+        hx-swap="outerHTML"
+    >
+        <label for="project-edit-title-{{ project.id }}" class="visually-hidden">Edit project title</label>
+        <input
+            type="text"
+            id="project-edit-title-{{ project.id }}"
+            name="title"
+            value="{{ project.title }}"
+            maxlength="300"
+            class="project-item__edit-input"
+            autofocus
+        >
+        <button type="submit" class="project-item__edit-save">Save</button>
+        <a
+            href="/projects/{{ project.id }}/item"
+            class="project-item__edit-cancel"
+            hx-get="/projects/{{ project.id }}/item"
+            hx-target="#project-{{ project.id }}"
+            hx-swap="outerHTML"
+        >Cancel</a>
+    </form>
+</li>

@@ -2,12 +2,13 @@ use chrono::{DateTime, Utc};
 use sqlx::{PgExecutor, PgPool};
 use uuid::Uuid;
 
-use crate::domain::{ContextId, NextAction, NextActionId, TodoTitle, UserId};
+use crate::domain::{ContextId, NextAction, NextActionId, ProjectId, TodoTitle, UserId};
 
 struct NextActionRecord {
     id: Uuid,
     user_id: Uuid,
     context_id: Uuid,
+    project_id: Option<Uuid>,
     title: String,
     created_at: DateTime<Utc>,
     completed_at: Option<DateTime<Utc>>,
@@ -18,12 +19,14 @@ impl NextActionRecord {
         let id = NextActionId::from_uuid(self.id);
         let user_id = UserId::from_uuid(self.user_id);
         let context_id = ContextId::from_uuid(self.context_id);
+        let project_id = self.project_id.map(ProjectId::from_uuid);
         let title = TodoTitle::parse(self.title).expect("stored title should be valid");
 
         NextAction::from_parts(
             id,
             user_id,
             context_id,
+            project_id,
             title,
             self.created_at,
             self.completed_at,
@@ -40,12 +43,15 @@ pub async fn insert_next_action(
         NextAction::Active { .. } => None,
     };
 
+    let project_id = action.project_id().map(|pid| *pid.as_uuid());
+
     sqlx::query!(
-        r#"INSERT INTO next_actions (id, user_id, context_id, title, created_at, completed_at)
-           VALUES ($1, $2, $3, $4, $5 :: timestamptz, $6 :: timestamptz)"#,
+        r#"INSERT INTO next_actions (id, user_id, context_id, project_id, title, created_at, completed_at)
+           VALUES ($1, $2, $3, $4, $5, $6 :: timestamptz, $7 :: timestamptz)"#,
         action.id().as_uuid(),
         action.user_id().as_uuid(),
         action.context_id().as_uuid(),
+        project_id as Option<Uuid>,
         action.title().as_str(),
         action.created_at() as &DateTime<Utc>,
         completed_at as Option<&DateTime<Utc>>,
@@ -61,7 +67,7 @@ pub async fn find_active_next_actions_by_user(
 ) -> Result<Vec<NextAction>, sqlx::Error> {
     let records = sqlx::query_as!(
         NextActionRecord,
-        r#"SELECT id, user_id, context_id, title,
+        r#"SELECT id, user_id, context_id, project_id, title,
            created_at as "created_at: DateTime<Utc>",
            completed_at as "completed_at: DateTime<Utc>"
            FROM next_actions
@@ -85,7 +91,7 @@ pub async fn find_active_next_actions_by_user_and_context(
 ) -> Result<Vec<NextAction>, sqlx::Error> {
     let records = sqlx::query_as!(
         NextActionRecord,
-        r#"SELECT id, user_id, context_id, title,
+        r#"SELECT id, user_id, context_id, project_id, title,
            created_at as "created_at: DateTime<Utc>",
            completed_at as "completed_at: DateTime<Utc>"
            FROM next_actions
@@ -109,7 +115,7 @@ pub async fn find_next_action_by_id(
 ) -> Result<Option<NextAction>, sqlx::Error> {
     let record: Option<NextActionRecord> = sqlx::query_as!(
         NextActionRecord,
-        r#"SELECT id, user_id, context_id, title,
+        r#"SELECT id, user_id, context_id, project_id, title,
            created_at as "created_at: DateTime<Utc>",
            completed_at as "completed_at: DateTime<Utc>"
            FROM next_actions WHERE id = $1"#,
@@ -176,4 +182,24 @@ pub async fn count_active_next_actions(
     .await?;
 
     Ok(record.count)
+}
+
+pub async fn find_next_actions_by_project(
+    pool: &PgPool,
+    project_id: &ProjectId,
+) -> Result<Vec<NextAction>, sqlx::Error> {
+    let records = sqlx::query_as!(
+        NextActionRecord,
+        r#"SELECT id, user_id, context_id, project_id, title,
+           created_at as "created_at: DateTime<Utc>",
+           completed_at as "completed_at: DateTime<Utc>"
+           FROM next_actions
+           WHERE project_id = $1
+           ORDER BY completed_at NULLS FIRST, created_at ASC"#,
+        project_id.as_uuid(),
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(records.into_iter().map(|r| r.into_domain()).collect())
 }

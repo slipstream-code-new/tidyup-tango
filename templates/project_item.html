@@ -1,0 +1,35 @@
+<li class="project-item{% if project.is_stalled %} project-item--stalled{% endif %}" id="project-{{ project.id }}">
+    <a href="/projects/{{ project.id }}" class="project-item__title">{{ project.title }}</a>
+    <span class="project-item__count">{{ project.next_action_count }} action{% if project.next_action_count != 1 %}s{% endif %}</span>
+    {% if project.is_stalled %}
+    <span class="project-item__stalled-flag">No next actions</span>
+    {% endif %}
+    <a
+        href="/projects/{{ project.id }}/edit"
+        class="project-item__edit"
+        aria-label="Edit: {{ project.title }}"
+        hx-get="/projects/{{ project.id }}/edit"
+        hx-target="#project-{{ project.id }}"
+        hx-swap="outerHTML"
+    >Edit</a>
+    <form
+        method="post"
+        action="/projects/{{ project.id }}/complete"
+        class="project-item__complete"
+        hx-post="/projects/{{ project.id }}/complete"
+        hx-target="#project-{{ project.id }}"
+        hx-swap="outerHTML"
+    >
+        <button type="submit" class="project-item__complete-button" aria-label="Complete: {{ project.title }}">Complete</button>
+    </form>
+    <form
+        method="post"
+        action="/projects/{{ project.id }}/delete"
+        class="project-item__delete"
+        hx-post="/projects/{{ project.id }}/delete"
+        hx-target="#project-{{ project.id }}"
+        hx-swap="outerHTML"
+    >
+        <button type="submit" class="project-item__delete-button" aria-label="Delete: {{ project.title }}">Delete</button>
+    </form>
+</li>

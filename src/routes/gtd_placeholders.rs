@@ -58,21 +58,6 @@ async fn render_placeholder(
     Ok(Html(template.render()?))
 }
 
-pub async fn get_projects(
-    AuthenticatedUser(user_id): AuthenticatedUser,
-    State(pool): State<PgPool>,
-) -> Result<impl IntoResponse, GtdPlaceholderError> {
-    render_placeholder(
-        &user_id,
-        &pool,
-        "projects",
-        "Projects -- Todo List",
-        "Projects",
-        "Outcomes that need more than one action step.",
-    )
-    .await
-}
-
 pub async fn get_waiting_for(
     AuthenticatedUser(user_id): AuthenticatedUser,
     State(pool): State<PgPool>,

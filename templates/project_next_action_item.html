@@ -1,0 +1,18 @@
+<li class="project-action-item{% if action.is_completed %} project-action-item--completed{% endif %}" id="project-action-{{ action.id }}">
+    {% if !action.is_completed %}
+    <form
+        method="post"
+        action="/next-actions/{{ action.id }}/complete"
+        class="project-action-item__complete"
+        hx-post="/next-actions/{{ action.id }}/complete"
+        hx-target="#project-action-{{ action.id }}"
+        hx-swap="outerHTML"
+    >
+        <button type="submit" class="project-action-item__complete-button" aria-label="Complete: {{ action.title }}">&#x2610;</button>
+    </form>
+    {% else %}
+    <span class="project-action-item__done-icon" aria-hidden="true">&#x2611;</span>
+    {% endif %}
+    <span class="project-action-item__title">{{ action.title }}</span>
+    <span class="project-action-item__context">{{ action.context_name }}</span>
+</li>

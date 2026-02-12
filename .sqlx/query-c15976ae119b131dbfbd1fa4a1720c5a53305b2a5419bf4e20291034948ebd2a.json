@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) as \"count!\"\n           FROM projects p\n           WHERE p.user_id = $1\n             AND p.completed_at IS NULL\n             AND p.dropped_at IS NULL\n             AND NOT EXISTS (\n                 SELECT 1 FROM next_actions na\n                 WHERE na.project_id = p.id\n                   AND na.completed_at IS NULL\n             )",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "c15976ae119b131dbfbd1fa4a1720c5a53305b2a5419bf4e20291034948ebd2a"
+}

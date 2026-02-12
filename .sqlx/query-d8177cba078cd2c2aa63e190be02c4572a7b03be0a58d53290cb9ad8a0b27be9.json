@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO projects (id, user_id, title, created_at, completed_at, dropped_at)\n           VALUES ($1, $2, $3, $4 :: timestamptz, $5 :: timestamptz, $6 :: timestamptz)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Timestamptz",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d8177cba078cd2c2aa63e190be02c4572a7b03be0a58d53290cb9ad8a0b27be9"
+}

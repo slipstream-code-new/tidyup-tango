@@ -66,6 +66,16 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Invalid title (edit next action) | `UpdateNextActionTitleError::InvalidTitle(TodoTitleError)` | Title validation failure in update_next_action_title service |
 | Inbox item not found (clarify) | `ClarifyAsNextActionError::NotFound` | Referenced inbox item does not exist |
 | Not authorized (clarify) | `ClarifyAsNextActionError::Unauthorized` | User does not own the inbox item |
+| Invalid title (add project) | `AddProjectError::InvalidTitle(TodoTitleError)` | Title validation failure in add_project service |
+| Project not found (complete) | `CompleteProjectError::NotFound` | Referenced project does not exist |
+| Not authorized (complete project) | `CompleteProjectError::Unauthorized` | User does not own the project |
+| Project not found (delete) | `DeleteProjectError::NotFound` | Referenced project does not exist |
+| Not authorized (delete project) | `DeleteProjectError::Unauthorized` | User does not own the project |
+| Project not found (edit) | `UpdateProjectTitleError::NotFound` | Referenced project does not exist |
+| Not authorized (edit project) | `UpdateProjectTitleError::Unauthorized` | User does not own the project |
+| Invalid title (edit project) | `UpdateProjectTitleError::InvalidTitle(TodoTitleError)` | Title validation failure in update_project_title service |
+| Project not found (add action) | `AddProjectNextActionError::ProjectNotFound` | Referenced project does not exist |
+| Not authorized (add project action) | `AddProjectNextActionError::Unauthorized` | User does not own the project |
 
 ## Error Copy Convention
 
@@ -156,7 +166,8 @@ implementation.*
 | Inbox item | `InboxItem` | Raw, unclarified capture. Has title and created_at. No context, no project link. |
 | Next action | `NextAction` (enum: Active, Completed) | A concrete, physical action ready to do. Has context and optional project link. **Implemented.** |
 | Next action ID | `NextActionId(Uuid)` | Newtype wrapper; uniquely identifies a next action. **Implemented.** |
-| Project | `Project` (enum: Active, Completed, Dropped) | An outcome requiring 2+ actions. Has title and linked next actions. |
+| Project | `Project` (enum: Active, Completed, Dropped) | An outcome requiring 2+ actions. Has title and linked next actions. **Implemented.** |
+| Project ID | `ProjectId(Uuid)` | Newtype wrapper; uniquely identifies a project. **Implemented.** |
 | Context | `Context` | Where/how an action can be performed. User-defined. Defaults: @computer, @home, @errands, @phone, @anywhere. **Implemented.** |
 | Context ID | `ContextId(Uuid)` | Newtype wrapper; uniquely identifies a context. **Implemented.** |
 | Waiting For item | `WaitingForItem` | Delegated/blocked item. Has title, waiting_on (text), and date added. |
@@ -178,8 +189,12 @@ implementation.*
 | Complete action | `NextAction::complete()` | Active -> Completed; records completion time. **Implemented.** |
 | Delete next action | `delete_next_action()` | Service: verifies ownership, permanently removes. **Implemented.** |
 | Edit next action title | `update_next_action_title()` | Service: verifies ownership, parses new title, persists. **Implemented.** |
-| Complete project | `Project::complete()` | Active -> Completed; records completion time |
-| Drop project | `Project::drop()` | Active -> Dropped; project abandoned |
+| Add project | `add_project()` | Service: creates Project (Active) with title. **Implemented.** |
+| Complete project | `Project::complete()` | Active -> Completed; records completion time. **Implemented.** |
+| Drop project | `Project::drop_project()` | Active -> Dropped; project abandoned. **Implemented.** |
+| Delete project | `delete_project()` | Service: verifies ownership, permanently removes. **Implemented.** |
+| Edit project title | `update_project_title()` | Service: verifies ownership, parses new title, persists. **Implemented.** |
+| Add next action to project | `add_next_action_to_project()` | Service: creates NextAction linked to project. **Implemented.** |
 | Activate someday/maybe | `activate()` | SomedayMaybeItem -> InboxItem (for re-clarification) |
 | Resolve waiting for | `resolve()` | WaitingForItem -> completed or moved to inbox |
 | Add context | `add_context()` | Creates a new user-defined context |
