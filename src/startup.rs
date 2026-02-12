@@ -13,10 +13,10 @@ use crate::routes::{
     get_contexts, get_dashboard, get_edit_context, get_edit_next_action, get_edit_todo,
     get_forgot_password, get_inbox, get_login, get_next_action_item, get_next_actions,
     get_projects, get_register, get_review, get_someday_maybe, get_todo_item, get_todos_page,
-    get_waiting_for, health_check, index, post_complete_next_action, post_context,
-    post_delete_context, post_delete_inbox_item, post_delete_next_action, post_delete_todo,
-    post_edit_context, post_edit_next_action, post_edit_todo, post_inbox, post_login, post_logout,
-    post_next_action, post_register, post_todo, post_toggle_todo,
+    get_waiting_for, health_check, index, post_clarify_inbox_item, post_complete_next_action,
+    post_context, post_delete_context, post_delete_inbox_item, post_delete_next_action,
+    post_delete_todo, post_edit_context, post_edit_next_action, post_edit_todo, post_inbox,
+    post_login, post_logout, post_next_action, post_register, post_todo, post_toggle_todo,
 };
 
 pub struct Application {
@@ -64,6 +64,10 @@ impl Application {
             .route(
                 "/inbox/{id}/delete",
                 axum::routing::post(post_delete_inbox_item),
+            )
+            .route(
+                "/inbox/{id}/clarify",
+                axum::routing::post(post_clarify_inbox_item),
             )
             .route(
                 "/contexts",

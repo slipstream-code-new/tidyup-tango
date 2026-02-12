@@ -1,13 +1,31 @@
 <li class="inbox-item" id="inbox-item-{{ item.id }}">
     <span class="inbox-item__title">{{ item.title }}</span>
-    <form
-        method="post"
-        action="/inbox/{{ item.id }}/delete"
-        class="inbox-item__delete"
-        hx-post="/inbox/{{ item.id }}/delete"
-        hx-target="#inbox-item-{{ item.id }}"
-        hx-swap="outerHTML"
-    >
-        <button type="submit" class="inbox-item__delete-button" aria-label="Delete: {{ item.title }}">Delete</button>
-    </form>
+    <div class="inbox-item__actions">
+        <form
+            method="post"
+            action="/inbox/{{ item.id }}/clarify"
+            class="inbox-item__clarify"
+            hx-post="/inbox/{{ item.id }}/clarify"
+            hx-target="#inbox-item-{{ item.id }}"
+            hx-swap="outerHTML"
+        >
+            <label for="clarify-context-{{ item.id }}" class="inbox-item__context-label">Context</label>
+            <select id="clarify-context-{{ item.id }}" name="context_id" class="inbox-item__context-select">
+                {% for ctx in contexts %}
+                <option value="{{ ctx.id }}">{{ ctx.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="inbox-item__clarify-button" aria-label="Clarify as next action: {{ item.title }}">Next Action</button>
+        </form>
+        <form
+            method="post"
+            action="/inbox/{{ item.id }}/delete"
+            class="inbox-item__delete"
+            hx-post="/inbox/{{ item.id }}/delete"
+            hx-target="#inbox-item-{{ item.id }}"
+            hx-swap="outerHTML"
+        >
+            <button type="submit" class="inbox-item__delete-button" aria-label="Trash: {{ item.title }}">Trash</button>
+        </form>
+    </div>
 </li>

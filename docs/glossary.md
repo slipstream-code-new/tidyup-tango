@@ -64,6 +64,8 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Next action not found (edit) | `UpdateNextActionTitleError::NotFound` | Referenced next action does not exist |
 | Not authorized (edit next action) | `UpdateNextActionTitleError::Unauthorized` | User does not own the next action |
 | Invalid title (edit next action) | `UpdateNextActionTitleError::InvalidTitle(TodoTitleError)` | Title validation failure in update_next_action_title service |
+| Inbox item not found (clarify) | `ClarifyAsNextActionError::NotFound` | Referenced inbox item does not exist |
+| Not authorized (clarify) | `ClarifyAsNextActionError::Unauthorized` | User does not own the inbox item |
 
 ## Error Copy Convention
 
@@ -167,11 +169,11 @@ implementation.*
 | Business Action | Proposed Rust Function / Method | Notes |
 |-----------------|-------------------------------|-------|
 | Capture to inbox | `capture_to_inbox()` | Creates InboxItem from raw text |
-| Clarify as next action | `clarify_as_next_action()` | InboxItem -> NextAction (requires context) |
+| Clarify as next action | `clarify_as_next_action()` | InboxItem -> NextAction (requires context). **Implemented.** |
 | Clarify as project | `clarify_as_project()` | InboxItem -> Project + first NextAction |
 | Delegate | `delegate()` | InboxItem or NextAction -> WaitingForItem |
 | Defer | `defer()` | InboxItem or NextAction -> SomedayMaybeItem |
-| Trash | (delete) | InboxItem is permanently removed |
+| Trash | (delete) | InboxItem is permanently removed. **Implemented.** |
 | Add next action | `add_next_action()` | Service: creates NextAction (Active) with title and context. **Implemented.** |
 | Complete action | `NextAction::complete()` | Active -> Completed; records completion time. **Implemented.** |
 | Delete next action | `delete_next_action()` | Service: verifies ownership, permanently removes. **Implemented.** |

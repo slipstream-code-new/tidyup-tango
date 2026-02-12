@@ -1,7 +1,10 @@
 use sqlx::PgPool;
 
-use crate::domain::{InboxItem, InboxItemId, TodoTitle, TodoTitleError, UserId};
+use crate::domain::{
+    ContextId, InboxItem, InboxItemId, NextAction, TodoTitle, TodoTitleError, UserId,
+};
 use crate::infrastructure::inbox_repository;
+use crate::infrastructure::next_action_repository;
 
 #[derive(Debug, thiserror::Error)]
 pub enum CaptureInboxError {
@@ -100,4 +103,56 @@ pub async fn delete_inbox_item(
 
     tracing::info!("Inbox item deleted");
     Ok(())
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum ClarifyAsNextActionError {
+    #[error("Inbox item not found")]
+    NotFound,
+    #[error("Not authorized to clarify this inbox item")]
+    Unauthorized,
+    #[error(transparent)]
+    Unexpected(#[from] anyhow::Error),
+}
+
+#[tracing::instrument(
+    name = "clarify_as_next_action",
+    skip(pool),
+    fields(item_id = %item_id.as_uuid(), user_id = %user_id.as_uuid(), context_id = %context_id.as_uuid())
+)]
+pub async fn clarify_as_next_action(
+    pool: &PgPool,
+    item_id: &InboxItemId,
+    user_id: &UserId,
+    context_id: ContextId,
+) -> Result<NextAction, ClarifyAsNextActionError> {
+    let item = inbox_repository::find_inbox_item_by_id(pool, item_id)
+        .await
+        .map_err(|e| ClarifyAsNextActionError::Unexpected(anyhow::anyhow!("Database error: {e}")))?
+        .ok_or(ClarifyAsNextActionError::NotFound)?;
+
+    if item.user_id() != user_id {
+        return Err(ClarifyAsNextActionError::Unauthorized);
+    }
+
+    let action = NextAction::new(user_id.clone(), context_id, item.title().clone());
+
+    next_action_repository::insert_next_action(pool, &action)
+        .await
+        .map_err(|e| {
+            ClarifyAsNextActionError::Unexpected(anyhow::anyhow!(
+                "Failed to insert next action: {e}"
+            ))
+        })?;
+
+    inbox_repository::delete_inbox_item(pool, item_id)
+        .await
+        .map_err(|e| {
+            ClarifyAsNextActionError::Unexpected(anyhow::anyhow!(
+                "Failed to delete inbox item: {e}"
+            ))
+        })?;
+
+    tracing::info!("Inbox item clarified as next action");
+    Ok(action)
 }

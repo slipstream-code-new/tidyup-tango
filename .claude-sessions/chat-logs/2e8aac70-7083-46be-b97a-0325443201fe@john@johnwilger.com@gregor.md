@@ -1551,3 +1551,186 @@ Good — Luca has completed the mini-retro and is ready to discuss Step 5. The t
 Waiting for team responses on the Step 5 driver decision.
 
 ---
+
+## 2026-02-12 22:16 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T22:16:24.782Z","idleReason":"available","summary":"[to luca-palmieri] Support Luca continuing as driver for Step 5"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T22:16:26.022Z","idleReason":"available","summary":"[to luca-palmieri] +1 Luca as Driver for Step 5, UX priorities noted"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T22:16:26.212Z","idleReason":"available","summary":"[to luca-palmieri] +1 Luca drives Step 5, requests Tidy First first"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T22:16:26.326Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T22:16:26.523Z","idleReason":"available","summary":"[to luca-palmieri] +1 Luca as driver, design notes for clarify form"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T22:16:27.837Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T22:16:27.914Z","idleReason":"available","summary":"[to luca-palmieri] Support Luca driving Step 5, product context for clarify flow"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T22:16:27.942Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T22:16:28.139Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T22:16:29.494Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T22:16:30.070Z","idleReason":"available","summary":"[to luca-palmieri] Step 5 a11y expectations: fieldset, disclosure, focus, labels"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T22:16:30.510Z","idleReason":"available","summary":"[to luca-palmieri] Type sketch for clarify workflow + driver vote"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T22:16:31.826Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T22:16:31.946Z","idleReason":"available","summary":"[to luca-palmieri] Support Luca as driver, upfront HTMX pattern for clarify form"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T22:16:33.737Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T22:16:34.763Z","idleReason":"available","summary":"[to luca-palmieri] Confirming +1 Luca as Step 5 driver"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:16 UTC -- Assistant
+
+Unanimous support — all 8 reviewers voted for Luca to continue as Driver for Step 5. The team also sent proactive guidance:
+
+- **Kent Beck**: Tidy First before starting Step 5
+- **Scott Wlaschin**: Type sketch for clarify workflow
+- **Carson Gross**: HTMX pattern for clarify form
+- **Heydon Pickering**: A11y expectations (fieldset, disclosure, focus, labels)
+- **Steve Schoger**: Design notes for clarify form
+- **Steve Krug**: UX priorities
+- **Marty Cagan**: Product context for clarify flow
+- **Lea Verou**: CSS/frontend support
+
+---
+
+## 2026-02-12 22:16 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 22:16 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 4 docs updated, offering to drive Step 5">
+Step 4 marked complete in docs/gtd-product-discovery.md (commit 196e830, pushed):
+- Step 4 checked off: `[x] **Next Actions with Contexts**`
+- NEXT marker moved to Step 5: `[ ] **Clarify as Next Action + Trash** <!-- NEXT -->`
+- Current step summary updated to: `5 -- Clarify as Next Action + Trash`
+
+For Step 5 driver selection: I'm happy to continue driving. I have full context on both the inbox code (from Step 2) and the next actions code (from Step 4), which are the two systems that Step 5 connects. The clarify workflow needs to read from inbox, create a next action with context, and delete the inbox item -- all code I wrote.
+
+The team should decide via consensus. I'm ready to start whenever the team agrees on the driver.
+</teammate-message>
+
+---
+
+## 2026-02-12 22:16 UTC -- Assistant
+
+Step 4 docs are updated and pushed. The team already unanimously agreed Luca drives Step 5.
+
+---
+
+## 2026-02-12 22:16 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 22:16 UTC -- Assistant
+
+Luca is now starting Step 5: Clarify as Next Action + Trash. Waiting for his progress updates.
+
+---
+
+## 2026-02-12 22:16 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:16:44.595Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:16 UTC -- Assistant
+
+Luca went idle briefly — likely processing the reviewer guidance before starting implementation. Standing by.
+
+---
+
+## 2026-02-12 22:16 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Doc update already pushed, ready to drive Step 5">
+The doc update is already done -- commit 196e830 was pushed to origin/main in my previous message. Step 4 is marked `[x]`, NEXT marker is on Step 5, current step line reads "5 -- Clarify as Next Action + Trash".
+
+For Step 5 driver: I recommend myself (Luca) as driver. I have full context on both the inbox (Step 2) and next actions (Step 4) code paths, which are the two systems the clarify workflow connects. This avoids context-switching overhead.
+
+I'm ready to begin Step 5 implementation now if the team agrees. Should I start reading the acceptance criteria for US-GTD-2a and planning the implementation?
+</teammate-message>
+
+---
+
+## 2026-02-12 22:16 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 22:16 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T22:16:51.239Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 22:16 UTC -- Assistant
+
+Waiting for Luca to begin Step 5 implementation.
+
+---

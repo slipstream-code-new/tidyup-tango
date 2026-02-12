@@ -273,7 +273,7 @@ test.describe("Core user journey", () => {
     await expect(page.getByText("Call the dentist")).toBeVisible();
 
     // Delete the item
-    await page.getByRole("button", { name: "Delete: Call the dentist" }).click();
+    await page.getByRole("button", { name: "Trash: Call the dentist" }).click();
 
     // Item should be gone
     await expect(page.getByText("Call the dentist")).not.toBeVisible();

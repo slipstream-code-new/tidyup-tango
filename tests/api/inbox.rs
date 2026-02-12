@@ -190,15 +190,15 @@ async fn delete_inbox_item_removes_it_and_redirects() {
     assert!(body.contains("Delete me"));
 
     // Extract the item ID from the delete form action URL
-    let action_prefix = "action=\"/inbox/";
-    let start = body
-        .find(action_prefix)
-        .expect("Missing delete form action")
-        + action_prefix.len();
-    let end = body[start..]
-        .find("/delete\"")
-        .expect("Missing /delete suffix");
-    let item_id = &body[start..start + end];
+    let delete_action_prefix = "action=\"/inbox/";
+    // Find the delete form action specifically (contains /delete")
+    let delete_action_pos = body.find("/delete\"").expect("Missing /delete action");
+    // Walk backwards to find the start of the action attribute value
+    let action_start = body[..delete_action_pos]
+        .rfind(delete_action_prefix)
+        .expect("Missing delete form action prefix")
+        + delete_action_prefix.len();
+    let item_id = &body[action_start..delete_action_pos];
 
     // Delete the item
     let response = client
@@ -397,8 +397,8 @@ async fn delete_button_has_accessible_label_with_item_title() {
 
     let body = response.text().await.unwrap();
     assert!(
-        body.contains("aria-label=\"Delete: Call the dentist\""),
-        "Delete button should have aria-label including the item title"
+        body.contains("aria-label=\"Trash: Call the dentist\""),
+        "Trash button should have aria-label including the item title"
     );
 }
 
@@ -484,15 +484,13 @@ async fn htmx_delete_inbox_item_returns_empty_body_with_announce() {
         .expect("Failed to GET /inbox");
     let body = response.text().await.unwrap();
 
-    let action_prefix = "action=\"/inbox/";
-    let start = body
-        .find(action_prefix)
-        .expect("Missing delete form action")
-        + action_prefix.len();
-    let end = body[start..]
-        .find("/delete\"")
-        .expect("Missing /delete suffix");
-    let item_id = &body[start..start + end];
+    let delete_action_prefix = "action=\"/inbox/";
+    let delete_action_pos = body.find("/delete\"").expect("Missing /delete action");
+    let action_start = body[..delete_action_pos]
+        .rfind(delete_action_prefix)
+        .expect("Missing delete form action prefix")
+        + delete_action_prefix.len();
+    let item_id = &body[action_start..delete_action_pos];
 
     // Delete via HTMX
     let response = client
@@ -561,5 +559,249 @@ async fn quick_capture_form_posts_to_inbox() {
     assert!(
         body.contains("From quick capture"),
         "Item captured via quick capture should appear in inbox"
+    );
+}
+
+/// Helper: get the first context ID from the contexts page
+async fn get_first_context_id(client: &reqwest::Client, address: &str) -> String {
+    let response = client
+        .get(format!("{address}/contexts"))
+        .send()
+        .await
+        .expect("Failed to GET /contexts");
+
+    let body = response.text().await.unwrap();
+    let action_prefix = "action=\"/contexts/";
+    let start = body.find(action_prefix).expect("Missing context action") + action_prefix.len();
+    let end = body[start..].find('/').expect("Missing / after context ID");
+    body[start..start + end].to_string()
+}
+
+/// Helper: get the first inbox item ID from the inbox page
+async fn get_first_inbox_item_id(client: &reqwest::Client, address: &str) -> String {
+    let response = client
+        .get(format!("{address}/inbox"))
+        .send()
+        .await
+        .expect("Failed to GET /inbox");
+
+    let body = response.text().await.unwrap();
+    let action_prefix = "action=\"/inbox/";
+    let start = body.find(action_prefix).expect("Missing inbox item action") + action_prefix.len();
+    let end = body[start..].find('/').expect("Missing / after item ID");
+    body[start..start + end].to_string()
+}
+
+// ---- Clarify as Next Action ----
+
+#[tokio::test]
+async fn clarify_inbox_item_as_next_action_removes_from_inbox() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "clarify1@example.com", "securepassword123").await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+
+    // Capture an item
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Clarify me")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    // Clarify as next action
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .form(&[("context_id", &context_id)])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    assert_eq!(response.status().as_u16(), 303, "Clarify should redirect");
+
+    // Item should be gone from inbox
+    let response = client
+        .get(format!("{}/inbox", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /inbox");
+    let body = response.text().await.unwrap();
+    assert!(
+        !body.contains("Clarify me"),
+        "Clarified item should no longer appear in inbox"
+    );
+}
+
+#[tokio::test]
+async fn clarify_inbox_item_creates_next_action() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "clarify2@example.com", "securepassword123").await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+
+    // Capture an item
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Becomes next action")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    // Clarify as next action
+    client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .form(&[("context_id", &context_id)])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    // Item should appear in next actions
+    let response = client
+        .get(format!("{}/next-actions", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /next-actions");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Becomes next action"),
+        "Clarified item should appear in next actions list"
+    );
+}
+
+#[tokio::test]
+async fn clarify_nonexistent_inbox_item_returns_404() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "clarify3@example.com", "securepassword123").await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+    let fake_id = uuid::Uuid::new_v4();
+
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, fake_id))
+        .form(&[("context_id", &context_id)])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    assert_eq!(response.status().as_u16(), 404);
+}
+
+#[tokio::test]
+async fn htmx_clarify_returns_empty_body_with_announce() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "clarify4@example.com", "securepassword123").await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "HTMX clarify test")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .header("hx-request", "true")
+        .form(&[("context_id", &context_id)])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    assert_eq!(response.status().as_u16(), 200);
+
+    let trigger = response
+        .headers()
+        .get("hx-trigger")
+        .expect("Missing HX-Trigger")
+        .to_str()
+        .unwrap();
+    assert!(
+        trigger.contains("Clarified as next action"),
+        "HX-Trigger should contain announce"
+    );
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.is_empty(),
+        "HTMX clarify should return empty body (item removed)"
+    );
+}
+
+#[tokio::test]
+async fn inbox_item_has_clarify_form_with_context_select() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "clarify5@example.com", "securepassword123").await;
+
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Item with clarify")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let response = client
+        .get(format!("{}/inbox", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /inbox");
+    let body = response.text().await.unwrap();
+
+    assert!(
+        body.contains("/clarify"),
+        "Inbox item should have a clarify form action"
+    );
+    assert!(
+        body.contains("Next Action"),
+        "Inbox item should have a 'Next Action' clarify button"
+    );
+    assert!(
+        body.contains("Trash"),
+        "Inbox item should have a 'Trash' button"
+    );
+    assert!(
+        body.contains("inbox-item__context-select"),
+        "Inbox item should have a context select for clarifying"
+    );
+}
+
+#[tokio::test]
+async fn inbox_item_clarify_button_has_accessible_label() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "clarify6@example.com", "securepassword123").await;
+
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "A11y clarify test")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let response = client
+        .get(format!("{}/inbox", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /inbox");
+    let body = response.text().await.unwrap();
+
+    assert!(
+        body.contains("aria-label=\"Clarify as next action: A11y clarify test\""),
+        "Clarify button should have aria-label including item title"
+    );
+    assert!(
+        body.contains("aria-label=\"Trash: A11y clarify test\""),
+        "Trash button should have aria-label including item title"
     );
 }

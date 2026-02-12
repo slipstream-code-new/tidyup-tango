@@ -37,7 +37,7 @@ pub use dashboard::get_dashboard;
 pub use forgot_password::get_forgot_password;
 pub use gtd_placeholders::{get_projects, get_review, get_someday_maybe, get_waiting_for};
 pub use health_check::health_check;
-pub use inbox::{get_inbox, post_delete_inbox_item, post_inbox};
+pub use inbox::{get_inbox, post_clarify_inbox_item, post_delete_inbox_item, post_inbox};
 pub use index::index;
 pub use login::{get_login, post_login, post_logout};
 pub use next_actions::{
