@@ -241,6 +241,111 @@ async fn next_action_shows_context_name() {
     );
 }
 
+// ---- Context Headings in All View ----
+
+#[tokio::test]
+async fn all_view_groups_actions_under_context_headings() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "grp1@example.com", "securepassword123").await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+
+    client
+        .post(format!("{}/next-actions", &app.address))
+        .form(&[("title", "Grouped action"), ("context_id", &context_id)])
+        .send()
+        .await
+        .expect("Failed to add");
+
+    // Default (All) view should have context headings as h2
+    let response = client
+        .get(format!("{}/next-actions", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /next-actions");
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("<h2"),
+        "All view should have context headings (<h2>)"
+    );
+    assert!(
+        body.contains("aria-labelledby=\"context-heading-"),
+        "Context groups should have aria-labelledby for accessibility"
+    );
+}
+
+#[tokio::test]
+async fn filtered_view_does_not_show_context_headings() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "grp2@example.com", "securepassword123").await;
+
+    let context_id = get_first_context_id(&client, &app.address).await;
+
+    client
+        .post(format!("{}/next-actions", &app.address))
+        .form(&[("title", "Filtered action"), ("context_id", &context_id)])
+        .send()
+        .await
+        .expect("Failed to add");
+
+    // Filtered view should NOT have context group headings
+    let response = client
+        .get(format!(
+            "{}/next-actions?context={}",
+            &app.address, &context_id
+        ))
+        .send()
+        .await
+        .expect("Failed to GET filtered next-actions");
+
+    let body = response.text().await.unwrap();
+    assert!(
+        !body.contains("next-actions__context-heading"),
+        "Filtered view should not show context group headings"
+    );
+}
+
+// ---- Context Select Defaults to Filtered Context ----
+
+#[tokio::test]
+async fn add_form_context_select_defaults_to_filtered_context() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "sel1@example.com", "securepassword123").await;
+
+    // Get contexts page to find a context ID
+    let response = client
+        .get(format!("{}/contexts", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /contexts");
+
+    let body = response.text().await.unwrap();
+    let action_prefix = "action=\"/contexts/";
+    let start = body.find(action_prefix).expect("Missing context") + action_prefix.len();
+    let end = body[start..].find('/').unwrap();
+    let context_id = body[start..start + end].to_string();
+
+    // Filtered view: the select should have the filtered context as selected
+    let response = client
+        .get(format!(
+            "{}/next-actions?context={}",
+            &app.address, &context_id
+        ))
+        .send()
+        .await
+        .expect("Failed to GET filtered next-actions");
+
+    let body = response.text().await.unwrap();
+    // The selected option should have the "selected" attribute
+    let selected_pattern = format!("value=\"{}\" selected", &context_id);
+    assert!(
+        body.contains(&selected_pattern),
+        "Add form context select should default to the filtered context. Looking for: {}",
+        selected_pattern
+    );
+}
+
 // ---- Context Filter ----
 
 #[tokio::test]

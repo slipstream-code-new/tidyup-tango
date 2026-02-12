@@ -27,12 +27,18 @@ pub struct ContextOption {
     pub name: String,
 }
 
+pub struct ContextGroup {
+    pub context_name: String,
+    pub context_id: String,
+    pub actions: Vec<NextActionView>,
+}
+
 #[derive(Template)]
 #[template(path = "next_actions.html")]
 struct NextActionsTemplate {
     current_page: &'static str,
     inbox_count: i64,
-    actions: Vec<NextActionView>,
+    groups: Vec<ContextGroup>,
     contexts: Vec<ContextOption>,
     selected_context: Option<String>,
     error_message: Option<String>,
@@ -64,6 +70,63 @@ fn build_action_view(action: &NextAction, contexts: &[Context]) -> NextActionVie
     }
 }
 
+fn build_context_groups(
+    actions: &[NextAction],
+    contexts: &[Context],
+    single_context: bool,
+) -> Vec<ContextGroup> {
+    if single_context {
+        // When filtering by a single context, put all actions in one group
+        // (the heading is redundant since the filter pill already shows it)
+        let context_name = actions
+            .first()
+            .and_then(|a| {
+                contexts
+                    .iter()
+                    .find(|c| c.id() == a.context_id())
+                    .map(|c| c.name().as_str().to_string())
+            })
+            .unwrap_or_default();
+
+        let context_id = actions
+            .first()
+            .map(|a| a.context_id().as_uuid().to_string())
+            .unwrap_or_default();
+
+        let action_views = actions
+            .iter()
+            .map(|a| build_action_view(a, contexts))
+            .collect();
+
+        return vec![ContextGroup {
+            context_name,
+            context_id,
+            actions: action_views,
+        }];
+    }
+
+    // "All" view: group actions by context, preserving context order
+    let mut groups: Vec<ContextGroup> = Vec::new();
+
+    for ctx in contexts {
+        let ctx_actions: Vec<NextActionView> = actions
+            .iter()
+            .filter(|a| a.context_id() == ctx.id())
+            .map(|a| build_action_view(a, contexts))
+            .collect();
+
+        if !ctx_actions.is_empty() {
+            groups.push(ContextGroup {
+                context_name: ctx.name().as_str().to_string(),
+                context_id: ctx.id().as_uuid().to_string(),
+                actions: ctx_actions,
+            });
+        }
+    }
+
+    groups
+}
+
 #[derive(serde::Deserialize)]
 pub struct ContextFilter {
     pub context: Option<Uuid>,
@@ -93,10 +156,7 @@ pub async fn get_next_actions(
             .map_err(NextActionError::Unexpected)?
     };
 
-    let action_views: Vec<NextActionView> = actions
-        .iter()
-        .map(|a| build_action_view(a, &contexts))
-        .collect();
+    let groups = build_context_groups(&actions, &contexts, filter.context.is_some());
 
     let context_options: Vec<ContextOption> = contexts
         .iter()
@@ -111,7 +171,7 @@ pub async fn get_next_actions(
     let template = NextActionsTemplate {
         current_page: "next_actions",
         inbox_count,
-        actions: action_views,
+        groups,
         contexts: context_options,
         selected_context,
         error_message: None,
@@ -195,10 +255,7 @@ async fn render_next_actions_with_error(
         .await
         .map_err(NextActionError::Unexpected)?;
 
-    let action_views: Vec<NextActionView> = actions
-        .iter()
-        .map(|a| build_action_view(a, &contexts))
-        .collect();
+    let groups = build_context_groups(&actions, &contexts, false);
 
     let context_options: Vec<ContextOption> = contexts
         .iter()
@@ -211,7 +268,7 @@ async fn render_next_actions_with_error(
     let template = NextActionsTemplate {
         current_page: "next_actions",
         inbox_count,
-        actions: action_views,
+        groups,
         contexts: context_options,
         selected_context: None,
         error_message: Some(error_message.to_string()),

@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `2e8aac70-7083-46be-b97a-0325443201fe` |
-| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-12 21:32 UTC |
+| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-12 21:47 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -457,5 +457,266 @@ Starting with the domain types now.
 ## 2026-02-12 21:32 UTC -- Assistant
 
 Luca has verified the baseline is green and has a solid incremental plan. He's starting with domain types — the right foundation. The team is aligned and ready. Let's let him work.
+
+---
+
+## 2026-02-12 21:46 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 4 complete, CI green, ready for review">
+Step 4 (Next Actions with Contexts, US-GTD-3) is complete. Full pipeline green, CI green.
+
+## Summary of changes
+
+### New files created:
+- `src/domain/next_action.rs` — NextActionId newtype, NextAction enum (Active/Completed), 9 unit tests
+- `src/infrastructure/next_action_repository.rs` — 8 repository functions (insert, find active by user, find by user+context, find by id, complete, delete, update title, count active)
+- `src/services/next_action_service.rs` — 7 service functions with ownership verification, tracing, error types
+- `src/routes/next_actions.rs` — 7 route handlers with HTMX progressive enhancement, context filtering via query params
+- `templates/next_actions.html` — full page with context filter pills, add form, action list
+- `templates/next_action_item.html` — individual item with complete/edit/delete controls
+- `templates/next_action_edit.html` — inline edit form
+- `tests/api/next_actions.rs` — 24 integration tests
+- `migrations/20240101000006_create_next_actions_table.sql` — next_actions table with indexes
+
+### Modified files:
+- `src/domain/mod.rs` — register next_action module
+- `src/infrastructure/mod.rs` — register next_action_repository module
+- `src/services/mod.rs` — register next_action_service module
+- `src/routes/mod.rs` — register next_actions module, updated pub uses
+- `src/routes/gtd_placeholders.rs` — removed placeholder get_next_actions
+- `src/startup.rs` — added 5 route definitions
+- `static/css/main.css` — ~200 lines of next-actions component styles
+- `tests/api/main.rs` — register next_actions test module
+- `docs/glossary.md` — added NextActionId, service errors, user-facing copy
+- `docker-compose.yml` — increased shm_size to 256m (fixes test DB exhaustion)
+- `.sqlx/` — 8 new offline query files
+
+### Test counts:
+- 57 unit tests (9 new for NextAction domain)
+- 142 integration tests (24 new for next_actions routes)
+- 11 Playwright e2e tests (unchanged, all pass)
+
+### Environment fix:
+- Docker PostgreSQL was running out of shared memory (64M default) from accumulated test databases. Increased shm_size to 256m in docker-compose.yml.
+
+### Pipeline status:
+- cargo fmt: clean
+- cargo clippy: clean
+- cargo test: 199 tests passing
+- Playwright: 11 tests passing
+- sqlx prepare: done
+- CI: green (run 21965301626)
+
+Ready for team review and mini-retro.
+</teammate-message>
+
+---
+
+## 2026-02-12 21:46 UTC -- Assistant
+
+Luca has completed the implementation and CI is green. Let me notify all reviewers to begin their review.
+
+---
+
+## 2026-02-12 21:46 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 21:46 UTC -- Assistant
+
+All 8 reviewers have been notified that the code is ready for review. Waiting for their feedback to come in. Luca implemented:
+
+- **57 unit tests** (9 new) + **142 integration tests** (24 new) + **11 e2e tests** — all green
+- NextAction domain type with Active/Completed enum variants
+- Full CRUD with context filtering, HTMX enhancement, CSS styling
+- Glossary updated
+
+The reviewers will now examine the code from their specialties and send feedback to Luca.
+
+---
+
+## 2026-02-12 21:46 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:46:53.627Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-12 21:46 UTC -- Assistant
+
+Luca is idle and waiting for reviewer feedback — that's expected. The reviewers are now reading through the code. Standing by.
+
+---
+
+## 2026-02-12 21:47 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:46:59.360Z","idleReason":"available","summary":"[to carson-gross] Code ready for HTMX review, pointing to files"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:47:04.153Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:47:11.421Z","idleReason":"available","summary":"[to marty-cagan] Code ready for product review, mapped to AC"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-12T21:47:18.369Z","idleReason":"available","summary":"[to lea-verou] Code ready, noting alignment/divergence from guidance"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-12T21:47:22.189Z","idleReason":"available","summary":"[to luca-palmieri] UX review: 1 BLOCKING (missing context headings), 2 Minor, 2 Nice-to-have"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T21:47:22.543Z","idleReason":"available","summary":"[to luca-palmieri] CSS review: 1 BLOCKING (context headings), 2 Minor items"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T21:47:23.754Z","idleReason":"available","summary":"[to luca-palmieri] HTMX review: 1 BLOCKING (filter partial swap), 2 minor, 2 nice-to-have"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-12T21:47:24.497Z","idleReason":"available","summary":"[to luca-palmieri] Visual design review with 1 BLOCKING item (context grouping headings)"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-12T21:47:26.076Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-12T21:47:26.258Z","idleReason":"available","summary":"[to luca-palmieri] Domain review: approved, no blocking issues"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T21:47:28.021Z","idleReason":"available","summary":"[to luca-palmieri] Product review: 2 blocking, 1 minor, 1 nice-to-have"}
+</teammate-message>
+
+---
+
+## 2026-02-12 21:47 UTC -- Assistant
+
+Reviews are coming in. From the summaries I can see:
+
+- **Scott Wlaschin**: Approved, no blocking issues
+- **Steve Krug**: 1 BLOCKING (missing context headings), 2 Minor, 2 Nice-to-have
+- **Lea Verou**: 1 BLOCKING (context headings), 2 Minor
+- **Carson Gross**: 1 BLOCKING (filter partial swap), 2 Minor, 2 Nice-to-have
+- **Steve Schoger**: 1 BLOCKING (context grouping headings)
+- **Marty Cagan**: 2 BLOCKING, 1 Minor, 1 Nice-to-have
+
+There's a clear pattern — multiple reviewers are flagging **missing context headings/grouping** as blocking. Carson has a separate blocking item about filter partial swap. Waiting for Kent Beck and Heydon Pickering to complete their reviews, then Luca can address all blocking items together.
+
+---
+
+## 2026-02-12 21:47 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red" summary="A11y review complete: 2 blocking, 2 minor, 2 nice-to-have">
+I've completed my accessibility review and sent detailed feedback to Luca. Summary:
+
+**2 BLOCKING issues:**
+1. Focus management after HTMX complete/delete -- when an item is removed from the DOM, focus falls to body. Keyboard users lose their place. Must move focus to the next/previous sibling or the add input.
+2. Context `<select>` in the add form has no visible `<label>` -- only `aria-label`. Our Definition of Done requires visible labels on all form inputs.
+
+**2 Minor issues:**
+3. Edit form Save/Cancel buttons lack unique accessible names (should include the action title).
+4. Unicode checkbox character on complete button could be more robust (wrap in `aria-hidden` span).
+
+**2 Nice-to-haves:**
+5. Context badge could be semantically associated with the action title.
+6. Empty state toggle could announce via live region.
+
+The blocking items must be fixed before I can give consensus. The rest of the work is strong -- accessible names, live region announcements, landmark usage, progressive enhancement, forced-colors support, and `prefers-reduced-motion` are all handled correctly.
+</teammate-message>
+
+---
+
+## 2026-02-12 21:47 UTC -- Assistant
+
+Reviews are nearly all in. Still waiting on Kent Beck. Here's the consolidated blocking items so far:
+
+1. **Context headings/grouping** — flagged by Steve Krug, Lea Verou, Steve Schoger (and likely Marty as one of his 2 blocking items)
+2. **Filter partial swap** — Carson Gross (HTMX should swap just the list, not full page)
+3. **Focus management after complete/delete** — Heydon Pickering (keyboard users lose their place)
+4. **Visible label on context select** — Heydon Pickering
+5. **Marty's blocking items** — likely overlap with context headings + possibly another AC gap
+
+Waiting for Kent Beck's review, then Luca can address all blocking items in one pass.
+
+---
+
+## 2026-02-12 21:47 UTC -- User
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-12T21:47:31.012Z","idleReason":"available","summary":"[to luca-palmieri] Re-sent review summary: 1 BLOCKING (filter partial swap), 1 minor, 3 nice-to-have"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-12T21:47:31.742Z","idleReason":"available","summary":"[to luca-palmieri] A11y review: 2 BLOCKING, 2 minor, 2 nice-to-have"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-12T21:47:32.418Z","idleReason":"available","summary":"[to luca-palmieri] TDD review: APPROVE with 2 minor items"}
+</teammate-message>
+
+---
+
+## 2026-02-12 21:47 UTC -- Assistant
+
+All 8 reviews are in:
+
+| Reviewer | Blocking | Status |
+|----------|----------|--------|
+| Kent Beck | 0 | Approved (2 minor) |
+| Scott Wlaschin | 0 | Approved |
+| Carson Gross | 1 (filter partial swap) | Needs fix |
+| Lea Verou | 1 (context headings) | Needs fix |
+| Steve Schoger | 1 (context grouping headings) | Needs fix |
+| Steve Krug | 1 (context headings) | Needs fix |
+| Heydon Pickering | 2 (focus mgmt, visible label) | Needs fix |
+| Marty Cagan | 2 (likely context headings + AC gap) | Needs fix |
+
+Luca has received all the feedback directly. He should now address the blocking items and push a fix. He's idle, so let me nudge him to start working on the fixes.
+
+---
+
+## 2026-02-12 21:47 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-12 21:47 UTC -- Assistant
+
+Luca has been notified of all blocking items. Waiting for him to implement the fixes.
+
+---
+
+## 2026-02-12 21:47 UTC -- User
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-12T21:47:36.322Z","idleReason":"available","summary":"[to luca-palmieri] Recap: 2 blocking items need fixing before consensus"}
+</teammate-message>
+
+---
+
+## 2026-02-12 21:47 UTC -- Assistant
+
+Marty sent Luca a recap of his blocking items. All reviewers have communicated their feedback. Waiting for Luca to work through the fixes.
 
 ---

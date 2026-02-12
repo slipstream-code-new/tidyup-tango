@@ -1506,6 +1506,18 @@
     flex-shrink: 0;
   }
 
+  /* Context groups (All view) */
+  .next-actions__group {
+    margin-block-end: var(--space-lg);
+  }
+
+  .next-actions__context-heading {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-semibold);
+    color: var(--color-fg-muted);
+    margin-block-end: var(--space-sm);
+  }
+
   /* Next action items */
   .next-actions__list {
     display: flex;

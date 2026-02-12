@@ -50,7 +50,7 @@
             >
             <select id="next-action-context" name="context_id" class="next-actions__add-context" aria-label="Context">
                 {% for ctx in contexts %}
-                <option value="{{ ctx.id }}">{{ ctx.name }}</option>
+                <option value="{{ ctx.id }}"{% if selected_context.as_deref() == Some(ctx.id.as_str()) %} selected{% endif %}>{{ ctx.name }}</option>
                 {% endfor %}
             </select>
             <button type="submit" class="next-actions__add-submit">Add</button>
@@ -58,16 +58,33 @@
     </form>
     {% endif %}
 
-    {% if actions.is_empty() %}
+    {% if groups.is_empty() %}
     <div class="next-actions__empty-state" id="next-actions-empty-state">
         <p>No next actions yet. Process your <a href="/inbox">inbox</a> to find things to do.</p>
     </div>
     {% endif %}
-    <ul class="next-actions__list" role="list" id="next-actions-list"{% if actions.is_empty() %} hidden{% endif %}>
-        {% for action in actions %}
-        {% include "next_action_item.html" %}
+    <div id="next-actions-list"{% if groups.is_empty() %} hidden{% endif %}>
+        {% if selected_context.is_none() %}
+        {% for group in groups %}
+        <section class="next-actions__group" aria-labelledby="context-heading-{{ group.context_id }}">
+            <h2 id="context-heading-{{ group.context_id }}" class="next-actions__context-heading">{{ group.context_name }}</h2>
+            <ul class="next-actions__list" role="list">
+                {% for action in group.actions %}
+                {% include "next_action_item.html" %}
+                {% endfor %}
+            </ul>
+        </section>
         {% endfor %}
-    </ul>
+        {% else %}
+        <ul class="next-actions__list" role="list">
+            {% for group in groups %}
+            {% for action in group.actions %}
+            {% include "next_action_item.html" %}
+            {% endfor %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
 
