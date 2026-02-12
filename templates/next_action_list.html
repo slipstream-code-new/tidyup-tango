@@ -1,0 +1,23 @@
+{% if groups.is_empty() %}
+{% else %}
+{% if show_headings %}
+{% for group in groups %}
+<section class="next-actions__group" aria-labelledby="context-heading-{{ group.context_id }}">
+    <h2 id="context-heading-{{ group.context_id }}" class="next-actions__context-heading">{{ group.context_name }}</h2>
+    <ul class="next-actions__list" role="list">
+        {% for action in group.actions %}
+        {% include "next_action_item.html" %}
+        {% endfor %}
+    </ul>
+</section>
+{% endfor %}
+{% else %}
+<ul class="next-actions__list" role="list">
+    {% for group in groups %}
+    {% for action in group.actions %}
+    {% include "next_action_item.html" %}
+    {% endfor %}
+    {% endfor %}
+</ul>
+{% endif %}
+{% endif %}

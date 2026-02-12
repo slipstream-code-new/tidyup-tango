@@ -1490,6 +1490,13 @@
     min-inline-size: 10rem;
   }
 
+  .next-actions__context-label {
+    flex-shrink: 0;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-fg-muted);
+  }
+
   .next-actions__add-context {
     flex-shrink: 0;
     min-inline-size: 8rem;

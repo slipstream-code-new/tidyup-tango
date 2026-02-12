@@ -758,6 +758,46 @@ async fn next_actions_page_has_visible_label_for_add_input() {
     );
 }
 
+#[tokio::test]
+async fn next_actions_page_has_visible_label_for_context_select() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "a11y5@example.com", "securepassword123").await;
+
+    let response = client
+        .get(format!("{}/next-actions", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET");
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("for=\"next-action-context\""),
+        "Context select should have a visible label associated via for attribute"
+    );
+    assert!(
+        body.contains(">Context</label>"),
+        "Context label should have visible text"
+    );
+}
+
+#[tokio::test]
+async fn next_actions_page_includes_focus_management_script() {
+    let app = spawn_app().await;
+    let client = register_and_login(&app.address, "a11y6@example.com", "securepassword123").await;
+
+    let response = client
+        .get(format!("{}/next-actions", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET");
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("next-action-focus.js"),
+        "Next Actions page should include focus management script"
+    );
+}
+
 // ---- User Isolation ----
 
 #[tokio::test]

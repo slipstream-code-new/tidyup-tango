@@ -17,11 +17,21 @@
     <nav class="next-actions__filters" aria-label="Filter by context">
         <ul class="next-actions__filter-list" role="list">
             <li>
-                <a href="/next-actions"{% if selected_context.is_none() %} aria-current="true" class="next-actions__filter-link next-actions__filter-link--active"{% else %} class="next-actions__filter-link"{% endif %}>All</a>
+                <a href="/next-actions"
+                    hx-get="/next-actions"
+                    hx-target="#next-actions-list"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                    {% if selected_context.is_none() %}aria-current="true" class="next-actions__filter-link next-actions__filter-link--active"{% else %}class="next-actions__filter-link"{% endif %}>All</a>
             </li>
             {% for ctx in contexts %}
             <li>
-                <a href="/next-actions?context={{ ctx.id }}"{% if selected_context.as_deref() == Some(ctx.id.as_str()) %} aria-current="true" class="next-actions__filter-link next-actions__filter-link--active"{% else %} class="next-actions__filter-link"{% endif %}>{{ ctx.name }}</a>
+                <a href="/next-actions?context={{ ctx.id }}"
+                    hx-get="/next-actions?context={{ ctx.id }}"
+                    hx-target="#next-actions-list"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                    {% if selected_context.as_deref() == Some(ctx.id.as_str()) %}aria-current="true" class="next-actions__filter-link next-actions__filter-link--active"{% else %}class="next-actions__filter-link"{% endif %}>{{ ctx.name }}</a>
             </li>
             {% endfor %}
         </ul>
@@ -48,7 +58,8 @@
                 autocomplete="off"
                 class="next-actions__add-input"
             >
-            <select id="next-action-context" name="context_id" class="next-actions__add-context" aria-label="Context">
+            <label for="next-action-context" class="next-actions__context-label">Context</label>
+            <select id="next-action-context" name="context_id" class="next-actions__add-context">
                 {% for ctx in contexts %}
                 <option value="{{ ctx.id }}"{% if selected_context.as_deref() == Some(ctx.id.as_str()) %} selected{% endif %}>{{ ctx.name }}</option>
                 {% endfor %}
@@ -89,22 +100,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-document.getElementById('next-actions-list').addEventListener('htmx:afterSwap', function() {
-    var list = document.getElementById('next-actions-list');
-    var emptyState = document.getElementById('next-actions-empty-state');
-    if (list && list.children.length > 0) {
-        list.hidden = false;
-        if (emptyState) emptyState.hidden = true;
-    }
-});
-document.body.addEventListener('htmx:afterSettle', function() {
-    var list = document.getElementById('next-actions-list');
-    var emptyState = document.getElementById('next-actions-empty-state');
-    if (list && list.children.length === 0 && emptyState) {
-        list.hidden = true;
-        emptyState.hidden = false;
-    }
-});
-</script>
+<script src="/static/js/next-action-focus.js"></script>
 {% endblock %}
