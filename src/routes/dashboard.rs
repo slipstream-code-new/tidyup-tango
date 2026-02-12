@@ -6,12 +6,14 @@ use sqlx::PgPool;
 
 use super::auth::AuthenticatedUser;
 use crate::services::inbox_service;
+use crate::services::next_action_service;
 
 #[derive(Template)]
 #[template(path = "dashboard.html")]
 struct DashboardTemplate {
     current_page: &'static str,
     inbox_count: i64,
+    next_actions_count: i64,
 }
 
 pub async fn get_dashboard(
@@ -22,9 +24,14 @@ pub async fn get_dashboard(
         .await
         .map_err(DashboardError::Unexpected)?;
 
+    let next_actions_count = next_action_service::count_active_next_actions(&pool, &user_id)
+        .await
+        .map_err(DashboardError::Unexpected)?;
+
     let template = DashboardTemplate {
         current_page: "dashboard",
         inbox_count,
+        next_actions_count,
     };
     Ok(Html(template.render()?))
 }

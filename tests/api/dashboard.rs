@@ -290,3 +290,61 @@ async fn dashboard_shows_getting_started_guidance_when_empty() {
         "Getting started guidance should link to weekly review"
     );
 }
+
+/// Helper: get the first context ID from the contexts page
+async fn get_first_context_id(client: &reqwest::Client, address: &str) -> String {
+    let response = client
+        .get(format!("{address}/contexts"))
+        .send()
+        .await
+        .expect("Failed to GET /contexts");
+
+    let body = response.text().await.unwrap();
+    let action_prefix = "action=\"/contexts/";
+    let start = body.find(action_prefix).expect("Missing context action") + action_prefix.len();
+    let end = body[start..].find('/').expect("Missing / after context ID");
+    body[start..start + end].to_string()
+}
+
+#[tokio::test]
+async fn dashboard_shows_dynamic_next_actions_count() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "dashcount@example.com", "securepassword123").await;
+
+    // Initially should show 0
+    let response = client
+        .get(format!("{}/dashboard", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /dashboard");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains(">0 items</dd>"),
+        "Dashboard should show 0 next actions initially"
+    );
+
+    // Add a next action
+    let context_id = get_first_context_id(&client, &app.address).await;
+    client
+        .post(format!("{}/next-actions", &app.address))
+        .form(&[
+            ("title", "Dashboard count test"),
+            ("context_id", &context_id),
+        ])
+        .send()
+        .await
+        .expect("Failed to add next action");
+
+    // Dashboard should now show 1
+    let response = client
+        .get(format!("{}/dashboard", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /dashboard");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains(">1 items</dd>"),
+        "Dashboard should show 1 next action after adding one"
+    );
+}
