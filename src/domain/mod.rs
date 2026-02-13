@@ -7,6 +7,7 @@ mod project;
 mod todo_item;
 mod todo_title;
 mod user;
+mod waiting_for_item;
 
 pub use context::{Context, ContextId, ContextName, ContextNameError};
 pub use email::{EmailValidationError, ValidatedEmail};
@@ -17,3 +18,4 @@ pub use project::{Project, ProjectId};
 pub use todo_item::{TodoItem, TodoItemId};
 pub use todo_title::{TodoTitle, TodoTitleError};
 pub use user::{User, UserId};
+pub use waiting_for_item::{WaitingForId, WaitingForItem, WaitingOn, WaitingOnError};

@@ -8,6 +8,7 @@ use super::auth::AuthenticatedUser;
 use crate::services::inbox_service;
 use crate::services::next_action_service;
 use crate::services::project_service;
+use crate::services::waiting_for_service;
 
 #[derive(Template)]
 #[template(path = "dashboard.html")]
@@ -17,6 +18,7 @@ struct DashboardTemplate {
     next_actions_count: i64,
     projects_count: i64,
     stalled_projects_count: i64,
+    waiting_for_count: i64,
 }
 
 pub async fn get_dashboard(
@@ -39,12 +41,17 @@ pub async fn get_dashboard(
         .await
         .map_err(DashboardError::Unexpected)?;
 
+    let waiting_for_count = waiting_for_service::count_active_waiting_for_items(&pool, &user_id)
+        .await
+        .map_err(DashboardError::Unexpected)?;
+
     let template = DashboardTemplate {
         current_page: "dashboard",
         inbox_count,
         next_actions_count,
         projects_count,
         stalled_projects_count,
+        waiting_for_count,
     };
     Ok(Html(template.render()?))
 }

@@ -58,21 +58,6 @@ async fn render_placeholder(
     Ok(Html(template.render()?))
 }
 
-pub async fn get_waiting_for(
-    AuthenticatedUser(user_id): AuthenticatedUser,
-    State(pool): State<PgPool>,
-) -> Result<impl IntoResponse, GtdPlaceholderError> {
-    render_placeholder(
-        &user_id,
-        &pool,
-        "waiting_for",
-        "Waiting For -- Todo List",
-        "Waiting For",
-        "Items you're waiting on from others.",
-    )
-    .await
-}
-
 pub async fn get_someday_maybe(
     AuthenticatedUser(user_id): AuthenticatedUser,
     State(pool): State<PgPool>,

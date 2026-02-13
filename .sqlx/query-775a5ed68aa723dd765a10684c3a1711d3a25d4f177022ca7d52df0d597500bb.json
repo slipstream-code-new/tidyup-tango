@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO waiting_for_items (id, user_id, title, waiting_on, created_at, resolved_at)\n           VALUES ($1, $2, $3, $4, $5 :: timestamptz, $6 :: timestamptz)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "775a5ed68aa723dd765a10684c3a1711d3a25d4f177022ca7d52df0d597500bb"
+}

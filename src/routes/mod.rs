@@ -14,6 +14,7 @@ mod next_actions;
 mod projects;
 mod register;
 mod todos;
+mod waiting_for;
 
 fn is_htmx_request(headers: &HeaderMap) -> bool {
     headers.contains_key("hx-request")
@@ -36,7 +37,7 @@ pub use contexts::{
 };
 pub use dashboard::get_dashboard;
 pub use forgot_password::get_forgot_password;
-pub use gtd_placeholders::{get_review, get_someday_maybe, get_waiting_for};
+pub use gtd_placeholders::{get_review, get_someday_maybe};
 pub use health_check::health_check;
 pub use inbox::{get_inbox, post_clarify_inbox_item, post_delete_inbox_item, post_inbox};
 pub use index::index;
@@ -53,4 +54,8 @@ pub use register::{get_register, post_register};
 pub use todos::{
     get_edit_todo, get_todo_item, get_todos_page, post_delete_todo, post_edit_todo, post_todo,
     post_toggle_todo,
+};
+pub use waiting_for::{
+    get_edit_waiting_for, get_waiting_for, get_waiting_for_item, post_complete_waiting_for,
+    post_delete_waiting_for, post_edit_waiting_for, post_waiting_for,
 };

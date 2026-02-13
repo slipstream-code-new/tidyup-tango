@@ -1,0 +1,371 @@
+src/routes/mod.rs:23:fn htmx_response_with_announce(body: Html<String>, message: &str) -> Response {
+src/routes/mod.rs-24-    let trigger_json = format!(r#"{{"announce":"{}"}}"#, message);
+/home/jwilger/projects/todo_list/src/routes/mod.rs-25-    (
+/home/jwilger/projects/todo_list/src/routes/mod.rs-26-        [(
+src/routes/mod.rs-27-            axum::http::header::HeaderName::from_static("hx-trigger"),
+src/routes/mod.rs-28-            axum::http::HeaderValue::from_str(&trigger_json).unwrap(),
+/home/jwilger/projects/todo_list/src/routes/mod.rs-29-        )],
+/home/jwilger/projects/todo_list/src/routes/mod.rs-30-        body,
+/home/jwilger/projects/todo_list/src/routes/mod.rs-31-    )
+/home/jwilger/projects/todo_list/src/routes/mod.rs-32-        .into_response()
+/home/jwilger/projects/todo_list/src/routes/mod.rs-33-}
+--
+src/routes/contexts.rs:10:use super::{htmx_response_with_announce, is_htmx_request};
+src/routes/contexts.rs-11-use crate::domain::{Context, ContextId, ContextNameError};
+src/routes/contexts.rs-12-use crate::services::context_service::{
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-13-    add_context, delete_context, list_contexts, update_context, AddContextError,
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-14-    DeleteContextError, UpdateContextError,
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-15-};
+src/routes/contexts.rs-16-use crate::services::inbox_service;
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-17-
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-18-pub struct ContextView {
+src/routes/contexts.rs-19-    pub id: String,
+src/routes/contexts.rs-20-    pub name: String,
+--
+src/routes/contexts.rs:103:                Ok(htmx_response_with_announce(Html(body), "Context added"))
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-104-            } else {
+src/routes/contexts.rs-105-                Ok(Redirect::to("/contexts").into_response())
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-106-            }
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-107-        }
+src/routes/contexts.rs-108-        Err(AddContextError::InvalidName(name_err)) => {
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-109-            let user_facing = match name_err {
+src/routes/contexts.rs-110-                ContextNameError::Empty => {
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-111-                    if htmx {
+src/routes/contexts.rs-112-                        return Ok(StatusCode::NO_CONTENT.into_response());
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-113-                    }
+--
+src/routes/contexts.rs:222:                Ok(htmx_response_with_announce(Html(body), "Context updated"))
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-223-            } else {
+src/routes/contexts.rs-224-                Ok(Redirect::to("/contexts").into_response())
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-225-            }
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-226-        }
+src/routes/contexts.rs-227-        Err(UpdateContextError::NotFound) => Ok((
+src/routes/contexts.rs-228-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-229-            Html("<h1>Context not found</h1>".to_string()),
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-230-        )
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-231-            .into_response()),
+src/routes/contexts.rs-232-        Err(UpdateContextError::Unauthorized) => Ok((
+--
+src/routes/contexts.rs:266:                Ok(htmx_response_with_announce(
+src/routes/contexts.rs-267-                    Html(String::new()),
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-268-                    "Context deleted",
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-269-                ))
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-270-            } else {
+src/routes/contexts.rs-271-                Ok(Redirect::to("/contexts").into_response())
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-272-            }
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-273-        }
+src/routes/contexts.rs-274-        Err(DeleteContextError::NotFound) => Ok((
+src/routes/contexts.rs-275-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/contexts.rs-276-            Html("<h1>Context not found</h1>".to_string()),
+--
+src/routes/waiting_for.rs:10:use super::{htmx_response_with_announce, is_htmx_request};
+src/routes/waiting_for.rs-11-use crate::domain::{TodoTitleError, WaitingForId, WaitingOnPersonError};
+src/routes/waiting_for.rs-12-use crate::services::inbox_service;
+src/routes/waiting_for.rs-13-use crate::services::waiting_for_service::{
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-14-    self, AddWaitingForError, CompleteWaitingForError, DeleteWaitingForError, UpdateWaitingForError,
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-15-};
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-16-
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-17-pub struct WaitingForView {
+src/routes/waiting_for.rs-18-    pub id: String,
+src/routes/waiting_for.rs-19-    pub title: String,
+src/routes/waiting_for.rs-20-    pub waiting_on: String,
+--
+src/routes/waiting_for.rs:119:                Ok(htmx_response_with_announce(
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-120-                    Html(body),
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-121-                    "Waiting-for item added",
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-122-                ))
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-123-            } else {
+src/routes/waiting_for.rs-124-                Ok(Redirect::to("/waiting-for").into_response())
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-125-            }
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-126-        }
+src/routes/waiting_for.rs-127-        Err(AddWaitingForError::InvalidTitle(title_err)) => {
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-128-            let user_facing = match title_err {
+src/routes/waiting_for.rs-129-                TodoTitleError::Empty => {
+--
+src/routes/waiting_for.rs:196:                Ok(htmx_response_with_announce(
+src/routes/waiting_for.rs-197-                    Html(String::new()),
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-198-                    "Item received",
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-199-                ))
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-200-            } else {
+src/routes/waiting_for.rs-201-                Ok(Redirect::to("/waiting-for").into_response())
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-202-            }
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-203-        }
+src/routes/waiting_for.rs-204-        Err(CompleteWaitingForError::NotFound) => Ok((
+src/routes/waiting_for.rs-205-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-206-            Html("<h1>Waiting-for item not found</h1>".to_string()),
+--
+src/routes/waiting_for.rs:230:                Ok(htmx_response_with_announce(
+src/routes/waiting_for.rs-231-                    Html(String::new()),
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-232-                    "Item deleted",
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-233-                ))
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-234-            } else {
+src/routes/waiting_for.rs-235-                Ok(Redirect::to("/waiting-for").into_response())
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-236-            }
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-237-        }
+src/routes/waiting_for.rs-238-        Err(DeleteWaitingForError::NotFound) => Ok((
+src/routes/waiting_for.rs-239-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-240-            Html("<h1>Waiting-for item not found</h1>".to_string()),
+--
+src/routes/waiting_for.rs:329:                Ok(htmx_response_with_announce(Html(body), "Item updated"))
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-330-            } else {
+src/routes/waiting_for.rs-331-                Ok(Redirect::to("/waiting-for").into_response())
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-332-            }
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-333-        }
+src/routes/waiting_for.rs-334-        Err(UpdateWaitingForError::NotFound) => Ok((
+src/routes/waiting_for.rs-335-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-336-            Html("<h1>Waiting-for item not found</h1>".to_string()),
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-337-        )
+/home/jwilger/projects/todo_list/src/routes/waiting_for.rs-338-            .into_response()),
+src/routes/waiting_for.rs-339-        Err(UpdateWaitingForError::Unauthorized) => Ok((
+--
+src/routes/inbox.rs:10:use super::{htmx_response_with_announce, is_htmx_request};
+src/routes/inbox.rs-11-use crate::domain::{ContextId, InboxItem, InboxItemId};
+src/routes/inbox.rs-12-use crate::services::context_service;
+src/routes/inbox.rs-13-use crate::services::inbox_service::{
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-14-    capture_inbox_item, clarify_as_next_action, clarify_as_project, delete_inbox_item,
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-15-    get_inbox_items, CaptureInboxError, ClarifyAsNextActionError, ClarifyAsProjectError,
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-16-    DeleteInboxError,
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-17-};
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-18-
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-19-pub struct InboxItemView {
+src/routes/inbox.rs-20-    pub id: String,
+--
+src/routes/inbox.rs:129:                Ok(htmx_response_with_announce(Html(body), "Captured to inbox"))
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-130-            } else {
+src/routes/inbox.rs-131-                Ok(Redirect::to("/inbox").into_response())
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-132-            }
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-133-        }
+src/routes/inbox.rs-134-        Err(CaptureInboxError::InvalidTitle(title_err)) => {
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-135-            let user_facing = match title_err {
+src/routes/inbox.rs-136-                crate::domain::TodoTitleError::Empty => {
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-137-                    if htmx {
+src/routes/inbox.rs-138-                        return Ok(StatusCode::NO_CONTENT.into_response());
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-139-                    }
+--
+src/routes/inbox.rs:190:                Ok(htmx_response_with_announce(
+src/routes/inbox.rs-191-                    Html(String::new()),
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-192-                    "Inbox item deleted",
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-193-                ))
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-194-            } else {
+src/routes/inbox.rs-195-                Ok(Redirect::to("/inbox").into_response())
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-196-            }
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-197-        }
+src/routes/inbox.rs-198-        Err(DeleteInboxError::NotFound) => Ok((
+src/routes/inbox.rs-199-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-200-            Html("<h1>Inbox item not found</h1>".to_string()),
+--
+src/routes/inbox.rs:244:                    Ok(htmx_response_with_announce(
+src/routes/inbox.rs-245-                        Html(String::new()),
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-246-                        "Clarified as project",
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-247-                    ))
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-248-                } else {
+src/routes/inbox.rs-249-                    Ok(Redirect::to("/inbox").into_response())
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-250-                }
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-251-            }
+src/routes/inbox.rs-252-            Err(ClarifyAsProjectError::NotFound) => Ok((
+src/routes/inbox.rs-253-                StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-254-                Html("<h1>Inbox item not found</h1>".to_string()),
+--
+src/routes/inbox.rs:304:                    Ok(htmx_response_with_announce(
+src/routes/inbox.rs-305-                        Html(String::new()),
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-306-                        "Clarified as next action",
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-307-                    ))
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-308-                } else {
+src/routes/inbox.rs-309-                    Ok(Redirect::to("/inbox").into_response())
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-310-                }
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-311-            }
+src/routes/inbox.rs-312-            Err(ClarifyAsNextActionError::NotFound) => Ok((
+src/routes/inbox.rs-313-                StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/inbox.rs-314-                Html("<h1>Inbox item not found</h1>".to_string()),
+--
+src/routes/projects.rs:10:use super::{htmx_response_with_announce, is_htmx_request};
+src/routes/projects.rs-11-use crate::domain::{Context, NextAction, Project, ProjectId, TodoTitleError};
+src/routes/projects.rs-12-use crate::services::context_service;
+src/routes/projects.rs-13-use crate::services::inbox_service;
+src/routes/projects.rs-14-use crate::services::project_service::{
+/home/jwilger/projects/todo_list/src/routes/projects.rs-15-    self, AddProjectError, AddProjectNextActionError, CompleteProjectError, DeleteProjectError,
+/home/jwilger/projects/todo_list/src/routes/projects.rs-16-    GetProjectError, UpdateProjectTitleError,
+/home/jwilger/projects/todo_list/src/routes/projects.rs-17-};
+/home/jwilger/projects/todo_list/src/routes/projects.rs-18-
+/home/jwilger/projects/todo_list/src/routes/projects.rs-19-pub struct ProjectView {
+src/routes/projects.rs-20-    pub id: String,
+--
+src/routes/projects.rs:160:                Ok(htmx_response_with_announce(Html(body), "Project added"))
+/home/jwilger/projects/todo_list/src/routes/projects.rs-161-            } else {
+src/routes/projects.rs-162-                Ok(Redirect::to("/projects").into_response())
+/home/jwilger/projects/todo_list/src/routes/projects.rs-163-            }
+/home/jwilger/projects/todo_list/src/routes/projects.rs-164-        }
+src/routes/projects.rs-165-        Err(AddProjectError::InvalidTitle(title_err)) => {
+/home/jwilger/projects/todo_list/src/routes/projects.rs-166-            let user_facing = match title_err {
+src/routes/projects.rs-167-                TodoTitleError::Empty => {
+/home/jwilger/projects/todo_list/src/routes/projects.rs-168-                    if htmx {
+src/routes/projects.rs-169-                        return Ok(StatusCode::NO_CONTENT.into_response());
+/home/jwilger/projects/todo_list/src/routes/projects.rs-170-                    }
+--
+src/routes/projects.rs:300:                Ok(htmx_response_with_announce(
+src/routes/projects.rs-301-                    Html(String::new()),
+/home/jwilger/projects/todo_list/src/routes/projects.rs-302-                    "Project completed",
+/home/jwilger/projects/todo_list/src/routes/projects.rs-303-                ))
+/home/jwilger/projects/todo_list/src/routes/projects.rs-304-            } else {
+src/routes/projects.rs-305-                Ok(Redirect::to("/projects").into_response())
+/home/jwilger/projects/todo_list/src/routes/projects.rs-306-            }
+/home/jwilger/projects/todo_list/src/routes/projects.rs-307-        }
+src/routes/projects.rs-308-        Err(CompleteProjectError::NotFound) => Ok((
+src/routes/projects.rs-309-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/projects.rs-310-            Html("<h1>Project not found</h1>".to_string()),
+--
+src/routes/projects.rs:334:                Ok(htmx_response_with_announce(
+src/routes/projects.rs-335-                    Html(String::new()),
+/home/jwilger/projects/todo_list/src/routes/projects.rs-336-                    "Project deleted",
+/home/jwilger/projects/todo_list/src/routes/projects.rs-337-                ))
+/home/jwilger/projects/todo_list/src/routes/projects.rs-338-            } else {
+src/routes/projects.rs-339-                Ok(Redirect::to("/projects").into_response())
+/home/jwilger/projects/todo_list/src/routes/projects.rs-340-            }
+/home/jwilger/projects/todo_list/src/routes/projects.rs-341-        }
+src/routes/projects.rs-342-        Err(DeleteProjectError::NotFound) => Ok((
+src/routes/projects.rs-343-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/projects.rs-344-            Html("<h1>Project not found</h1>".to_string()),
+--
+src/routes/projects.rs:427:                Ok(htmx_response_with_announce(Html(body), "Project updated"))
+/home/jwilger/projects/todo_list/src/routes/projects.rs-428-            } else {
+src/routes/projects.rs-429-                Ok(Redirect::to("/projects").into_response())
+/home/jwilger/projects/todo_list/src/routes/projects.rs-430-            }
+/home/jwilger/projects/todo_list/src/routes/projects.rs-431-        }
+src/routes/projects.rs-432-        Err(UpdateProjectTitleError::NotFound) => Ok((
+src/routes/projects.rs-433-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/projects.rs-434-            Html("<h1>Project not found</h1>".to_string()),
+/home/jwilger/projects/todo_list/src/routes/projects.rs-435-        )
+/home/jwilger/projects/todo_list/src/routes/projects.rs-436-            .into_response()),
+src/routes/projects.rs-437-        Err(UpdateProjectTitleError::Unauthorized) => Ok((
+--
+src/routes/projects.rs:522:                Ok(htmx_response_with_announce(
+/home/jwilger/projects/todo_list/src/routes/projects.rs-523-                    Html(body),
+/home/jwilger/projects/todo_list/src/routes/projects.rs-524-                    "Next action added to project",
+/home/jwilger/projects/todo_list/src/routes/projects.rs-525-                ))
+/home/jwilger/projects/todo_list/src/routes/projects.rs-526-            } else {
+src/routes/projects.rs-527-                Ok(Redirect::to(&format!("/projects/{project_id}")).into_response())
+/home/jwilger/projects/todo_list/src/routes/projects.rs-528-            }
+/home/jwilger/projects/todo_list/src/routes/projects.rs-529-        }
+src/routes/projects.rs-530-        Err(AddProjectNextActionError::ProjectNotFound) => Ok((
+src/routes/projects.rs-531-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/projects.rs-532-            Html("<h1>Project not found</h1>".to_string()),
+--
+src/routes/next_actions.rs:10:use super::{htmx_response_with_announce, is_htmx_request};
+src/routes/next_actions.rs-11-use crate::domain::{Context, ContextId, NextAction, NextActionId, Project, TodoTitleError};
+src/routes/next_actions.rs-12-use crate::services::context_service;
+src/routes/next_actions.rs-13-use crate::services::inbox_service;
+src/routes/next_actions.rs-14-use crate::services::next_action_service::{
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-15-    self, AddNextActionError, CompleteNextActionError, DeleteNextActionError,
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-16-    UpdateNextActionTitleError,
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-17-};
+src/routes/next_actions.rs-18-use crate::services::project_service;
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-19-
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-20-pub struct NextActionView {
+--
+src/routes/next_actions.rs:236:                Ok(htmx_response_with_announce(Html(body), "Next action added"))
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-237-            } else {
+src/routes/next_actions.rs-238-                Ok(Redirect::to("/next-actions").into_response())
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-239-            }
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-240-        }
+src/routes/next_actions.rs-241-        Err(AddNextActionError::InvalidTitle(title_err)) => {
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-242-            let user_facing = match title_err {
+src/routes/next_actions.rs-243-                TodoTitleError::Empty => {
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-244-                    if htmx {
+src/routes/next_actions.rs-245-                        return Ok(StatusCode::NO_CONTENT.into_response());
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-246-                    }
+--
+src/routes/next_actions.rs:315:                Ok(htmx_response_with_announce(
+src/routes/next_actions.rs-316-                    Html(String::new()),
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-317-                    "Action completed",
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-318-                ))
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-319-            } else {
+src/routes/next_actions.rs-320-                Ok(Redirect::to("/next-actions").into_response())
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-321-            }
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-322-        }
+src/routes/next_actions.rs-323-        Err(CompleteNextActionError::NotFound) => Ok((
+src/routes/next_actions.rs-324-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-325-            Html("<h1>Next action not found</h1>".to_string()),
+--
+src/routes/next_actions.rs:349:                Ok(htmx_response_with_announce(
+src/routes/next_actions.rs-350-                    Html(String::new()),
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-351-                    "Next action deleted",
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-352-                ))
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-353-            } else {
+src/routes/next_actions.rs-354-                Ok(Redirect::to("/next-actions").into_response())
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-355-            }
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-356-        }
+src/routes/next_actions.rs-357-        Err(DeleteNextActionError::NotFound) => Ok((
+src/routes/next_actions.rs-358-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-359-            Html("<h1>Next action not found</h1>".to_string()),
+--
+src/routes/next_actions.rs:452:                Ok(htmx_response_with_announce(Html(body), "Action updated"))
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-453-            } else {
+src/routes/next_actions.rs-454-                Ok(Redirect::to("/next-actions").into_response())
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-455-            }
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-456-        }
+src/routes/next_actions.rs-457-        Err(UpdateNextActionTitleError::NotFound) => Ok((
+src/routes/next_actions.rs-458-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-459-            Html("<h1>Next action not found</h1>".to_string()),
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-460-        )
+/home/jwilger/projects/todo_list/src/routes/next_actions.rs-461-            .into_response()),
+src/routes/next_actions.rs-462-        Err(UpdateNextActionTitleError::Unauthorized) => Ok((
+--
+src/routes/todos.rs:10:use super::{htmx_response_with_announce, is_htmx_request};
+src/routes/todos.rs-11-use crate::domain::{TodoItem, TodoItemId};
+src/routes/todos.rs-12-use crate::services::todo_service::{
+/home/jwilger/projects/todo_list/src/routes/todos.rs-13-    add_todo, delete_todo, get_todos, toggle_todo_completion, update_todo_title, AddTodoError,
+/home/jwilger/projects/todo_list/src/routes/todos.rs-14-    DeleteTodoError, ToggleTodoError, UpdateTitleError,
+/home/jwilger/projects/todo_list/src/routes/todos.rs-15-};
+/home/jwilger/projects/todo_list/src/routes/todos.rs-16-
+/home/jwilger/projects/todo_list/src/routes/todos.rs-17-/// View model for a single todo item in the template.
+/home/jwilger/projects/todo_list/src/routes/todos.rs-18-pub struct TodoItemView {
+src/routes/todos.rs-19-    pub id: String,
+src/routes/todos.rs-20-    pub title: String,
+--
+src/routes/todos.rs:92:                Ok(htmx_response_with_announce(Html(body), "Todo added"))
+/home/jwilger/projects/todo_list/src/routes/todos.rs-93-            } else {
+src/routes/todos.rs-94-                Ok(Redirect::to("/todos").into_response())
+/home/jwilger/projects/todo_list/src/routes/todos.rs-95-            }
+/home/jwilger/projects/todo_list/src/routes/todos.rs-96-        }
+src/routes/todos.rs-97-        Err(AddTodoError::InvalidTitle(title_err)) => {
+/home/jwilger/projects/todo_list/src/routes/todos.rs-98-            let user_facing = match title_err {
+src/routes/todos.rs-99-                crate::domain::TodoTitleError::Empty => {
+/home/jwilger/projects/todo_list/src/routes/todos.rs-100-                    // Should not reach here due to empty check above, but handle gracefully
+/home/jwilger/projects/todo_list/src/routes/todos.rs-101-                    if htmx {
+src/routes/todos.rs-102-                        return Ok(StatusCode::NO_CONTENT.into_response());
+--
+src/routes/todos.rs:148:                Ok(htmx_response_with_announce(Html(body), announce))
+/home/jwilger/projects/todo_list/src/routes/todos.rs-149-            } else {
+src/routes/todos.rs-150-                Ok(Redirect::to("/todos").into_response())
+/home/jwilger/projects/todo_list/src/routes/todos.rs-151-            }
+/home/jwilger/projects/todo_list/src/routes/todos.rs-152-        }
+src/routes/todos.rs-153-        Err(ToggleTodoError::NotFound) => Ok((
+src/routes/todos.rs-154-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/todos.rs-155-            Html("<h1>Todo not found</h1>".to_string()),
+/home/jwilger/projects/todo_list/src/routes/todos.rs-156-        )
+/home/jwilger/projects/todo_list/src/routes/todos.rs-157-            .into_response()),
+src/routes/todos.rs-158-        Err(ToggleTodoError::Unauthorized) => Ok((
+--
+src/routes/todos.rs:179:                Ok(htmx_response_with_announce(
+src/routes/todos.rs-180-                    Html(String::new()),
+/home/jwilger/projects/todo_list/src/routes/todos.rs-181-                    "Todo deleted",
+/home/jwilger/projects/todo_list/src/routes/todos.rs-182-                ))
+/home/jwilger/projects/todo_list/src/routes/todos.rs-183-            } else {
+src/routes/todos.rs-184-                Ok(Redirect::to("/todos").into_response())
+/home/jwilger/projects/todo_list/src/routes/todos.rs-185-            }
+/home/jwilger/projects/todo_list/src/routes/todos.rs-186-        }
+src/routes/todos.rs-187-        Err(DeleteTodoError::NotFound) => Ok((
+src/routes/todos.rs-188-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/todos.rs-189-            Html("<h1>Todo not found</h1>".to_string()),
+--
+src/routes/todos.rs:290:                        Ok(htmx_response_with_announce(Html(body), "Todo updated"))
+/home/jwilger/projects/todo_list/src/routes/todos.rs-291-                    }
+src/routes/todos.rs-292-                    None => Ok(Redirect::to("/todos").into_response()),
+/home/jwilger/projects/todo_list/src/routes/todos.rs-293-                }
+/home/jwilger/projects/todo_list/src/routes/todos.rs-294-            } else {
+src/routes/todos.rs-295-                Ok(Redirect::to("/todos").into_response())
+/home/jwilger/projects/todo_list/src/routes/todos.rs-296-            }
+/home/jwilger/projects/todo_list/src/routes/todos.rs-297-        }
+src/routes/todos.rs-298-        Err(UpdateTitleError::NotFound) => Ok((
+src/routes/todos.rs-299-            StatusCode::NOT_FOUND,
+/home/jwilger/projects/todo_list/src/routes/todos.rs-300-            Html("<h1>Todo not found</h1>".to_string()),

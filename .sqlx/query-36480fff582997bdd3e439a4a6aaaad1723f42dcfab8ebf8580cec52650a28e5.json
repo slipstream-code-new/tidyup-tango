@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE waiting_for_items SET title = $1, waiting_on = $2 WHERE id = $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "36480fff582997bdd3e439a4a6aaaad1723f42dcfab8ebf8580cec52650a28e5"
+}

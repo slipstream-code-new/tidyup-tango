@@ -1,0 +1,35 @@
+<li class="waiting-for-item" id="waiting-for-{{ item.id }}">
+    <div class="waiting-for-item__content">
+        <span class="waiting-for-item__title">{{ item.title }}</span>
+        <span class="waiting-for-item__person">{{ item.waiting_on }}</span>
+    </div>
+    <span class="waiting-for-item__date"><time datetime="{{ item.date_added_iso }}">{{ item.date_added }}</time></span>
+    <a
+        href="/waiting-for/{{ item.id }}/edit"
+        class="waiting-for-item__edit"
+        aria-label="Edit: {{ item.title }} — {{ item.waiting_on }}"
+        hx-get="/waiting-for/{{ item.id }}/edit"
+        hx-target="#waiting-for-{{ item.id }}"
+        hx-swap="outerHTML"
+    >Edit</a>
+    <form
+        method="post"
+        action="/waiting-for/{{ item.id }}/complete"
+        class="waiting-for-item__complete"
+        hx-post="/waiting-for/{{ item.id }}/complete"
+        hx-target="#waiting-for-{{ item.id }}"
+        hx-swap="outerHTML"
+    >
+        <button type="submit" class="waiting-for-item__complete-button" aria-label="Received: {{ item.title }} — {{ item.waiting_on }}">Received</button>
+    </form>
+    <form
+        method="post"
+        action="/waiting-for/{{ item.id }}/delete"
+        class="waiting-for-item__delete"
+        hx-post="/waiting-for/{{ item.id }}/delete"
+        hx-target="#waiting-for-{{ item.id }}"
+        hx-swap="outerHTML"
+    >
+        <button type="submit" class="waiting-for-item__delete-button" aria-label="Delete: {{ item.title }} — {{ item.waiting_on }}">Delete</button>
+    </form>
+</li>

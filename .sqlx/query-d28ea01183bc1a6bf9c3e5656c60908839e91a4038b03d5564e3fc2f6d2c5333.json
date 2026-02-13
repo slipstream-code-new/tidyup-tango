@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE waiting_for_items SET resolved_at = $1 :: timestamptz WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d28ea01183bc1a6bf9c3e5656c60908839e91a4038b03d5564e3fc2f6d2c5333"
+}

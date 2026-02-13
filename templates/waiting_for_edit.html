@@ -1,0 +1,44 @@
+<li class="waiting-for-item" id="waiting-for-{{ item.id }}">
+    <form
+        method="post"
+        action="/waiting-for/{{ item.id }}/edit"
+        class="waiting-for-item__edit-form"
+        hx-post="/waiting-for/{{ item.id }}/edit"
+        hx-target="#waiting-for-{{ item.id }}"
+        hx-swap="outerHTML"
+    >
+        <div class="waiting-for-item__edit-fields">
+            <label for="edit-title-{{ item.id }}" class="visually-hidden">Title</label>
+            <input
+                type="text"
+                id="edit-title-{{ item.id }}"
+                name="title"
+                value="{{ item.title }}"
+                maxlength="300"
+                class="waiting-for-item__edit-input"
+                placeholder="What are you waiting for?"
+            >
+            <label for="edit-person-{{ item.id }}" class="visually-hidden">Who or what</label>
+            <input
+                type="text"
+                id="edit-person-{{ item.id }}"
+                name="waiting_on"
+                value="{{ item.waiting_on }}"
+                maxlength="100"
+                class="waiting-for-item__edit-person-input"
+                placeholder="Who or what?"
+            >
+        </div>
+        <div class="waiting-for-item__edit-actions">
+            <button type="submit" class="waiting-for-item__edit-save">Save</button>
+            <a
+                href="/waiting-for/{{ item.id }}"
+                class="waiting-for-item__edit-cancel"
+                aria-label="Cancel editing: {{ item.title }} — {{ item.waiting_on }}"
+                hx-get="/waiting-for/{{ item.id }}"
+                hx-target="#waiting-for-{{ item.id }}"
+                hx-swap="outerHTML"
+            >Cancel</a>
+        </div>
+    </form>
+</li>

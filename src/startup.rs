@@ -11,14 +11,16 @@ use tower_sessions_sqlx_store::PostgresStore;
 use crate::configuration::Settings;
 use crate::routes::{
     get_contexts, get_dashboard, get_edit_context, get_edit_next_action, get_edit_project,
-    get_edit_todo, get_forgot_password, get_inbox, get_login, get_next_action_item,
-    get_next_actions, get_project_detail, get_project_item, get_projects, get_register, get_review,
-    get_someday_maybe, get_todo_item, get_todos_page, get_waiting_for, health_check, index,
-    post_clarify_inbox_item, post_complete_next_action, post_complete_project, post_context,
-    post_delete_context, post_delete_inbox_item, post_delete_next_action, post_delete_project,
-    post_delete_todo, post_edit_context, post_edit_next_action, post_edit_project, post_edit_todo,
-    post_inbox, post_login, post_logout, post_next_action, post_project, post_project_next_action,
-    post_register, post_todo, post_toggle_todo,
+    get_edit_todo, get_edit_waiting_for, get_forgot_password, get_inbox, get_login,
+    get_next_action_item, get_next_actions, get_project_detail, get_project_item, get_projects,
+    get_register, get_review, get_someday_maybe, get_todo_item, get_todos_page, get_waiting_for,
+    get_waiting_for_item, health_check, index, post_clarify_inbox_item, post_complete_next_action,
+    post_complete_project, post_complete_waiting_for, post_context, post_delete_context,
+    post_delete_inbox_item, post_delete_next_action, post_delete_project, post_delete_todo,
+    post_delete_waiting_for, post_edit_context, post_edit_next_action, post_edit_project,
+    post_edit_todo, post_edit_waiting_for, post_inbox, post_login, post_logout, post_next_action,
+    post_project, post_project_next_action, post_register, post_todo, post_toggle_todo,
+    post_waiting_for,
 };
 
 pub struct Application {
@@ -125,7 +127,26 @@ impl Application {
                 "/projects/{id}/next-actions",
                 axum::routing::post(post_project_next_action),
             )
-            .route("/waiting-for", axum::routing::get(get_waiting_for))
+            .route(
+                "/waiting-for",
+                axum::routing::get(get_waiting_for).post(post_waiting_for),
+            )
+            .route(
+                "/waiting-for/{id}",
+                axum::routing::get(get_waiting_for_item),
+            )
+            .route(
+                "/waiting-for/{id}/complete",
+                axum::routing::post(post_complete_waiting_for),
+            )
+            .route(
+                "/waiting-for/{id}/delete",
+                axum::routing::post(post_delete_waiting_for),
+            )
+            .route(
+                "/waiting-for/{id}/edit",
+                axum::routing::get(get_edit_waiting_for).post(post_edit_waiting_for),
+            )
             .route("/someday-maybe", axum::routing::get(get_someday_maybe))
             .route("/review", axum::routing::get(get_review))
             .route(

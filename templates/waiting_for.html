@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Waiting For -- Todo List{% endblock %}
+
+{% block nav %}
+{% include "gtd_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="waiting-for">
+    <h1>Waiting For</h1>
+
+    {% if let Some(error) = error_message %}
+    <div class="waiting-for__error" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <form
+        method="post"
+        action="/waiting-for"
+        class="waiting-for__add"
+        hx-post="/waiting-for"
+        hx-target="#waiting-for-list"
+        hx-swap="beforeend"
+        hx-on::after-request="if(event.detail.successful) { this.querySelector('#waiting-for-title').value = ''; this.querySelector('#waiting-for-person').value = ''; this.querySelector('#waiting-for-title').focus(); }"
+    >
+        <div class="waiting-for__add-fields">
+            <div class="waiting-for__add-group">
+                <label for="waiting-for-title">What are you waiting for?</label>
+                <input
+                    type="text"
+                    id="waiting-for-title"
+                    name="title"
+                    placeholder="e.g., Approval on budget proposal"
+                    maxlength="300"
+                    autocomplete="off"
+                    class="waiting-for__add-input"
+                >
+            </div>
+            <div class="waiting-for__add-group waiting-for__add-group--person">
+                <label for="waiting-for-person">Who or what?</label>
+                <div class="waiting-for__add-row">
+                    <input
+                        type="text"
+                        id="waiting-for-person"
+                        name="waiting_on"
+                        placeholder="e.g., Finance team"
+                        maxlength="100"
+                        autocomplete="off"
+                        class="waiting-for__person-input"
+                    >
+                    <button type="submit" class="waiting-for__add-submit">Add</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {% if items.is_empty() %}
+    <div class="waiting-for__empty-state" id="waiting-for-empty-state">
+        <p>Nothing pending from others. When you delegate something or need to follow up, add it here.</p>
+    </div>
+    {% endif %}
+    <ul class="waiting-for__list" role="list" id="waiting-for-list"{% if items.is_empty() %} hidden{% endif %}>
+        {% for item in items %}
+        {% include "waiting_for_item.html" %}
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/waiting-for-focus.js"></script>
+{% endblock %}
