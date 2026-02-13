@@ -801,6 +801,14 @@ async fn inbox_item_has_clarify_form_with_context_select() {
         body.contains("first_action_title"),
         "Inbox item should have a first action title input for project clarification"
     );
+    assert!(
+        body.contains("Waiting For"),
+        "Inbox item should have a 'Waiting For' radio option"
+    );
+    assert!(
+        body.contains("waiting_on"),
+        "Inbox item should have a waiting_on input for waiting-for clarification"
+    );
 }
 
 #[tokio::test]
@@ -1188,5 +1196,265 @@ async fn clarify_as_project_first_action_is_linked_to_project() {
     assert!(
         body.contains("Buy storage bins"),
         "Project detail should show the first action created during clarify"
+    );
+}
+
+// ---- Clarify as Waiting For ----
+
+#[tokio::test]
+async fn clarify_inbox_item_as_waiting_for_removes_from_inbox() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "wfclarify1@example.com", "securepassword123").await;
+
+    // Capture an item
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Waiting for reply")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    // Clarify as waiting for
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .form(&[("clarify_type", "waiting_for"), ("waiting_on", "Alice")])
+        .send()
+        .await
+        .expect("Failed to clarify as waiting for");
+
+    assert_eq!(
+        response.status().as_u16(),
+        303,
+        "Clarify as waiting for should redirect"
+    );
+
+    // Item should be gone from inbox
+    let response = client
+        .get(format!("{}/inbox", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /inbox");
+    let body = response.text().await.unwrap();
+    assert!(
+        !body.contains("Waiting for reply"),
+        "Clarified item should no longer appear in inbox"
+    );
+}
+
+#[tokio::test]
+async fn clarify_inbox_item_as_waiting_for_creates_waiting_for_item() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "wfclarify2@example.com", "securepassword123").await;
+
+    // Capture an item
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Waiting on Bob")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    // Clarify as waiting for
+    client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .form(&[("clarify_type", "waiting_for"), ("waiting_on", "Bob")])
+        .send()
+        .await
+        .expect("Failed to clarify as waiting for");
+
+    // Item should appear in waiting for list
+    let response = client
+        .get(format!("{}/waiting-for", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /waiting-for");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Waiting on Bob"),
+        "Clarified item should appear in waiting-for list"
+    );
+    assert!(
+        body.contains("Bob"),
+        "Waiting-for item should show who we're waiting on"
+    );
+}
+
+#[tokio::test]
+async fn clarify_as_waiting_for_nonexistent_inbox_item_returns_404() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "wfclarify3@example.com", "securepassword123").await;
+
+    let fake_id = uuid::Uuid::new_v4();
+
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, fake_id))
+        .form(&[("clarify_type", "waiting_for"), ("waiting_on", "Someone")])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    assert_eq!(response.status().as_u16(), 404);
+}
+
+#[tokio::test]
+async fn htmx_clarify_as_waiting_for_returns_empty_body_with_announce() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "wfclarify4@example.com", "securepassword123").await;
+
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "HTMX waiting for test")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .header("hx-request", "true")
+        .form(&[("clarify_type", "waiting_for"), ("waiting_on", "Carol")])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    assert_eq!(response.status().as_u16(), 200);
+
+    let trigger = response
+        .headers()
+        .get("hx-trigger")
+        .expect("Missing HX-Trigger")
+        .to_str()
+        .unwrap();
+    assert!(
+        trigger.contains("Moved to Waiting For"),
+        "HX-Trigger should contain 'Moved to Waiting For' announce"
+    );
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.is_empty(),
+        "HTMX clarify as waiting for should return empty body (item removed)"
+    );
+}
+
+#[tokio::test]
+async fn clarify_as_waiting_for_with_empty_waiting_on_redirects() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "wfclarify5@example.com", "securepassword123").await;
+
+    // Capture an item
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Needs waiting on")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    // Clarify as waiting for with empty waiting_on (non-HTMX redirects)
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .form(&[("clarify_type", "waiting_for"), ("waiting_on", "")])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    assert_eq!(
+        response.status().as_u16(),
+        303,
+        "Non-HTMX empty waiting_on should redirect to inbox"
+    );
+
+    // Item should still be in inbox
+    let response = client
+        .get(format!("{}/inbox", &app.address))
+        .send()
+        .await
+        .expect("Failed to GET /inbox");
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("Needs waiting on"),
+        "Item should still be in inbox after failed clarify"
+    );
+}
+
+#[tokio::test]
+async fn htmx_clarify_as_waiting_for_with_empty_waiting_on_returns_204() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "wfclarify6@example.com", "securepassword123").await;
+
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "HTMX empty waiting on")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .header("hx-request", "true")
+        .form(&[("clarify_type", "waiting_for"), ("waiting_on", "")])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    assert_eq!(
+        response.status().as_u16(),
+        204,
+        "HTMX empty waiting_on should return 204"
+    );
+}
+
+#[tokio::test]
+async fn htmx_clarify_as_waiting_for_with_too_long_waiting_on_returns_422() {
+    let app = spawn_app().await;
+    let client =
+        register_and_login(&app.address, "wfclarify7@example.com", "securepassword123").await;
+
+    client
+        .post(format!("{}/inbox", &app.address))
+        .form(&[("title", "Long waiting on test")])
+        .send()
+        .await
+        .expect("Failed to capture");
+
+    let item_id = get_first_inbox_item_id(&client, &app.address).await;
+
+    let long_waiting_on = "x".repeat(101);
+    let response = client
+        .post(format!("{}/inbox/{}/clarify", &app.address, item_id))
+        .header("hx-request", "true")
+        .form(&[
+            ("clarify_type", "waiting_for"),
+            ("waiting_on", &long_waiting_on),
+        ])
+        .send()
+        .await
+        .expect("Failed to clarify");
+
+    assert_eq!(
+        response.status().as_u16(),
+        422,
+        "HTMX too-long waiting_on should return 422"
+    );
+
+    let body = response.text().await.unwrap();
+    assert!(
+        body.contains("too long"),
+        "Should contain error about name being too long"
     );
 }

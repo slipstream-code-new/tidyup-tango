@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use sqlx::PgPool;
+use sqlx::{PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::domain::{TodoTitle, UserId, WaitingForId, WaitingForItem, WaitingOn};
@@ -33,7 +33,7 @@ impl WaitingForRecord {
 }
 
 pub async fn insert_waiting_for_item(
-    pool: &PgPool,
+    executor: impl PgExecutor<'_>,
     item: &WaitingForItem,
 ) -> Result<(), sqlx::Error> {
     let resolved_at: Option<&DateTime<Utc>> = match item {
@@ -51,7 +51,7 @@ pub async fn insert_waiting_for_item(
         item.created_at() as &DateTime<Utc>,
         resolved_at as Option<&DateTime<Utc>>,
     )
-    .execute(pool)
+    .execute(executor)
     .await?;
     Ok(())
 }

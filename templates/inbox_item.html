@@ -20,6 +20,10 @@
                         <input type="radio" name="clarify_type" value="project" class="inbox-item__radio">
                         Project
                     </label>
+                    <label class="inbox-item__radio-label">
+                        <input type="radio" name="clarify_type" value="waiting_for" class="inbox-item__radio">
+                        Waiting For
+                    </label>
                 </div>
                 <div class="inbox-item__shared-fields">
                     <label for="clarify-context-{{ item.id }}" class="inbox-item__context-label">Context</label>
@@ -39,6 +43,18 @@
                         maxlength="300"
                         autocomplete="off"
                         class="inbox-item__first-action-input"
+                    >
+                </div>
+                <div class="inbox-item__waiting-for-fields">
+                    <label for="waiting-on-{{ item.id }}" class="inbox-item__waiting-on-label">Who or what are you waiting on?</label>
+                    <input
+                        type="text"
+                        id="waiting-on-{{ item.id }}"
+                        name="waiting_on"
+                        placeholder="Who or what?"
+                        maxlength="100"
+                        autocomplete="off"
+                        class="inbox-item__waiting-on-input"
                     >
                 </div>
                 {% if let Some(msg) = error %}

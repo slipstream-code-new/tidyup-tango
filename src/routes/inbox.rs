@@ -8,12 +8,13 @@ use uuid::Uuid;
 
 use super::auth::AuthenticatedUser;
 use super::{htmx_response_with_announce, is_htmx_request};
+use crate::domain::WaitingOnError;
 use crate::domain::{ContextId, InboxItem, InboxItemId};
 use crate::services::context_service;
 use crate::services::inbox_service::{
-    capture_inbox_item, clarify_as_next_action, clarify_as_project, delete_inbox_item,
-    get_inbox_items, CaptureInboxError, ClarifyAsNextActionError, ClarifyAsProjectError,
-    DeleteInboxError,
+    capture_inbox_item, clarify_as_next_action, clarify_as_project, clarify_as_waiting_for,
+    delete_inbox_item, get_inbox_items, CaptureInboxError, ClarifyAsNextActionError,
+    ClarifyAsProjectError, ClarifyAsWaitingForError, DeleteInboxError,
 };
 
 pub struct InboxItemView {
@@ -211,11 +212,14 @@ pub async fn post_delete_inbox_item(
 
 #[derive(serde::Deserialize)]
 pub struct ClarifyForm {
-    pub context_id: Uuid,
+    #[serde(default)]
+    pub context_id: Option<Uuid>,
     #[serde(default)]
     pub clarify_type: String,
     #[serde(default)]
     pub first_action_title: String,
+    #[serde(default)]
+    pub waiting_on: String,
 }
 
 pub async fn post_clarify_inbox_item(
@@ -227,9 +231,83 @@ pub async fn post_clarify_inbox_item(
 ) -> Result<Response, InboxError> {
     let htmx = is_htmx_request(&headers);
     let inbox_item_id = InboxItemId::from_uuid(item_id);
-    let context_id = ContextId::from_uuid(form.context_id);
 
-    if form.clarify_type == "project" {
+    if form.clarify_type == "waiting_for" {
+        match clarify_as_waiting_for(&pool, &inbox_item_id, &user_id, form.waiting_on).await {
+            Ok(_item) => {
+                if htmx {
+                    Ok(htmx_response_with_announce(
+                        Html(String::new()),
+                        "Moved to Waiting For",
+                    ))
+                } else {
+                    Ok(Redirect::to("/inbox").into_response())
+                }
+            }
+            Err(ClarifyAsWaitingForError::NotFound) => Ok((
+                StatusCode::NOT_FOUND,
+                Html("<h1>Inbox item not found</h1>".to_string()),
+            )
+                .into_response()),
+            Err(ClarifyAsWaitingForError::Unauthorized) => Ok((
+                StatusCode::FORBIDDEN,
+                Html("<h1>Not authorized</h1>".to_string()),
+            )
+                .into_response()),
+            Err(ClarifyAsWaitingForError::InvalidWaitingOn(ref err)) => {
+                let user_facing = match err {
+                    WaitingOnError::Empty => {
+                        if htmx {
+                            return Ok(StatusCode::NO_CONTENT.into_response());
+                        }
+                        return Ok(Redirect::to("/inbox").into_response());
+                    }
+                    WaitingOnError::TooLong { max, .. } => {
+                        format!("That name is too long (max {max} characters)")
+                    }
+                };
+                if htmx {
+                    let item = get_inbox_items(&pool, &user_id)
+                        .await
+                        .map_err(InboxError::Unexpected)?
+                        .into_iter()
+                        .find(|i| *i.id() == inbox_item_id);
+                    if let Some(item) = item {
+                        let contexts = context_service::list_contexts(&pool, &user_id)
+                            .await
+                            .map_err(InboxError::Unexpected)?;
+                        let context_options: Vec<ContextOption> = contexts
+                            .iter()
+                            .map(|c| ContextOption {
+                                id: c.id().as_uuid().to_string(),
+                                name: c.name().as_str().to_string(),
+                            })
+                            .collect();
+                        let template = InboxItemTemplate {
+                            item: InboxItemView::from(&item),
+                            contexts: context_options,
+                            error: Some(user_facing),
+                        };
+                        let body = template.render().map_err(InboxError::Render)?;
+                        Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(body)).into_response())
+                    } else {
+                        Ok((
+                            StatusCode::NOT_FOUND,
+                            Html("<h1>Inbox item not found</h1>".to_string()),
+                        )
+                            .into_response())
+                    }
+                } else {
+                    Ok(Redirect::to("/inbox").into_response())
+                }
+            }
+            Err(ClarifyAsWaitingForError::Unexpected(err)) => Err(InboxError::Unexpected(err)),
+        }
+    } else if form.clarify_type == "project" {
+        let context_id = ContextId::from_uuid(
+            form.context_id
+                .ok_or_else(|| InboxError::Unexpected(anyhow::anyhow!("Missing context_id")))?,
+        );
         match clarify_as_project(
             &pool,
             &inbox_item_id,
@@ -298,6 +376,10 @@ pub async fn post_clarify_inbox_item(
             Err(ClarifyAsProjectError::Unexpected(err)) => Err(InboxError::Unexpected(err)),
         }
     } else {
+        let context_id = ContextId::from_uuid(
+            form.context_id
+                .ok_or_else(|| InboxError::Unexpected(anyhow::anyhow!("Missing context_id")))?,
+        );
         match clarify_as_next_action(&pool, &inbox_item_id, &user_id, context_id).await {
             Ok(_action) => {
                 if htmx {

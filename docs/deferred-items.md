@@ -16,3 +16,4 @@ each retrospective.
 | Password toggle: confirm field removal needs hidden input mirror for no-JS fallback | A11y | Task #11 (Heydon) | Refinement | Open |
 | Focus management after HTMX delete (inbox + contexts): focus should move to a logical target after item removal | A11y | Step 3 (Heydon) | Refinement | Open |
 | Add optional `project_id` FK to `waiting_for_items` to link Waiting For items to Projects | Domain | Step 8 (Scott) | Refinement | Open |
+| Convert Waiting For item to Next Action (US-GTD-5: "User can convert a Waiting For item to a Next Action") | Feature | Step 8 (Marty) | Refinement | Open |

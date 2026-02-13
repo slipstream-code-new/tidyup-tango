@@ -79,6 +79,9 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Inbox item not found (clarify as project) | `ClarifyAsProjectError::NotFound` | Referenced inbox item does not exist |
 | Not authorized (clarify as project) | `ClarifyAsProjectError::Unauthorized` | User does not own the inbox item |
 | Invalid first action title (clarify as project) | `ClarifyAsProjectError::InvalidTitle(TodoTitleError)` | First action title validation failure in clarify_as_project service |
+| Inbox item not found (clarify as waiting for) | `ClarifyAsWaitingForError::NotFound` | Referenced inbox item does not exist |
+| Not authorized (clarify as waiting for) | `ClarifyAsWaitingForError::Unauthorized` | User does not own the inbox item |
+| Invalid waiting-on (clarify as waiting for) | `ClarifyAsWaitingForError::InvalidWaitingOn(WaitingOnError)` | Waiting-on validation failure in clarify_as_waiting_for service |
 | Waiting-on empty | `WaitingOnError::Empty` | Waiting-on cannot be blank |
 | Waiting-on too long | `WaitingOnError::TooLong { max, actual }` | Waiting-on exceeds 100 character limit |
 | Invalid title (add waiting-for) | `AddWaitingForError::InvalidTitle(TodoTitleError)` | Title validation failure in add_waiting_for_item service |
@@ -121,6 +124,8 @@ call `error.to_string()` on a domain error.
 | `TodoTitleError::Empty` (add waiting-for) | (silently ignored -- empty submissions are not errors) |
 | `TodoTitleError::Empty` (edit waiting-for) | "Title cannot be empty" |
 | `TodoTitleError::TooLong` (waiting-for) | "That title is too long (max 300 characters)" |
+| `WaitingOnError::Empty` (clarify as waiting for) | (silently ignored -- empty submissions are not errors) |
+| `WaitingOnError::TooLong` (clarify as waiting for) | "That name is too long (max 100 characters)" |
 | `WaitingOnError::Empty` (add) | (silently ignored -- empty submissions are not errors) |
 | `WaitingOnError::Empty` (edit) | "Who or what cannot be empty" |
 | `WaitingOnError::TooLong` | "That name is too long (max 100 characters)" |
@@ -205,6 +210,7 @@ implementation.*
 | Capture to inbox | `capture_to_inbox()` | Creates InboxItem from raw text |
 | Clarify as next action | `clarify_as_next_action()` | InboxItem -> NextAction (requires context). **Implemented.** |
 | Clarify as project | `clarify_as_project()` | InboxItem -> Project + first NextAction. **Implemented.** |
+| Clarify as waiting for | `clarify_as_waiting_for()` | InboxItem -> WaitingForItem (requires waiting_on). **Implemented.** |
 | Delegate | `delegate()` | InboxItem or NextAction -> WaitingForItem (not yet implemented as clarify action) |
 | Add waiting-for item | `add_waiting_for_item()` | Service: creates WaitingForItem (Active) with title and waiting_on person. **Implemented.** |
 | Mark received (resolve waiting-for) | `WaitingForItem::resolve()` | Active -> Resolved; records resolution time. **Implemented.** |
@@ -264,10 +270,11 @@ implementation.*
 ```
               add_waiting_for_item()
   [nothing] ───────────────────────> WaitingForItem (Active)
-                                         │
-                              resolve()  │  (mark as received)
-                                         v
-                                   WaitingForItem (Resolved)
+                                         ^       │
+        clarify_as_waiting_for()         │       │
+  InboxItem ─────────────────────────────┘       │  resolve()  (mark as received)
+                                                 v
+                                           WaitingForItem (Resolved)
 ```
 
 Both Active and Resolved variants can be deleted (`delete_waiting_for_item()`).

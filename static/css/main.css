@@ -1288,6 +1288,37 @@
     padding: var(--space-xs) var(--space-sm);
   }
 
+  /* Progressive disclosure: waiting-for fields hidden by default,
+     revealed when "Waiting For" radio is selected via CSS :has() */
+  .inbox-item__waiting-for-fields {
+    display: none;
+    align-items: center;
+    gap: var(--space-xs);
+    inline-size: 100%;
+  }
+
+  .inbox-item__clarify-fieldset:has(input[value="waiting_for"]:checked) .inbox-item__waiting-for-fields {
+    display: flex;
+  }
+
+  /* Hide context selector when "Waiting For" is selected (contexts don't apply) */
+  .inbox-item__clarify-fieldset:has(input[value="waiting_for"]:checked) .inbox-item__shared-fields {
+    display: none;
+  }
+
+  .inbox-item__waiting-on-label {
+    font-size: var(--font-size-xs);
+    color: var(--color-fg-muted);
+    flex-shrink: 0;
+  }
+
+  .inbox-item__waiting-on-input {
+    flex: 1;
+    min-inline-size: 8rem;
+    font-size: var(--font-size-sm);
+    padding: var(--space-xs) var(--space-sm);
+  }
+
   .inbox-item__error {
     color: var(--color-error, #b91c1c);
     font-size: var(--font-size-sm);

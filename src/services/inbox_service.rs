@@ -2,10 +2,12 @@ use sqlx::PgPool;
 
 use crate::domain::{
     ContextId, InboxItem, InboxItemId, NextAction, Project, TodoTitle, TodoTitleError, UserId,
+    WaitingForItem, WaitingOn, WaitingOnError,
 };
 use crate::infrastructure::inbox_repository;
 use crate::infrastructure::next_action_repository;
 use crate::infrastructure::project_repository;
+use crate::infrastructure::waiting_for_repository;
 
 #[derive(Debug, thiserror::Error)]
 pub enum CaptureInboxError {
@@ -248,4 +250,68 @@ pub async fn clarify_as_project(
         project,
         first_action,
     })
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum ClarifyAsWaitingForError {
+    #[error("Inbox item not found")]
+    NotFound,
+    #[error("Not authorized to clarify this inbox item")]
+    Unauthorized,
+    #[error("Invalid waiting-on: {0}")]
+    InvalidWaitingOn(#[from] WaitingOnError),
+    #[error(transparent)]
+    Unexpected(anyhow::Error),
+}
+
+#[tracing::instrument(
+    name = "clarify_as_waiting_for",
+    skip(pool, waiting_on),
+    fields(item_id = %item_id.as_uuid(), user_id = %user_id.as_uuid())
+)]
+pub async fn clarify_as_waiting_for(
+    pool: &PgPool,
+    item_id: &InboxItemId,
+    user_id: &UserId,
+    waiting_on: String,
+) -> Result<WaitingForItem, ClarifyAsWaitingForError> {
+    let waiting_on = WaitingOn::parse(waiting_on)?;
+
+    let mut tx = pool.begin().await.map_err(|e| {
+        ClarifyAsWaitingForError::Unexpected(anyhow::anyhow!("Failed to begin transaction: {e}"))
+    })?;
+
+    let item = inbox_repository::find_inbox_item_by_id(&mut *tx, item_id)
+        .await
+        .map_err(|e| ClarifyAsWaitingForError::Unexpected(anyhow::anyhow!("Database error: {e}")))?
+        .ok_or(ClarifyAsWaitingForError::NotFound)?;
+
+    if item.user_id() != user_id {
+        return Err(ClarifyAsWaitingForError::Unauthorized);
+    }
+
+    let wf_item = WaitingForItem::new(user_id.clone(), item.title().clone(), waiting_on);
+
+    waiting_for_repository::insert_waiting_for_item(&mut *tx, &wf_item)
+        .await
+        .map_err(|e| {
+            ClarifyAsWaitingForError::Unexpected(anyhow::anyhow!(
+                "Failed to insert waiting-for item: {e}"
+            ))
+        })?;
+
+    inbox_repository::delete_inbox_item(&mut *tx, item_id)
+        .await
+        .map_err(|e| {
+            ClarifyAsWaitingForError::Unexpected(anyhow::anyhow!(
+                "Failed to delete inbox item: {e}"
+            ))
+        })?;
+
+    tx.commit().await.map_err(|e| {
+        ClarifyAsWaitingForError::Unexpected(anyhow::anyhow!("Failed to commit transaction: {e}"))
+    })?;
+
+    tracing::info!("Inbox item clarified as waiting for");
+    Ok(wf_item)
 }
