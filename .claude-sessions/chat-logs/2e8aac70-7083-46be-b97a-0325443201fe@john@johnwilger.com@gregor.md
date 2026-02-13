@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `2e8aac70-7083-46be-b97a-0325443201fe` |
-| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-12 23:53 UTC |
+| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-13 00:05 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -7170,5 +7170,491 @@ All teammates except Carson have shut down. The team held their Step 7 mini-retr
 - SendMessage
 
 </details>
+
+---
+
+## 2026-02-13 00:03 UTC -- User
+
+<teammate-message teammate_id="carson-gross" color="purple" summary="Blocking fix done, CI green, Steve Krug notified">
+The blocking review item from Steve Krug has been fixed, committed, pushed, and CI is green.
+
+**Fix summary:** The validation error dead-end for clarify-as-project (empty first action title) now:
+- HTMX: Returns 422 with the inbox item re-rendered inline + error message ("Enter a first action for this project") via `role="alert"`
+- Non-HTMX: Redirects back to `/inbox` (303), item stays in inbox
+
+**Commit:** 1a40c16 — "Fix validation error dead-end for clarify-as-project"
+**CI:** Green (run 21968975698, ~7 min)
+**Tests:** 260 Rust (70 unit + 190 integration) + 11 Playwright e2e, all green
+
+I've sent Steve Krug a message requesting re-review with full details of the fix.
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T00:03:17.616Z","idleReason":"available","summary":"[to steve-krug] Fixed validation dead-end, requesting re-review"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"shutdown_approved","requestId":"shutdown-1770940420340@carson-gross","from":"carson-gross","timestamp":"2026-02-13T00:03:19.242Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+---
+
+## 2026-02-13 00:03 UTC -- Assistant
+
+Carson shut down after making one more fix (commit 1a40c16 — validation error dead-end fix, CI green). Now let me clean up and respawn.
+
+---
+
+## 2026-02-13 00:03 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- TeamDelete
+
+</details>
+
+---
+
+## 2026-02-13 00:03 UTC -- Assistant
+
+Team cleaned up. Now let me create a fresh team and read the profiles I need for spawn prompts.
+
+---
+
+## 2026-02-13 00:03 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- TeamCreate
+
+</details>
+
+---
+
+## 2026-02-13 00:03 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/projects/todo_list/.team/kent-beck.md
+
+</details>
+
+---
+
+## 2026-02-13 00:03 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/projects/todo_list/.team/scott-wlaschin.md
+
+</details>
+
+---
+
+## 2026-02-13 00:03 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/projects/todo_list/.team/steve-schoger.md
+
+</details>
+
+---
+
+## 2026-02-13 00:03 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/projects/todo_list/.team/steve-krug.md
+
+</details>
+
+---
+
+## 2026-02-13 00:03 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/projects/todo_list/.team/heydon-pickering.md
+
+</details>
+
+---
+
+## 2026-02-13 00:03 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Read: /home/jwilger/projects/todo_list/.team/marty-cagan.md
+
+</details>
+
+---
+
+## 2026-02-13 00:03 UTC -- Assistant
+
+Team cleaned up. Now let me spawn the full team for Step 8. The team's retro consensus was Luca for Step 8 driver (primarily backend work). Let me spawn all 9 members.
+
+---
+
+## 2026-02-13 00:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Task: Driver for Step 8 Waiting For
+
+</details>
+
+---
+
+## 2026-02-13 00:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Task: Reviewer for Step 8
+
+</details>
+
+---
+
+## 2026-02-13 00:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Task: Reviewer for Step 8
+
+</details>
+
+---
+
+## 2026-02-13 00:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Task: Reviewer for Step 8
+
+</details>
+
+---
+
+## 2026-02-13 00:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Task: Reviewer for Step 8
+
+</details>
+
+---
+
+## 2026-02-13 00:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Task: Reviewer for Step 8
+
+</details>
+
+---
+
+## 2026-02-13 00:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Task: Reviewer for Step 8
+
+</details>
+
+---
+
+## 2026-02-13 00:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Task: Reviewer for Step 8
+
+</details>
+
+---
+
+## 2026-02-13 00:04 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Task: Reviewer for Step 8
+
+</details>
+
+---
+
+## 2026-02-13 00:04 UTC -- Assistant
+
+All 9 team members spawned successfully for Step 8 (Waiting For). The team is:
+
+- **Driver**: Luca Palmieri (full write access)
+- **Reviewers**: Kent Beck, Scott Wlaschin, Carson Gross, Lea Verou, Steve Schoger, Steve Krug, Heydon Pickering, Marty Cagan
+
+Luca's first task is to update `docs/gtd-product-discovery.md` (mark Step 7 complete, move NEXT to Step 8), then implement the Waiting For feature. The team was instructed to hold a pre-implementation design discussion before coding (per the Step 7 retro lesson that this eliminated review-fix cycles).
+
+Waiting for the team to get started. I'll monitor and relay any messages that need project owner input.
+
+---
+
+## 2026-02-13 00:04 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T00:04:28.329Z","idleReason":"available","summary":"[to luca-palmieri] Ready to review Step 8 Waiting For implementation"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-13T00:04:33.784Z","idleReason":"available","summary":"[to luca-palmieri] Ready for review with domain modeling checklist"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-13T00:04:39.291Z","idleReason":"available","summary":"[to luca-palmieri] Ready to review Step 8 UX — key areas outlined"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red" summary="Ready as a11y reviewer for Step 8">
+Heydon Pickering here, Accessibility Specialist, ready as Reviewer for Step 8 (Waiting For, US-GTD-5). I've read TEAM_AGREEMENTS.md, PROJECT.md, the glossary, and the user story. I'll be watching for:
+
+- Semantic HTML structure (lists, headings, landmarks, forms, buttons)
+- Keyboard accessibility for all interactive elements
+- Visible labels on all form inputs (especially "waiting on" person field and optional date)
+- Proper `<time>` element with datetime attribute for date display
+- Unique accessible names on delete/complete/mark-received buttons (e.g., "Mark received: Buy groceries from Bob")
+- Focus management after HTMX content swaps
+- ARIA usage (only where native HTML cannot cover it)
+- Color contrast (WCAG AA)
+
+Waiting for the Driver to notify that code is ready for review.
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-13T00:04:41.813Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue" summary="Ready to review Step 8 (Waiting For)">
+I've read TEAM_AGREEMENTS.md, PROJECT.md, docs/gtd-product-discovery.md, and docs/glossary.md. I'm ready to review Step 8 — Waiting For (US-GTD-5) from a product perspective.
+
+Key acceptance criteria I'll be checking:
+1. Waiting For list shows all items the user is waiting on
+2. Each item shows: what is being waited on, who/what it's waiting on, date added
+3. User can add items directly to Waiting For
+4. User can mark a Waiting For item as received (moves to inbox or completes)
+5. User can convert a Waiting For item to a Next Action
+6. Works without JavaScript; HTMX enhances
+
+I'll also verify:
+- Scope matches V1 Must Have #5 — not over-built, not under-built
+- Empty state provides onboarding guidance per UX Principle #3
+- The feature feels calm and organized per UX Principle #6
+- The Trunk Test passes (user knows where they are, what options they have)
+- GTD terminology is explained in plain language per UX Principle #1
+
+Waiting for the Driver (luca-palmieri) to notify me that code is ready for review.
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-13T00:04:44.077Z","idleReason":"available","summary":"[to luca-palmieri] Ready for visual design review on Waiting For"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-13T00:04:44.813Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T00:04:51.087Z","idleReason":"available","summary":"[to luca-palmieri] HTMX architecture guidance for Step 8 Waiting For"}
+</teammate-message>
+
+---
+
+## 2026-02-13 00:05 UTC -- Assistant
+
+All 8 reviewers are ready and have read the project docs. Several have already sent proactive guidance to Luca (Carson with HTMX patterns, Heydon with a11y checklist, Marty with acceptance criteria). Waiting for Luca to complete his initial setup and begin the pre-implementation design discussion.
+
+---
+
+## 2026-02-13 00:05 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-13T00:04:58.390Z","idleReason":"available","summary":"[to luca-palmieri] Proactive CSS/frontend guidance for Waiting For page"}
+</teammate-message>
+
+---
+
+## 2026-02-13 00:05 UTC -- Assistant
+
+Lea has also sent proactive CSS guidance to Luca. All 9 team members are active and ready. Waiting for Luca to finish his initial pipeline check and begin work.
+
+---
+
+## 2026-02-13 00:05 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-13T00:04:59.925Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-13 00:05 UTC -- Assistant
+
+All reviewers are settled and waiting. Luca should be running his initial pipeline checks and reading the project docs now.
+
+---
+
+## 2026-02-13 00:05 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Proposed design for Waiting For feature">
+Team, I'm the Driver for Step 8 — Waiting For (US-GTD-5). I've completed onboarding:
+
+- Read TEAM_AGREEMENTS.md, PROJECT.md, glossary.md, and US-GTD-5
+- Verified clean working tree and all green: 70 unit tests, 190 integration tests, 11 e2e tests
+- Studied the existing patterns from Projects, Next Actions, and Contexts
+
+**FIRST TASK: Update implementation order** (mark Step 7 complete, move NEXT to Step 8). I'll do this doc update and commit+push it separately, then move to the implementation.
+
+**PROPOSED DESIGN for Waiting For (US-GTD-5)**
+
+Per the retro lesson about pre-implementation design discussion, here's my plan before coding:
+
+### Domain Layer
+- `WaitingForId(Uuid)` — newtype for the ID
+- `WaitingForItem` — enum with `Active` and `Completed` variants (like NextAction)
+  - Fields: `id`, `user_id`, `title` (TodoTitle), `waiting_on` (String — who/what we're waiting on), `created_at`
+  - Active -> Completed transition with `completed_at`
+- `WaitingOnPerson` — newtype for the waiting_on field (non-empty string, max 100 chars, trimmed)
+- Errors: `AddWaitingForError`, `CompleteWaitingForError`, `DeleteWaitingForError`, `UpdateWaitingForTitleError`
+
+### Database
+- New `waiting_for_items` table: `id UUID PK`, `user_id FK`, `title TEXT`, `waiting_on TEXT`, `created_at TIMESTAMPTZ`, `completed_at TIMESTAMPTZ NULL`
+- Note: The data model sketch in gtd-product-discovery.md includes `project_id FK -> projects NULL`, but US-GTD-5 doesn't mention project linkage. I propose we skip `project_id` for now and add it if needed later. Simpler is better per our architectural principles.
+
+### Routes
+- `GET /waiting-for` — list page (replaces placeholder)
+- `POST /waiting-for` — add new item
+- `POST /waiting-for/{id}/complete` — mark as received/resolved
+- `POST /waiting-for/{id}/delete` — remove item
+- `GET /waiting-for/{id}/edit` — inline edit form (HTMX)
+- `POST /waiting-for/{id}/edit` — update title/waiting_on
+- `GET /waiting-for/{id}` — single item fragment for HTMX cancel
+
+### Templates
+- `waiting_for.html` — main list page with add form (two fields: title + waiting_on)
+- `waiting_for_item.html` — individual list item partial
+- `waiting_for_edit.html` — inline edit form partial
+
+### Dashboard Integration
+- Replace hardcoded "0 items" with dynamic waiting-for count
+
+### UI Interaction Design
+- Add form has two visible labels: "What are you waiting for?" (title) and "Who or what?" (waiting_on)
+- Each item shows title, waiting_on person/entity, and date added
+- Complete button labeled "Received" (per GTD language — you receive what you were waiting for)
+- Inline edit via HTMX (same pattern as projects)
+- Focus management JS from day one
+- Empty state: "Nothing to follow up on. Items you're waiting on from others will appear here."
+- CSS in `@layer components` for waiting-for styles
+
+### Accessibility
+- All form inputs have visible `<label>` elements
+- Action buttons have aria-labels including item title (e.g., "Received: Fix server bug")
+- `aria-live="polite"` announcements via HX-Trigger
+- Semantic list markup (`<ul>` with `role="list"`)
+- fieldset/legend if grouping fields
+
+### What US-GTD-5 says about "convert to Next Action"
+US-GTD-5 mentions "User can convert a Waiting For item to a Next Action." This is an inter-list move that adds complexity (needs context selection). I propose we implement the basic CRUD first (add, list, complete/received, delete, edit) and defer the convert-to-next-action feature to a follow-up commit. This keeps the first commit atomic and testable.
+
+Please share feedback on this design before I begin implementation. Particularly interested in:
+- Scott: Does the domain model look right? Should `waiting_on` be a newtype?
+- Carson: HTMX pattern OK? Any concerns with the route structure?
+- Heydon: Accessibility approach sound?
+- Steve K: UX of "Received" as the complete action label?
+- Steve S: Visual design — any specific layout guidance?
+- Marty: Is deferring convert-to-next-action acceptable for the first commit?
+- Kent: TDD approach — start with domain unit tests, then integration, then templates?
+- Lea: CSS approach OK?
+</teammate-message>
+
+---
+
+## 2026-02-13 00:05 UTC -- Assistant
+
+Luca has shared a thorough pre-implementation design proposal with the team and is waiting for feedback before coding. This follows the Step 7 retro lesson that design discussions upfront eliminated review-fix cycles. The team is reviewing and will respond with their input. I'll wait for the discussion to play out.
+
+---
+
+## 2026-02-13 00:05 UTC -- User
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-13T00:05:43.533Z","idleReason":"available","summary":"[to luca-palmieri] UX approval — no blockers, three minor suggestions"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T00:05:43.551Z","idleReason":"available","summary":"[to luca-palmieri] HTMX review of Waiting For design - approved"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-13T00:05:44.508Z","idleReason":"available","summary":"[to luca-palmieri] Product review of Waiting For design — no blockers"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-13T00:05:44.876Z","idleReason":"available","summary":"[to luca-palmieri] A11y feedback on Waiting For design proposal"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-13T00:05:45.749Z","idleReason":"available","summary":"[to luca-palmieri] CSS/frontend feedback on Waiting For design proposal"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-13T00:05:47.236Z","idleReason":"available","summary":"[to luca-palmieri] Domain review: 3 blocking (naming, resolved_at, deferred doc), 2 minor"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-13T00:05:49.061Z","idleReason":"available","summary":"[to luca-palmieri] Visual design guidance for Waiting For layout"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T00:05:49.348Z","idleReason":"available","summary":"[to luca-palmieri] Design feedback: proceed, start with domain TDD"}
+</teammate-message>
+
+---
+
+## 2026-02-13 00:05 UTC -- Assistant
+
+All 8 reviewers have responded to Luca's design proposal. Looks like Scott had 3 blocking items (naming, resolved_at, deferred doc) while the rest approved with minor suggestions. Luca should be processing the feedback and incorporating it before starting implementation.
+
+---
+
+## 2026-02-13 00:05 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Request consensus for doc update commit">
+I've staged the doc update to mark Step 7 (Clarify as Project) as complete and move the NEXT marker to Step 8 (Waiting For) in docs/gtd-product-discovery.md. This is a straightforward progress marker update. 
+
+Can I get a quick 9/9 consensus to commit and push this doc change? Reply with your approval or concerns.
+</teammate-message>
+
+---
+
+## 2026-02-13 00:05 UTC -- Assistant
+
+The doc update is a straightforward progress marker change. The team should be able to approve quickly. Waiting for their responses.
 
 ---

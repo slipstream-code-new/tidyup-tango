@@ -480,7 +480,7 @@ Recommended build order, following the same incremental approach as the MVP. The
 clarify workflow (US-GTD-2) is split into sub-stories and interleaved with the lists
 it routes to, so each clarify path ships immediately after its destination exists:
 
-> **Current step**: 7 -- Clarify as Project
+> **Current step**: 8 -- Waiting For
 
 1. [x] **Navigation + Dashboard** -- Multi-page structure, header nav, route skeleton
 2. [x] **Inbox Capture** -- The new entry point (replaces direct todo add)
@@ -488,8 +488,8 @@ it routes to, so each clarify path ships immediately after its destination exist
 4. [x] **Next Actions with Contexts** -- Core working list
 5. [x] **Clarify as Next Action + Trash** -- First clarify paths
 6. [x] **Projects** -- Multi-step outcome tracking
-7. [ ] **Clarify as Project** -- Inbox -> new project + first next action  <!-- NEXT -->
-8. [ ] **Waiting For** -- Delegation tracking
+7. [x] **Clarify as Project** -- Inbox -> new project + first next action
+8. [ ] **Waiting For** -- Delegation tracking  <!-- NEXT -->
 9. [ ] **Clarify as Waiting For** -- Inbox -> waiting for
 10. [ ] **Someday/Maybe** -- Idea parking
 11. [ ] **Clarify as Someday/Maybe** -- Inbox -> someday/maybe
