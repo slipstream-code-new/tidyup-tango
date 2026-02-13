@@ -63,6 +63,12 @@ When a Driver is respawned (due to context loss, rotation, or session restart):
   the same files. Build on their observations rather than duplicating. A brief "+1"
   is fine for agreement.
 - Once a review is acknowledged, do not re-send it.
+- **Consensus approval format**: Use `CONSENSUS: APPROVED` as the first line of
+  approval messages. This standardized format makes tallying durable across context
+  compactions.
+- **Escalation clarity**: When promoting a nice-to-have item to BLOCKING, explicitly
+  state "escalating to BLOCKING because X" so the Driver and other reviewers know
+  the priority has changed.
 
 ### Feature Workflow
 Each feature follows this process with the full 9-person mob:
@@ -77,7 +83,10 @@ Each feature follows this process with the full 9-person mob:
    typography in concrete terms.
 4. **TDD cycle**: Red-Green-Refactor. The compiler is our first test. Take the smallest
    step possible. The Driver writes code; Reviewers provide feedback via messages.
-   Kent facilitates TDD discipline.
+   Kent facilitates TDD discipline. **When reviewers raise blocking feedback during
+   pre-implementation design, the Driver must explicitly acknowledge each item before
+   starting implementation** (e.g., "Accepted items 1, 2, 3; disagree with item 4
+   because X"). This prevents feedback from being silently dropped.
 5. **Continuous review**: Reviewers actively review each change as it happens --
    accessibility checked by Heydon, usability checked by Steve Krug, design checked
    by Steve Schoger, hypermedia patterns checked by Carson, domain modeling checked
@@ -533,7 +542,9 @@ Every commit must pass (in order):
 8. **`git commit`** — commit locally. **Do NOT push yet.**
 9. **All 9 agents review and reach consensus** — Driver and Reviewers confirm the change
    is correct. If concerns are raised, the Driver fixes them, re-runs steps 2–7, and
-   re-seeks consensus.
+   re-seeks consensus. **After applying review fixes, the Driver must immediately
+   `git add` the changed files and verify with `git diff --cached` that the staged
+   state matches the working tree before requesting re-review.**
 10. **Once 9/9 consensus → `git push`.**
 11. **Wait for CI green** — run `gh run list --limit 1` and WAIT for CI to complete
     green before beginning the next change. Never have more than 1 pending CI run. If

@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `2e8aac70-7083-46be-b97a-0325443201fe` |
-| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-13 00:58 UTC |
+| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-13 01:00 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -9241,5 +9241,347 @@ Luca seems to be idle. Let me give him a nudge.
 ## 2026-02-13 00:58 UTC -- Assistant
 
 Nudged Luca to wrap up the retro and move to Step 9 planning. Waiting for his response.
+
+---
+
+## 2026-02-13 00:59 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 8 complete, mini-retro done, ready for Step 9">
+Step 8 is fully complete. Implementation order updated, committed, and pushed. Mini-retro done.
+
+**Mini-retro action items adopted for future steps:**
+1. Stage fixes immediately after applying them (`git add` then `git diff --cached`)
+2. Driver explicitly acknowledges blocking feedback before starting implementation
+3. Reviewers explicitly state "escalating to BLOCKING" when promoting nice-to-haves
+4. Use "CONSENSUS: APPROVED" as standardized first line for approval messages
+
+**Step 9: Clarify as Waiting For** is next. This adds a clarify path from inbox to the Waiting For list. The team should discuss the design approach and select a driver. I'm ready to continue driving if the team agrees, since this builds directly on the Step 8 code.
+</teammate-message>
+
+---
+
+## 2026-02-13 00:59 UTC -- Assistant
+
+Step 8 is complete with retro action items captured. Luca has proposed continuing as driver for Step 9 since it builds on Step 8 code. Waiting for the team to discuss and reach consensus on the driver and design approach.
+
+---
+
+## 2026-02-13 00:59 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T00:59:03.535Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-13T00:59:12.728Z","idleReason":"available","summary":"[to luca-palmieri] Approved Luca as Step 9 driver, UX notes on clarify flow"}
+</teammate-message>
+
+---
+
+## 2026-02-13 00:59 UTC -- Assistant
+
+Steve Krug approved Luca continuing as driver. Waiting for the rest of the team to weigh in.
+
+---
+
+## 2026-02-13 00:59 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-13T00:59:18.766Z","idleReason":"available","summary":"[to luca-palmieri] Approved Luca as Step 9 driver, proactive CSS guidance"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-13T00:59:20.348Z","idleReason":"available","summary":"[to luca-palmieri] Approved Luca as Step 9 driver, a11y preview"}
+</teammate-message>
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T00:59:20.351Z","idleReason":"available","summary":"[to luca-palmieri] +1 Luca to drive Step 9, TDD approach outlined"}
+</teammate-message>
+
+---
+
+## 2026-02-13 00:59 UTC -- Assistant
+
+Four reviewers have approved Luca continuing as driver for Step 9. Waiting for the remaining four (Scott, Carson, Steve Schoger, Marty).
+
+---
+
+## 2026-02-13 00:59 UTC -- User
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-13T00:59:22.854Z","idleReason":"available","summary":"[to luca-palmieri] Product input on Step 9, support Luca as Driver"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-13T00:59:23.818Z","idleReason":"available","summary":"[to luca-palmieri] Domain modeling input for Step 9 clarify workflow"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T00:59:24.698Z","idleReason":"available","summary":"[to luca-palmieri] Approved Luca as Driver, HTMX design for Step 9 clarify flow"}
+</teammate-message>
+
+---
+
+## 2026-02-13 00:59 UTC -- Assistant
+
+7 approvals for Luca as Step 9 driver. Just waiting on Steve Schoger.
+
+---
+
+## 2026-02-13 00:59 UTC -- User
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-13T00:59:31.123Z","idleReason":"available","summary":"[to luca-palmieri] Visual design guidance for Clarify as Waiting For"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 9 design proposal and driver discussion">
+**Step 9: Clarify as Waiting For** -- Let's discuss design and driver selection.
+
+**What this step adds:**
+From US-GTD-2, acceptance criterion: "If actionable and delegated -> move to Waiting For with a note about who/what." This adds a clarify path from the inbox to the Waiting For list, following the same pattern as clarify-as-next-action (Step 5) and clarify-as-project (Step 7).
+
+**Proposed design (following existing patterns):**
+1. Add a "Waiting For" option to the clarify form on inbox items (alongside existing "Next Action" and "Project" options)
+2. When selected, show fields for: title (pre-filled from inbox item), waiting_on (who/what)
+3. On submit: create WaitingForItem, delete inbox item, return appropriate HTMX response
+4. Route: `POST /inbox/{id}/clarify-as-waiting-for` (following `clarify-as-project` pattern)
+5. Service function: `clarify_inbox_as_waiting_for` in inbox_service or waiting_for_service
+
+**Driver selection:**
+I (Luca) am willing to continue driving since this builds directly on Step 8 code and the inbox clarify patterns I'm familiar with. But if someone else wants to drive, I'm happy to rotate.
+
+**Team -- please share:**
+1. Any design feedback or concerns
+2. Driver preference
+3. Blocking feedback (per our new retro action item: I'll explicitly acknowledge each item before coding)
+</teammate-message>
+
+---
+
+## 2026-02-13 00:59 UTC -- Assistant
+
+All 8 reviewers have weighed in — unanimous support for Luca continuing as driver for Step 9. Luca has shared his design proposal and is collecting feedback before coding. The team is engaged and providing proactive guidance. Waiting for the discussion to conclude and implementation to begin.
+
+---
+
+## 2026-02-13 00:59 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T00:59:35.574Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-13 00:59 UTC -- Assistant
+
+Luca is processing the team's design feedback. Waiting for him to begin implementation.
+
+---
+
+## 2026-02-13 00:59 UTC -- User
+
+what are the retro action items and where are you updating things?
+
+---
+
+## 2026-02-13 00:59 UTC -- Assistant
+
+Good question. The Step 8 retro action items Luca summarized were:
+
+1. Stage fixes immediately after applying them (`git add` then `git diff --cached`)
+2. Driver explicitly acknowledges blocking feedback before starting implementation
+3. Reviewers explicitly state "escalating to BLOCKING" when promoting nice-to-haves
+4. Use "CONSENSUS: APPROVED" as standardized first line for approval messages
+
+As for where these are being tracked — I'm not sure they've been committed to any file. They were communicated via messages only. Per my coordinator rules, I don't update files myself. The team should be documenting retro outcomes in `TEAM_AGREEMENTS.md` or `docs/deferred-items.md`.
+
+Let me ask Luca to make sure these get documented properly.
+
+---
+
+## 2026-02-13 00:59 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-13 01:00 UTC -- Assistant
+
+I've also been updating my own memory (MEMORY.md) with completed tasks and lessons learned, but that's just my coordinator notes — not a substitute for the team's own documentation. I'll make sure to update MEMORY.md once the retro items are properly committed by the team.
+
+---
+
+## 2026-02-13 01:00 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T00:59:38.279Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-13T00:59:40.198Z","idleReason":"available","summary":"[to luca-palmieri] Referencing prior design guidance, support Luca as driver"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T00:59:40.440Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T00:59:43.076Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-13T00:59:44.762Z","idleReason":"available","summary":"[to luca-palmieri] Design approved, question on deferred convert-to-next-action scope"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-13T00:59:49.204Z","idleReason":"available","summary":"[to luca-palmieri] Design approved, UX notes on radio label and field wording"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T00:59:49.643Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T00:59:52.124Z","idleReason":"available","summary":"[to luca-palmieri] Design feedback: use existing /clarify endpoint, not separate route"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:00 UTC -- Assistant
+
+The team is actively discussing Step 9 design. Luca should be processing their feedback and documenting the retro action items.
+
+---
+
+## 2026-02-13 01:00 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Acknowledging all Step 9 feedback, scope clarification">
+**Acknowledging all feedback so far for Step 9. Here's the tally:**
+
+**Driver selection**: Luca continues driving. Approved by Steve Krug, Lea, Heydon, Marty. No objections raised.
+
+**Design feedback acknowledged:**
+1. Steve Krug: Progressive disclosure pattern, seamless title carry-over -- Accepted
+2. Lea: `:has()` CSS pattern following existing project clarify disclosure, `display: none/flex` toggle -- Accepted
+3. Heydon: Radio group labelling, visible labels on revealed fields, AT-accessible disclosure, inbox count + focus management -- All 4 accepted
+4. Marty: Follow clarify-as-next-action / clarify-as-project pattern, collect waiting_on field -- Accepted
+
+**On Marty's "convert Waiting For to Next Action" note**: This is from US-GTD-5 ("User can convert a Waiting For item to a Next Action"), not from the clarify workflow. Step 9 scope is "Clarify as Waiting For" (inbox -> waiting for). The convert-to-next-action feature is a separate concern. I propose we track it as a deferred item and address it in a later step. Team -- agree or disagree?
+
+**Still waiting on feedback from**: Scott, Carson, Kent, Steve Schoger. Please share design feedback or +1 so we can start implementation.
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-13T01:00:07.036Z","idleReason":"available","summary":"[to luca-palmieri] Detailed CSS guidance for Step 9 clarify-as-waiting-for"}
+</teammate-message>
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-13T01:00:09.946Z","idleReason":"available","summary":"[to luca-palmieri] Step 9 design approved, no blocking items, 7 points to acknowledge"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-13T01:00:10.502Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:00:11.466Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:00 UTC -- Assistant
+
+Luca is collecting all design feedback and acknowledging each point (per the retro action item). Scott and Lea have responded. Waiting for Carson, Kent, and Steve Schoger to weigh in, and for Luca to begin implementation.
+
+---
+
+## 2026-02-13 01:00 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-13T01:00:13.756Z","idleReason":"available","summary":"[to luca-palmieri] Step 9 a11y design feedback, 2 blocking items"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-13T01:00:13.965Z","idleReason":"available","summary":"[to luca-palmieri] Agreed on deferred tracking for convert-to-next-action"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-13T01:00:15.875Z","idleReason":"available","summary":"[to luca-palmieri] CONSENSUS: APPROVED for Step 9 design"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-13T01:00:15.939Z","idleReason":"available","summary":"[to luca-palmieri] +1 defer convert-to-next-action, keep Step 9 scope tight"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-13T01:00:16.403Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:00 UTC -- Assistant
+
+Most reviewers have responded. Heydon has 2 blocking a11y items for the design. Steve Schoger approved. Team agrees to defer convert-to-next-action. Waiting for Carson and Kent, and for Luca to acknowledge Heydon's blockers before coding.
+
+---
+
+## 2026-02-13 01:00 UTC -- User
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T01:00:19.147Z","idleReason":"available","summary":"[to luca-palmieri] Approved design, confirming route endpoint question was received"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:00 UTC -- Assistant
+
+Carson approved. Just waiting on Kent's feedback, then Luca should acknowledge all blocking items (especially Heydon's 2) and begin implementation.
+
+---
+
+## 2026-02-13 01:00 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-13T01:00:20.871Z","idleReason":"available","summary":"[to luca-palmieri] Design already sent, no blockers, defer convert-to-NA agreed"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:00 UTC -- Assistant
+
+Scott confirmed no blockers and agrees on the deferral. Just Kent's feedback remaining, then Luca can begin.
+
+---
+
+## 2026-02-13 01:00 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T01:00:25.275Z","idleReason":"available","summary":"[to luca-palmieri] Step 9 design feedback: extend existing clarify form, TDD sequence"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:00 UTC -- Assistant
+
+All 8 reviewers have responded to the Step 9 design. Luca has the full picture — Heydon's 2 blocking a11y items to incorporate, plus design guidance from everyone else. He should acknowledge the blockers and start implementation now.
+
+---
+
+## 2026-02-13 01:00 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T01:00:34.189Z","idleReason":"available","summary":"[to luca-palmieri] Design feedback confirmed, no blockers, ready"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:00 UTC -- Assistant
+
+All feedback in, no design blockers from Kent. Luca should be starting implementation now after acknowledging Heydon's 2 blocking items.
 
 ---
