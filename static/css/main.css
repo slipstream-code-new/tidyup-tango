@@ -2389,6 +2389,196 @@
     text-align: center;
     padding-block: var(--space-xl);
   }
+
+  /* ------------------------------------------------------------------
+     Someday/Maybe List
+     ------------------------------------------------------------------ */
+
+  .someday-maybe {
+    padding-block-start: var(--space-lg);
+  }
+
+  .someday-maybe h1 {
+    margin-block-end: var(--space-lg);
+  }
+
+  .someday-maybe__error {
+    background-color: var(--color-danger-light);
+    color: var(--color-danger);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    margin-block-end: var(--space-md);
+  }
+
+  /* Add someday/maybe form */
+  .someday-maybe__add {
+    margin-block-end: var(--space-lg);
+  }
+
+  .someday-maybe__add-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .someday-maybe__add-row {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .someday-maybe__add-input {
+    flex: 1;
+    min-inline-size: 8rem;
+  }
+
+  .someday-maybe__add-submit {
+    flex-shrink: 0;
+  }
+
+  /* Someday/maybe item list */
+  .someday-maybe__list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .someday-maybe-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding-block: var(--space-sm);
+    padding-inline: var(--space-sm);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .someday-maybe-item:first-child {
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .someday-maybe-item__content {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .someday-maybe-item__title {
+    overflow-wrap: break-word;
+  }
+
+  .someday-maybe-item__date {
+    flex-shrink: 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-fg-subtle);
+  }
+
+  .someday-maybe-item__edit {
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .someday-maybe-item__edit:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .someday-maybe-item__activate {
+    flex-shrink: 0;
+  }
+
+  .someday-maybe-item__activate-button {
+    background: none;
+    border: none;
+    padding: var(--space-xs);
+    cursor: pointer;
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+  }
+
+  .someday-maybe-item__activate-button:hover {
+    background: none;
+    color: var(--color-primary);
+  }
+
+  .someday-maybe-item__delete {
+    flex-shrink: 0;
+  }
+
+  .someday-maybe-item__delete-button {
+    background: none;
+    border: none;
+    padding: var(--space-xs);
+    cursor: pointer;
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+  }
+
+  .someday-maybe-item__delete-button:hover {
+    background: none;
+    color: var(--color-danger);
+  }
+
+  /* Someday/maybe edit form */
+  .someday-maybe-item__edit-form {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+    min-inline-size: 0;
+  }
+
+  .someday-maybe-item__edit-fields {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .someday-maybe-item__edit-input {
+    inline-size: 100%;
+    font-size: var(--font-size-base);
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .someday-maybe-item__edit-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex-shrink: 0;
+  }
+
+  .someday-maybe-item__edit-save {
+    font-size: var(--font-size-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    flex-shrink: 0;
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .someday-maybe-item__edit-cancel {
+    font-size: var(--font-size-xs);
+    color: var(--color-fg-muted);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .someday-maybe-item__edit-cancel:hover {
+    color: var(--color-fg);
+    text-decoration: underline;
+  }
+
+  /* Someday/maybe empty state */
+  .someday-maybe__empty-state {
+    color: var(--color-fg-muted);
+    font-size: var(--font-size-sm);
+    text-align: center;
+    padding-block: var(--space-xl);
+  }
 }
 
 /* ==========================================================================

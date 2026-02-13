@@ -1,0 +1,34 @@
+<li class="someday-maybe-item" id="someday-maybe-{{ item.id }}">
+    <div class="someday-maybe-item__content">
+        <span class="someday-maybe-item__title">{{ item.title }}</span>
+    </div>
+    <span class="someday-maybe-item__date"><time datetime="{{ item.date_added_iso }}">{{ item.date_added }}</time></span>
+    <a
+        href="/someday-maybe/{{ item.id }}/edit"
+        class="someday-maybe-item__edit"
+        aria-label="Edit: {{ item.title }}"
+        hx-get="/someday-maybe/{{ item.id }}/edit"
+        hx-target="#someday-maybe-{{ item.id }}"
+        hx-swap="outerHTML"
+    >Edit</a>
+    <form
+        method="post"
+        action="/someday-maybe/{{ item.id }}/activate"
+        class="someday-maybe-item__activate"
+        hx-post="/someday-maybe/{{ item.id }}/activate"
+        hx-target="#someday-maybe-{{ item.id }}"
+        hx-swap="outerHTML"
+    >
+        <button type="submit" class="someday-maybe-item__activate-button" aria-label="Move to Inbox: {{ item.title }}">Activate</button>
+    </form>
+    <form
+        method="post"
+        action="/someday-maybe/{{ item.id }}/delete"
+        class="someday-maybe-item__delete"
+        hx-post="/someday-maybe/{{ item.id }}/delete"
+        hx-target="#someday-maybe-{{ item.id }}"
+        hx-swap="outerHTML"
+    >
+        <button type="submit" class="someday-maybe-item__delete-button" aria-label="Delete: {{ item.title }}">Delete</button>
+    </form>
+</li>

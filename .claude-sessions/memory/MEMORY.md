@@ -31,18 +31,19 @@
 - GTD Task #11: Navigation + Dashboard skeleton (gtd_nav, dashboard, placeholder pages)
 - GTD Task #15: Inbox Capture (US-GTD-1) — inbox_items table, domain type, CRUD routes, HTMX, live badge
 - GTD Task #18: Team Retrospective — 13 process improvements adopted (9/9 consensus)
-- GTD Step 3: Contexts — CRUD, default seeding, management UI, CSS
-- GTD Step 4: Next Actions with Contexts (US-GTD-3) — 9/9 consensus
-- GTD Step 5: Clarify as Next Action + Trash (US-GTD-2a) — 9/9 consensus
-- GTD Step 6: Projects (US-GTD-4) — in review, 5 blocking items being fixed
+- GTD Step 3: Contexts — ContextId, ContextName, CRUD, default seeding, management UI
+- GTD Step 4: Next Actions with Contexts (US-GTD-3) — NextAction domain, CRUD, context filtering
+- GTD Step 5: Clarify as Next Action (US-GTD-2a) — inbox → next action with DB transaction
+- GTD Step 6: Projects (US-GTD-4) — Project domain (Active/Completed/Dropped), CRUD, stalled detection
+- GTD Step 7: Clarify as Project — unified clarify form with radio buttons, CSS :has() disclosure
+- GTD Step 8: Waiting For (US-GTD-5) — WaitingForItem (Active/Resolved), WaitingOn newtype, CRUD, dashboard
+- GTD Step 9: Clarify as Waiting For — inbox → waiting for with waiting_on field, :has() disclosure
+- Current state: 312 Rust tests (85 unit + 227 integration) + 11 Playwright e2e tests, all green
 
 ## Next Implementation Steps (from docs/gtd-product-discovery.md)
-- Step 7: Clarify as Project
-- Step 8: Waiting For
-- Step 9: Clarify as Waiting For
-- Step 10: Someday/Maybe
+- Step 10: Someday/Maybe (US-GTD-6)
 - Step 11: Clarify as Someday/Maybe
-- Step 12: Weekly Review
+- Step 12: Weekly Review (US-GTD-7)
 - Step 13: Data Migration + Cleanup
 
 ## Key Process Rules (from Task #18 retro)

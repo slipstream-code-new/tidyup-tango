@@ -13,6 +13,7 @@ mod login;
 mod next_actions;
 mod projects;
 mod register;
+mod someday_maybe;
 mod todos;
 mod waiting_for;
 
@@ -37,7 +38,7 @@ pub use contexts::{
 };
 pub use dashboard::get_dashboard;
 pub use forgot_password::get_forgot_password;
-pub use gtd_placeholders::{get_review, get_someday_maybe};
+pub use gtd_placeholders::get_review;
 pub use health_check::health_check;
 pub use inbox::{get_inbox, post_clarify_inbox_item, post_delete_inbox_item, post_inbox};
 pub use index::index;
@@ -51,6 +52,10 @@ pub use projects::{
     post_delete_project, post_edit_project, post_project, post_project_next_action,
 };
 pub use register::{get_register, post_register};
+pub use someday_maybe::{
+    get_edit_someday_maybe, get_someday_maybe, get_someday_maybe_item, post_activate_someday_maybe,
+    post_delete_someday_maybe, post_edit_someday_maybe, post_someday_maybe,
+};
 pub use todos::{
     get_edit_todo, get_todo_item, get_todos_page, post_delete_todo, post_edit_todo, post_todo,
     post_toggle_todo,

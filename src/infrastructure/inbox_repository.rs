@@ -21,7 +21,10 @@ impl InboxRecord {
     }
 }
 
-pub async fn insert_inbox_item(pool: &PgPool, item: &InboxItem) -> Result<(), sqlx::Error> {
+pub async fn insert_inbox_item(
+    executor: impl PgExecutor<'_>,
+    item: &InboxItem,
+) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"INSERT INTO inbox_items (id, user_id, title, created_at)
            VALUES ($1, $2, $3, $4 :: timestamptz)"#,
@@ -30,7 +33,7 @@ pub async fn insert_inbox_item(pool: &PgPool, item: &InboxItem) -> Result<(), sq
         item.title().as_str(),
         item.created_at() as &DateTime<Utc>,
     )
-    .execute(pool)
+    .execute(executor)
     .await?;
     Ok(())
 }

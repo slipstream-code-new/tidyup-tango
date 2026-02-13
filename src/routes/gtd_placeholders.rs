@@ -58,21 +58,6 @@ async fn render_placeholder(
     Ok(Html(template.render()?))
 }
 
-pub async fn get_someday_maybe(
-    AuthenticatedUser(user_id): AuthenticatedUser,
-    State(pool): State<PgPool>,
-) -> Result<impl IntoResponse, GtdPlaceholderError> {
-    render_placeholder(
-        &user_id,
-        &pool,
-        "someday_maybe",
-        "Someday/Maybe -- Todo List",
-        "Someday/Maybe",
-        "Ideas and possibilities for the future.",
-    )
-    .await
-}
-
 pub async fn get_review(
     AuthenticatedUser(user_id): AuthenticatedUser,
     State(pool): State<PgPool>,

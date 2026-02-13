@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Session ID** | `2e8aac70-7083-46be-b97a-0325443201fe` |
-| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-13 01:27 UTC |
+| **Date Range** | 2026-02-12 21:30 UTC -- 2026-02-13 01:47 UTC |
 | **Git Branch** | `main` |
 
 ---
@@ -10956,5 +10956,982 @@ Good progress — Steps 7, 8, and 9 all completed this session. Luca will update
 - Read: /home/jwilger/.claude/projects/-home-jwilger-projects-todo-list/memory/MEMORY.md
 
 </details>
+
+---
+
+## 2026-02-13 01:27 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- Edit: /home/jwilger/.claude/projects/-home-jwilger-projects-todo-list/memory/MEMORY.md
+
+</details>
+
+---
+
+## 2026-02-13 01:27 UTC -- Assistant
+
+Memory updated. Steps 7-9 complete, next up is Step 10 (Someday/Maybe). Waiting for Luca to update the implementation order doc and start Step 10 planning with the team.
+
+---
+
+## 2026-02-13 01:27 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:27:17.115Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:27:19.071Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:27:21.207Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:27 UTC -- Assistant
+
+Luca is working. Waiting patiently.
+
+---
+
+## 2026-02-13 01:28 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 10 design discussion: Someday/Maybe list">
+Step 9 is complete and docs updated. Moving to Step 10: **Someday/Maybe** (US-GTD-6).
+
+**User Story (US-GTD-6):**
+As a GTD practitioner, I want to park ideas and someday projects, so that they don't clutter my action lists but aren't forgotten either.
+
+**Acceptance Criteria:**
+- Someday/Maybe list shows all parked ideas
+- User can add items directly to Someday/Maybe
+- User can activate an item (moves to inbox for clarification, or directly to Next Actions)
+- User can delete items that are no longer interesting
+- List is reviewed during the weekly review
+- Works without JavaScript; HTMX enhances
+
+**From the glossary:**
+- `SomedayMaybeItem` -- parked idea with title and created_at
+- `defer()` -- InboxItem or NextAction -> SomedayMaybeItem
+- `activate()` -- SomedayMaybeItem -> InboxItem (for re-clarification)
+
+**Step 10 scope:** The Someday/Maybe list itself (CRUD). The clarify path (inbox -> someday/maybe) is Step 11.
+
+**Questions for the team:**
+1. **Domain type**: Should `SomedayMaybeItem` be a simple struct (just id, user_id, title, created_at) or an enum with states? The glossary suggests no state machine -- items are either on the list or not.
+2. **Activate action**: The AC says "moves to inbox for clarification, or directly to Next Actions." For Step 10, should we implement activate-to-inbox only (simpler), or both paths? Activate-to-next-actions would require a context, which adds complexity.
+3. **Driver rotation**: Should I (Luca) continue, or does someone else want to drive? This is a straightforward CRUD feature similar to Waiting For (Step 8).
+4. **Route**: `/someday-maybe` per the URL structure in the discovery doc.
+
+Please share your design feedback, driver preference, and any blocking concerns.
+</teammate-message>
+
+---
+
+## 2026-02-13 01:28 UTC -- Assistant
+
+Luca has moved to Step 10 planning with a clear design proposal and questions for the team. Waiting for their design feedback on the domain model, activate action scope, and driver rotation.
+
+---
+
+## 2026-02-13 01:28 UTC -- User
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-13T01:28:31.340Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 design approved — simple struct, activate to inbox only"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:28 UTC -- Assistant
+
+Marty responded — simple struct, activate to inbox only. Waiting for the rest of the team.
+
+---
+
+## 2026-02-13 01:28 UTC -- User
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-13T01:28:37.295Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 approved, activate-to-inbox only, empty state and subtitle guidance"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:28 UTC -- Assistant
+
+Steve Krug approved — activate-to-inbox only, with UX guidance. Waiting for the rest.
+
+---
+
+## 2026-02-13 01:28 UTC -- User
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-13T01:28:39.658Z","idleReason":"available","summary":"[to luca-palmieri] Visual design guidance for Someday/Maybe page"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T01:28:39.982Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 HTMX guidance: simpler than Step 8, activate-to-inbox only"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-13T01:28:40.147Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 a11y feedback, approve Luca as driver"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:28 UTC -- Assistant
+
+5 reviewers in. Waiting on Scott, Lea, and Kent.
+
+---
+
+## 2026-02-13 01:28 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T01:28:44.896Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 design feedback — simple struct, activate-to-inbox only"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:28 UTC -- Assistant
+
+6 in. Waiting on Scott and Lea.
+
+---
+
+## 2026-02-13 01:28 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-13T01:28:52.946Z","idleReason":"available","summary":"[to luca-palmieri] Design feedback: struct not enum, activate-to-inbox only, no edit"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:28 UTC -- Assistant
+
+7 in. Waiting on Lea.
+
+---
+
+## 2026-02-13 01:28 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-13T01:28:57.494Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 design feedback + proactive CSS guidance for Someday/Maybe"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:29 UTC -- Assistant
+
+All 8 reviewers have responded to the Step 10 design. Team consensus appears to be: simple struct (no state machine), activate-to-inbox only, Luca continues driving. Luca should acknowledge the feedback and begin implementation.
+
+---
+
+## 2026-02-13 01:31 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 10 Someday/Maybe design proposal for review">
+Team, I'm the Driver for Step 10: Someday/Maybe (US-GTD-6). I've reviewed the codebase, user story, and glossary thoroughly. Here is my design proposal for consensus:
+
+## Step 10: Someday/Maybe List -- Design Proposal
+
+### Domain Type: `SomedayMaybeItem`
+- Simple struct (not an enum). No state machine needed -- a parked idea is just a title + created_at. There's no "completed" or "resolved" state. When you activate it, it moves to inbox (becomes an InboxItem). When you're done with it, you delete it.
+- Fields: `id: SomedayMaybeId`, `user_id: UserId`, `title: TodoTitle`, `created_at: DateTime<Utc>`
+- `SomedayMaybeId(Uuid)` newtype
+
+### Database
+- New migration: `20240101000009_create_someday_maybe_items_table.sql`
+- Table: `someday_maybe_items` (id, user_id, title, created_at)
+- FK to users table
+
+### Repository: `someday_maybe_repository.rs`
+- `insert_someday_maybe_item(executor, &item)` -- PgExecutor for transaction support
+- `find_someday_maybe_items_by_user(pool, user_id)` -- all items, ordered by created_at ASC
+- `find_someday_maybe_item_by_id(pool, item_id)` -- single item
+- `delete_someday_maybe_item(pool, item_id)` -- permanent removal
+- `count_someday_maybe_items(pool, user_id)` -- for future nav badge
+- `update_someday_maybe_title(pool, item_id, title)` -- for edit
+
+### Service: `someday_maybe_service.rs`
+- `add_someday_maybe_item(pool, user_id, title)` -> `AddSomedayMaybeError`
+- `list_someday_maybe_items(pool, user_id)` -> `Vec<SomedayMaybeItem>`
+- `delete_someday_maybe_item(pool, item_id, user_id)` -> `DeleteSomedayMaybeError`
+- `update_someday_maybe_title(pool, item_id, user_id, title)` -> `UpdateSomedayMaybeError`
+- `activate_someday_maybe_item(pool, item_id, user_id)` -> `ActivateSomedayMaybeError`
+  - This moves the item to inbox: begins TX, finds item, checks ownership, creates InboxItem with same title, deletes someday/maybe item, commits
+
+### Routes: Replace `get_someday_maybe` placeholder in `gtd_placeholders.rs`
+- New file: `routes/someday_maybe.rs`
+- `GET /someday-maybe` -- list page
+- `POST /someday-maybe` -- add new item
+- `POST /someday-maybe/{id}/delete` -- delete item
+- `GET /someday-maybe/{id}/edit` -- inline edit form (HTMX)
+- `POST /someday-maybe/{id}/edit` -- submit edit
+- `POST /someday-maybe/{id}/activate` -- move to inbox
+- `GET /someday-maybe/{id}` -- single item (HTMX swap target)
+
+### Templates
+- `someday_maybe.html` -- full list page (mirrors waiting_for.html pattern)
+- `someday_maybe_item.html` -- single item (with Edit, Activate, Delete actions)
+- `someday_maybe_edit.html` -- inline edit form
+
+### UI Pattern
+- Same pattern as Waiting For: heading, add form, item list
+- Each item shows: title, date added
+- Actions: Edit (inline), Activate (moves to inbox), Delete
+- "Activate" button is the primary action (equivalent to "Received" on WF)
+- HTMX: hx-post for add appends to list, hx-post for delete/activate swaps outerHTML to empty
+
+### CSS
+- BEM classes: `.someday-maybe`, `.someday-maybe__add`, `.someday-maybe-item`, etc.
+- Mirror the waiting-for component structure and token usage
+- Simpler than WF since no "person" field, just title
+
+### Activate Flow
+- "Activate" creates a new InboxItem with the same title and deletes the SomedayMaybeItem
+- User-facing announce: "Moved to Inbox"
+- This follows the cross-aggregate service pattern from clarify_as_*
+
+### Error Copy
+- Empty title on add: silently ignored (consistent with other add forms)
+- Empty title on edit: "Title cannot be empty"
+- Too long title: "That title is too long (max 300 characters)"
+
+### Glossary Updates
+- Add `SomedayMaybeItem`, `SomedayMaybeId`, activate action, error types
+- Mark as Implemented
+
+### Not In Scope (Step 11 handles this)
+- Clarify as Someday/Maybe (inbox -> someday/maybe) is Step 11, not Step 10
+
+Please review and provide feedback. I'll start implementation once we have consensus on the design.
+</teammate-message>
+
+---
+
+## 2026-02-13 01:31 UTC -- Assistant
+
+Luca has shared a comprehensive design proposal for Step 10. Waiting for the team to review and approve before he starts coding.
+
+---
+
+## 2026-02-13 01:31 UTC -- User
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T01:31:35.568Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 design approved, minor note on button label"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-13T01:31:37.336Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 design approved — all AC covered, appropriately simple"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-13T01:31:38.468Z","idleReason":"available","summary":"[to luca-palmieri] CONSENSUS: APPROVED for Step 10 design"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-13T01:31:39.026Z","idleReason":"available","summary":"[to luca-palmieri] APPROVED design, 1 blocking: button label"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:31 UTC -- Assistant
+
+Approvals coming in fast. Heydon has 1 blocking item (button label). Waiting for Scott, Lea, Kent, and Steve Krug.
+
+---
+
+## 2026-02-13 01:31 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-13T01:31:41.145Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 design approved, minor notes on date and empty state"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-13T01:31:41.956Z","idleReason":"available","summary":"[to luca-palmieri] Design approved, confirming empty state and subtitle guidance"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:31 UTC -- Assistant
+
+6 in. Waiting on Scott and Kent.
+
+---
+
+## 2026-02-13 01:31 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-13T01:31:46.913Z","idleReason":"available","summary":"[to luca-palmieri] CONSENSUS: APPROVED, all feedback incorporated, no blockers"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:31 UTC -- Assistant
+
+7 in. Just Kent remaining.
+
+---
+
+## 2026-02-13 01:31 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T01:31:56.569Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 design APPROVED, minor naming suggestion"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:32 UTC -- Assistant
+
+All 8 reviewers approved the Step 10 design. Heydon had 1 blocking item (button label). Luca should acknowledge that and begin implementation.
+
+---
+
+## 2026-02-13 01:37 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 10 implementation ready for team review">
+Team, Step 10 (Someday/Maybe, US-GTD-6) is committed locally (e4c7b73). Ready for review.
+
+## Implementation Summary
+
+### Domain: `SomedayMaybeItem` (struct, not enum)
+- Simple struct with `id: SomedayMaybeId`, `user_id: UserId`, `title: TodoTitle`, `created_at: DateTime<Utc>`
+- No state machine — items are created, edited, activated (moved to inbox), or deleted
+- `SomedayMaybeId(Uuid)` newtype with the standard `new()`, `from_uuid()`, `as_uuid()` pattern
+- 4 unit tests covering ID uniqueness, field access, from_parts reconstruction
+
+### Database: `someday_maybe_items` table
+- Migration `20240101000009`: `id`, `user_id` (FK to users), `title`, `created_at`
+- Index on `user_id`
+
+### Repository: `someday_maybe_repository.rs`
+- `insert_someday_maybe_item(executor, &item)` — `impl PgExecutor` for transaction support
+- `find_someday_maybe_items_by_user`, `find_someday_maybe_item_by_id`, `delete_someday_maybe_item`, `count_someday_maybe_items`, `update_someday_maybe_title`
+- Also generalized `inbox_repository::insert_inbox_item` from `&PgPool` to `impl PgExecutor<'_>` (needed for the activate transaction)
+
+### Service: `someday_maybe_service.rs`
+- `add_someday_maybe_item` — validates title, persists
+- `list_someday_maybe_items` — all items for user, ordered by created_at ASC
+- `delete_someday_maybe_item` — ownership check, permanent removal
+- `update_someday_maybe_title` — ownership check, title validation, persist
+- `activate_someday_maybe_item` — transaction: creates InboxItem with same title, deletes SomedayMaybeItem
+
+### Routes: `routes/someday_maybe.rs` (replaces placeholder)
+- `GET /someday-maybe` — list page with add form, items, empty state
+- `POST /someday-maybe` — add item (redirect / HTMX fragment)
+- `POST /someday-maybe/{id}/activate` — move to inbox (redirect / HTMX empty body + announce "Moved to Inbox")
+- `POST /someday-maybe/{id}/delete` — delete item (redirect / HTMX empty body)
+- `GET /someday-maybe/{id}/edit` — inline edit form (HTMX)
+- `POST /someday-maybe/{id}/edit` — submit edit (redirect / HTMX fragment)
+- `GET /someday-maybe/{id}` — single item fragment (for cancel edit)
+
+### Templates
+- `someday_maybe.html` — list page with add form, empty state, item loop
+- `someday_maybe_item.html` — item with Edit link, Activate button, Delete button
+- `someday_maybe_edit.html` — inline edit form with Save button and Cancel link
+- All actions have unique accessible `aria-label` including item title
+
+### CSS: BEM `.someday-maybe*` classes in components layer
+- Mirrors the waiting-for pattern with simpler structure (no "person" field)
+- Uses design tokens throughout (no hardcoded values)
+
+### Tests: 25 new integration tests
+- Page loading (4): 200 status, heading, empty state, current page nav
+- Add (3): redirect, empty title silently ignored, too-long title 422
+- HTMX add (2): fragment + announce, empty title 204
+- Activate (3): moves to inbox + redirect, HTMX empty body + announce, nonexistent 404
+- Delete (3): redirect, HTMX empty body + announce, nonexistent 404
+- Edit (2): redirect, HTMX fragment + announce
+- A11y (3): accessible activate, delete, edit labels
+- Semantic list (1): `<ul>` with `role="list"`
+- User isolation (1): users cannot see each other's items
+- Form label (1): visible label "Park an idea"
+- HTMX edit form (1): inline form with Save/Cancel
+- Single item (1): fragment for cancel edit
+
+### Glossary: Updated with
+- `SomedayMaybeItem`, `SomedayMaybeId` types (marked Implemented)
+- 4 new actions: add, delete, edit, activate (all marked Implemented)
+- 7 error types in Domain Errors table
+- 3 error copy entries
+
+### Pipeline: 252 Rust tests (89 unit + 163 integration) + 11 Playwright e2e, all green
+
+Please review and provide your CONSENSUS: APPROVED or blocking feedback.
+</teammate-message>
+
+---
+
+## 2026-02-13 01:37 UTC -- Assistant
+
+Step 10 implementation is complete — 252 Rust tests + 11 Playwright all green. Luca has requested review. Waiting for the team's feedback.
+
+---
+
+## 2026-02-13 01:39 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 10 committed, awaiting 9/9 consensus">
+Step 10 (Someday/Maybe, US-GTD-6) implementation is committed locally and ready for team review.
+
+Key details:
+- Commit: e4c7b73
+- 25 new integration tests, all 252 Rust tests + 11 Playwright e2e green
+- Full feature: domain type, migration, repository, service, routes, templates, CSS, glossary
+- Design decision: SomedayMaybeItem is a simple struct (no state machine), which is the simplest approach for a "parked idea" concept
+- Activate action moves item to inbox via transaction (same cross-aggregate pattern as clarify_as_*)
+- Also generalized inbox_repository::insert_inbox_item to accept impl PgExecutor for transaction support
+
+Waiting for 9/9 consensus before pushing.
+</teammate-message>
+
+---
+
+## 2026-02-13 01:39 UTC -- Assistant
+
+Luca is waiting for reviews. The team should be reading the code now.
+
+---
+
+## 2026-02-13 01:39 UTC -- User
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-13T01:39:21.215Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 approved — all US-GTD-6 criteria met"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:39 UTC -- Assistant
+
+Marty approved. Waiting for the rest.
+
+---
+
+## 2026-02-13 01:39 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-13T01:39:24.662Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:39:44.288Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-13T01:39:47.817Z","idleReason":"available","summary":"[to luca-palmieri] Approved — good UX, flagged missing focus management JS for team discussion"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:40 UTC -- Assistant
+
+Steve Krug approved but flagged missing focus management JS. Waiting for more reviews.
+
+---
+
+## 2026-02-13 01:40 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-13T01:39:49.694Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:40:03.955Z","idleReason":"available","summary":"[to kent-beck] Please review Step 10, not Step 9"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:40 UTC -- Assistant
+
+Reviews coming in. Waiting for more feedback from the team.
+
+---
+
+## 2026-02-13 01:40 UTC -- User
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-13T01:40:11.706Z","idleReason":"available","summary":"[to luca-palmieri] CONSENSUS: APPROVED for Step 10 implementation"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:40 UTC -- Assistant
+
+Steve Schoger approved. Waiting for Scott, Carson, Lea, Kent, Heydon.
+
+---
+
+## 2026-02-13 01:40 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:40:22.717Z","idleReason":"available","summary":"[to steve-krug] Please review Step 10 UX, not Step 8-9 profiles"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:40 UTC -- Assistant
+
+Luca is redirecting reviewers to the correct step. Waiting for remaining reviews.
+
+---
+
+## 2026-02-13 01:40 UTC -- User
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-13T01:40:24.736Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:40 UTC -- Assistant
+
+Waiting for Scott, Carson, Lea, Kent, and Heydon's reviews.
+
+---
+
+## 2026-02-13 01:40 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-13T01:40:36.857Z","idleReason":"available","summary":"[to luca-palmieri] 2 BLOCKING: button label + missing focus JS"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:40 UTC -- Assistant
+
+Heydon has 2 blocking items: button label and missing focus management JS (which Steve Krug also flagged). Luca needs to address these. Waiting for Scott, Carson, Lea, Kent.
+
+---
+
+## 2026-02-13 01:40 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:40:41.270Z","idleReason":"available","summary":"[to marty-cagan] Please review Step 10 product scope, not profiles"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:40 UTC -- Assistant
+
+Luca is redirecting reviewers. Waiting for remaining reviews and for Luca to address Heydon's 2 blocking items.
+
+---
+
+## 2026-02-13 01:40 UTC -- User
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T01:40:45.410Z","idleReason":"available","summary":"[to luca-palmieri] BLOCKING: missing focus management JS; everything else approved"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:40 UTC -- Assistant
+
+Carson also blocking on missing focus management JS. That's now 3 reviewers flagging it (Steve Krug, Heydon, Carson). Luca needs to add `someday-maybe-focus.js`. Waiting for Scott, Lea, Kent.
+
+---
+
+## 2026-02-13 01:40 UTC -- User
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-13T01:40:50.736Z","idleReason":"available","summary":"[to luca-palmieri] Re-confirmed approval with direct answers to all 4 questions"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:40 UTC -- Assistant
+
+Marty re-confirmed. Waiting on Scott, Lea, Kent, and for Luca to fix the focus management JS and button label blockers.
+
+---
+
+## 2026-02-13 01:40 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T01:40:57.219Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 APPROVED pending Minor: find should use transaction"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:41 UTC -- Assistant
+
+Kent approved with a minor. Still waiting on Scott and Lea, plus Luca needs to fix the blocking items (focus JS, button label).
+
+---
+
+## 2026-02-13 01:41 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:41:00.606Z","idleReason":"available","summary":"[to kent-beck] Need Step 10 review, not profile updates"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:41 UTC -- Assistant
+
+Waiting on Scott and Lea's reviews, and for Luca to fix the blocking items.
+
+---
+
+## 2026-02-13 01:41 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T01:41:14.202Z","idleReason":"available","summary":"[to luca-palmieri] Clarification: previous review WAS Step 10, found 1 Minor"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:41 UTC -- Assistant
+
+Kent clarified his review was for Step 10. Waiting on Scott and Lea, then Luca can fix the blocking items (focus JS from Heydon/Carson, button label from Heydon).
+
+---
+
+## 2026-02-13 01:41 UTC -- User
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T01:41:25.897Z","idleReason":"available","summary":"[to luca-palmieri] Reiterated blocking issue: missing focus management JS"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:41 UTC -- Assistant
+
+Carson reiterated the focus JS blocker. Still waiting on Scott and Lea's reviews.
+
+---
+
+## 2026-02-13 01:41 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T01:41:36.277Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 APPROVED, 1 Minor: find should use &mut *tx not pool"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:41 UTC -- Assistant
+
+Kent re-confirmed approval. Waiting on Scott and Lea, then Luca can fix the blocking items.
+
+---
+
+## 2026-02-13 01:43 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 10 review request for Someday/Maybe feature">
+REVIEW REQUEST: Step 10 (Someday/Maybe, US-GTD-6), commit e4c7b73
+
+This is a NEW session continuation. The previous session ran out of context. Please review the Step 10 implementation — NOT Step 8 or Step 9 (those are already done and committed).
+
+## What Step 10 Implements
+
+US-GTD-6: "As a GTD practitioner, I want a Someday/Maybe list where I can park ideas I'm not committed to acting on now, so they don't clutter my active lists but aren't forgotten."
+
+Acceptance criteria:
+- Someday/Maybe list page showing all parked ideas (title only)
+- Add new item with title
+- Edit item title inline
+- Delete item
+- "Activate" button moves item back to Inbox for re-clarification
+- User isolation (users only see their own items)
+
+## Files to Review
+
+**Domain**: `src/domain/someday_maybe_item.rs` — SomedayMaybeId newtype + SomedayMaybeItem struct (no state machine — simple struct since parked ideas have no state transitions)
+
+**Migration**: `migrations/20240101000009_create_someday_maybe_items_table.sql`
+
+**Repository**: `src/infrastructure/someday_maybe_repository.rs` — CRUD with `impl PgExecutor` for transaction support
+
+**Service**: `src/services/someday_maybe_service.rs` — add, list, delete, update_title, activate (transaction: create InboxItem + delete SomedayMaybeItem)
+
+**Routes**: `src/routes/someday_maybe.rs` — full route handlers with HTMX fragment responses
+
+**Templates**: `templates/someday_maybe.html`, `templates/someday_maybe_item.html`, `templates/someday_maybe_edit.html`
+
+**CSS**: `static/css/main.css` — BEM styles for `.someday-maybe*` components (mirroring waiting-for pattern)
+
+**Tests**: `tests/api/someday_maybe.rs` — 25 integration tests
+
+**Glossary**: `docs/glossary.md` — SomedayMaybeItem types, actions, errors, error copy, lifecycle diagram
+
+**Infrastructure change**: `src/infrastructure/inbox_repository.rs` — generalized `insert_inbox_item` from `&PgPool` to `impl PgExecutor<'_>` for transaction support in activate flow
+
+## Pipeline Results
+- cargo fmt: clean
+- cargo clippy -- -D warnings: clean
+- cargo test: 252 passed (227 existing + 25 new)
+- npx playwright test: 11 passed
+- cargo sqlx prepare: regenerated
+
+Please review from your area of expertise and respond with CONSENSUS: APPROVED or blocking feedback. We need 9/9 consensus to push.
+</teammate-message>
+
+---
+
+## 2026-02-13 01:43 UTC -- Assistant
+
+Luca re-sent a detailed review request to make sure everyone is reviewing Step 10 specifically. He still needs to address the blocking items (focus JS, button label). Waiting on Scott and Lea's reviews.
+
+---
+
+## 2026-02-13 01:43 UTC -- User
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-13T01:43:16.666Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:43:17.319Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-13T01:43:17.463Z","idleReason":"available","summary":"[to luca-palmieri] Third approval for Step 10 — count me as yes"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-13T01:43:21.387Z","idleReason":"available","summary":"[to luca-palmieri] CONSENSUS: APPROVED, already reviewed Step 10"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:43 UTC -- Assistant
+
+Marty and Steve Schoger re-confirmed. Still need Scott and Lea's reviews, plus Luca needs to fix the blocking items from Heydon (button label + focus JS) and Carson (focus JS).
+
+---
+
+## 2026-02-13 01:43 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:43:25.493Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:43 UTC -- Assistant
+
+Waiting on Scott, Lea, and for Luca to fix the blocking items.
+
+---
+
+## 2026-02-13 01:43 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:43:32.271Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:43 UTC -- Assistant
+
+Luca seems to be idle cycling. Let me check if he's aware of the blocking items.
+
+---
+
+## 2026-02-13 01:43 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-13 01:43 UTC -- Assistant
+
+Nudged Luca about the blocking items. Waiting for him to fix them.
+
+---
+
+## 2026-02-13 01:43 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T01:43:37.600Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 APPROVED, 1 Minor: activate find should use transaction"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:43:39.359Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T01:43:40.148Z","idleReason":"available","summary":"[to luca-palmieri] BLOCKING: focus JS still missing, third time flagging this"}
+</teammate-message>
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-13T01:43:42.308Z","idleReason":"available","summary":"[to luca-palmieri] 2 BLOCKING still unfixed: button label + focus JS"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:43 UTC -- Assistant
+
+Carson and Heydon are re-flagging their blocking items. Luca needs to fix these before more reviews. Waiting for him to act on the fixes.
+
+---
+
+## 2026-02-13 01:43 UTC -- User
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-13T01:43:47.084Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 APPROVED -- clean CSS/frontend implementation"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:43:48.664Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:43 UTC -- Assistant
+
+Lea approved. Now just Scott remaining for reviews, plus the blocking fixes from Heydon and Carson. Luca should be working on those fixes now.
+
+---
+
+## 2026-02-13 01:43 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-13T01:43:52.224Z","idleReason":"available","summary":"[to luca-palmieri] BLOCKING: transaction bug in activate (find uses pool not tx)"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:44 UTC -- Assistant
+
+Scott has a blocking item too — transaction bug in activate (find uses pool instead of tx). So the current blocking items are:
+
+- **Heydon**: button label + focus management JS
+- **Carson**: focus management JS
+- **Scott**: transaction bug in activate (find uses pool not tx)
+
+Luca needs to fix all of these before consensus can be reached.
+
+---
+
+## 2026-02-13 01:47 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue" summary="Step 10 fixes: focus JS + button label, re-review needed">
+UPDATED: Step 10 commit amended to 2617a6d with two blocking fixes:
+
+1. **Focus management JS** (`static/js/someday-maybe-focus.js`): Added focus management script following the established pattern from `waiting-for-focus.js`. Handles:
+   - Focus moves to next/prev sibling item after activate or delete
+   - Focus moves to "Park an idea" input when list becomes empty
+   - Focus moves to edit input when entering inline edit mode
+   - Focus returns to Edit link after save/cancel
+   - Empty state shows/hides dynamically (WCAG 2.4.3 compliance)
+
+2. **Improved "Activate" button accessible label**: Changed `aria-label="Activate: {{ item.title }}"` to `aria-label="Move to Inbox: {{ item.title }}"` for clarity. The visible text stays "Activate" but the screen reader label now describes the actual outcome.
+
+Also added `{% block scripts %}` to `templates/someday_maybe.html` to load the focus script.
+
+Pipeline re-verified: fmt clean, clippy clean, 252 tests pass, 11 Playwright pass.
+
+Please review and respond with CONSENSUS: APPROVED or blocking feedback.
+</teammate-message>
+
+---
+
+## 2026-02-13 01:47 UTC -- Assistant
+
+Luca fixed the focus JS and button label. But I notice he didn't mention fixing Scott's blocking item (transaction bug in activate — find uses pool instead of tx). Let me check.
+
+---
+
+## 2026-02-13 01:47 UTC -- Assistant
+
+<details>
+<summary>Tool usage (1 call)</summary>
+
+- SendMessage
+
+</details>
+
+---
+
+## 2026-02-13 01:47 UTC -- User
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:47:04.679Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="marty-cagan" color="blue">
+{"type":"idle_notification","from":"marty-cagan","timestamp":"2026-02-13T01:47:10.317Z","idleReason":"available","summary":"[to luca-palmieri] Approved fixes — focus JS and improved aria-label"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-schoger" color="pink">
+{"type":"idle_notification","from":"steve-schoger","timestamp":"2026-02-13T01:47:13.797Z","idleReason":"available","summary":"[to luca-palmieri] CONSENSUS: APPROVED, fixes are non-visual"}
+</teammate-message>
+
+<teammate-message teammate_id="luca-palmieri" color="blue">
+{"type":"idle_notification","from":"luca-palmieri","timestamp":"2026-02-13T01:47:14.095Z","idleReason":"available"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:47 UTC -- Assistant
+
+Marty and Steve Schoger re-approved after fixes. Still waiting to confirm Scott's transaction bug was fixed, and for Heydon, Carson, Scott to re-review.
+
+---
+
+## 2026-02-13 01:47 UTC -- User
+
+<teammate-message teammate_id="scott-wlaschin" color="yellow">
+{"type":"idle_notification","from":"scott-wlaschin","timestamp":"2026-02-13T01:47:21.328Z","idleReason":"available","summary":"[to luca-palmieri] BLOCKING: transaction bug still unfixed at line 169"}
+</teammate-message>
+
+<teammate-message teammate_id="carson-gross" color="purple">
+{"type":"idle_notification","from":"carson-gross","timestamp":"2026-02-13T01:47:22.124Z","idleReason":"available","summary":"[to luca-palmieri] APPROVED: both blocking fixes verified"}
+</teammate-message>
+
+<teammate-message teammate_id="lea-verou" color="orange">
+{"type":"idle_notification","from":"lea-verou","timestamp":"2026-02-13T01:47:23.936Z","idleReason":"available","summary":"[to luca-palmieri] Step 10 updated commit APPROVED -- both fixes verified"}
+</teammate-message>
+
+<teammate-message teammate_id="steve-krug" color="cyan">
+{"type":"idle_notification","from":"steve-krug","timestamp":"2026-02-13T01:47:24.055Z","idleReason":"available","summary":"[to luca-palmieri] Both fixes verified, Step 10 fully approved"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:47 UTC -- Assistant
+
+Scott still blocking — the transaction bug at line 169 is unfixed. Carson, Lea, and Steve Krug approved the focus JS/button fixes. Luca needs to fix the transaction bug (find uses pool instead of tx in activate).
+
+---
+
+## 2026-02-13 01:47 UTC -- User
+
+<teammate-message teammate_id="heydon-pickering" color="red">
+{"type":"idle_notification","from":"heydon-pickering","timestamp":"2026-02-13T01:47:32.506Z","idleReason":"available","summary":"[to luca-palmieri] APPROVED — both fixes verified, minor note on visible text"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:47 UTC -- Assistant
+
+Heydon approved. Current status:
+
+- **Approved (8)**: Marty, Steve Schoger, Carson, Lea, Steve Krug, Heydon, Kent, Luca
+- **Blocking (1)**: Scott — transaction bug at line 169 still unfixed
+
+Luca needs to fix this one remaining blocker.
+
+---
+
+## 2026-02-13 01:47 UTC -- User
+
+<teammate-message teammate_id="kent-beck" color="green">
+{"type":"idle_notification","from":"kent-beck","timestamp":"2026-02-13T01:47:34.256Z","idleReason":"available","summary":"[to luca-palmieri] APPROVED: focus JS + aria-label fixes look good"}
+</teammate-message>
+
+---
+
+## 2026-02-13 01:47 UTC -- Assistant
+
+8 approved, 1 blocking (Scott — transaction bug). Luca needs to fix that last item.
 
 ---

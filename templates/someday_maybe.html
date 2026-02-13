@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Someday/Maybe -- Todo List{% endblock %}
+
+{% block nav %}
+{% include "gtd_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="someday-maybe">
+    <h1>Someday/Maybe</h1>
+
+    {% if let Some(error) = error_message %}
+    <div class="someday-maybe__error" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <form
+        method="post"
+        action="/someday-maybe"
+        class="someday-maybe__add"
+        hx-post="/someday-maybe"
+        hx-target="#someday-maybe-list"
+        hx-swap="beforeend"
+        hx-on::after-request="if(event.detail.successful) { this.querySelector('#someday-maybe-title').value = ''; this.querySelector('#someday-maybe-title').focus(); }"
+    >
+        <div class="someday-maybe__add-fields">
+            <label for="someday-maybe-title">Park an idea</label>
+            <div class="someday-maybe__add-row">
+                <input
+                    type="text"
+                    id="someday-maybe-title"
+                    name="title"
+                    placeholder="e.g., Learn Esperanto"
+                    maxlength="300"
+                    autocomplete="off"
+                    class="someday-maybe__add-input"
+                >
+                <button type="submit" class="someday-maybe__add-submit">Add</button>
+            </div>
+        </div>
+    </form>
+
+    {% if items.is_empty() %}
+    <div class="someday-maybe__empty-state" id="someday-maybe-empty-state">
+        <p>No ideas parked yet. Capture anything you might want to do someday -- no commitment required.</p>
+    </div>
+    {% endif %}
+    <ul class="someday-maybe__list" role="list" id="someday-maybe-list"{% if items.is_empty() %} hidden{% endif %}>
+        {% for item in items %}
+        {% include "someday_maybe_item.html" %}
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/someday-maybe-focus.js"></script>
+{% endblock %}

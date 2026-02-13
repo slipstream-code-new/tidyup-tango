@@ -94,6 +94,14 @@ Maintained by the mob. Changes reviewed by the domain architect (Scott Wlaschin)
 | Not authorized (edit waiting-for) | `UpdateWaitingForError::Unauthorized` | User does not own the waiting-for item |
 | Invalid title (edit waiting-for) | `UpdateWaitingForError::InvalidTitle(TodoTitleError)` | Title validation failure in update_waiting_for_item service |
 | Invalid waiting-on (edit waiting-for) | `UpdateWaitingForError::InvalidWaitingOn(WaitingOnError)` | Waiting-on validation failure in update_waiting_for_item service |
+| Invalid title (add someday/maybe) | `AddSomedayMaybeError::InvalidTitle(TodoTitleError)` | Title validation failure in add_someday_maybe_item service |
+| Someday/maybe not found (delete) | `DeleteSomedayMaybeError::NotFound` | Referenced someday/maybe item does not exist |
+| Not authorized (delete someday/maybe) | `DeleteSomedayMaybeError::Unauthorized` | User does not own the someday/maybe item |
+| Someday/maybe not found (edit) | `UpdateSomedayMaybeError::NotFound` | Referenced someday/maybe item does not exist |
+| Not authorized (edit someday/maybe) | `UpdateSomedayMaybeError::Unauthorized` | User does not own the someday/maybe item |
+| Invalid title (edit someday/maybe) | `UpdateSomedayMaybeError::InvalidTitle(TodoTitleError)` | Title validation failure in update_someday_maybe_title service |
+| Someday/maybe not found (activate) | `ActivateSomedayMaybeError::NotFound` | Referenced someday/maybe item does not exist |
+| Not authorized (activate someday/maybe) | `ActivateSomedayMaybeError::Unauthorized` | User does not own the someday/maybe item |
 
 ## Error Copy Convention
 
@@ -129,6 +137,9 @@ call `error.to_string()` on a domain error.
 | `WaitingOnError::Empty` (add) | (silently ignored -- empty submissions are not errors) |
 | `WaitingOnError::Empty` (edit) | "Who or what cannot be empty" |
 | `WaitingOnError::TooLong` | "That name is too long (max 100 characters)" |
+| `TodoTitleError::Empty` (add someday/maybe) | (silently ignored -- empty submissions are not errors) |
+| `TodoTitleError::Empty` (edit someday/maybe) | "Title cannot be empty" |
+| `TodoTitleError::TooLong` (someday/maybe) | "That title is too long (max 300 characters)" |
 
 *Copy reviewed by Steve Krug. Update this table when adding new error types.*
 
@@ -199,7 +210,8 @@ implementation.*
 | Waiting For item | `WaitingForItem` (enum: Active, Resolved) | Delegated/blocked item. Has title, waiting_on, and date added. **Implemented.** |
 | Waiting For item ID | `WaitingForId(Uuid)` | Newtype wrapper; uniquely identifies a waiting-for item. **Implemented.** |
 | Waiting-on | `WaitingOn` | Non-empty, max 100 chars, trimmed. Who or what the user is waiting on. Validated at construction via `WaitingOn::parse()`. **Implemented.** |
-| Someday/Maybe item | `SomedayMaybeItem` | Parked idea. Has title and created_at. Not committed to. |
+| Someday/Maybe item | `SomedayMaybeItem` (struct) | Parked idea. Has title and created_at. Not committed to. No state machine -- activated to inbox or deleted. **Implemented.** |
+| Someday/Maybe item ID | `SomedayMaybeId(Uuid)` | Newtype wrapper; uniquely identifies a someday/maybe item. **Implemented.** |
 | Item title | `ItemTitle` | Replaces `TodoTitle`. Non-empty, max 300 chars, trimmed. Same validation. |
 | Context name | `ContextName` | Non-empty, max 50 chars, trimmed. Validated at construction via `ContextName::parse()`. **Implemented.** |
 
@@ -228,7 +240,10 @@ implementation.*
 | Delete project | `delete_project()` | Service: verifies ownership, permanently removes. **Implemented.** |
 | Edit project title | `update_project_title()` | Service: verifies ownership, parses new title, persists. **Implemented.** |
 | Add next action to project | `add_next_action_to_project()` | Service: creates NextAction linked to project. **Implemented.** |
-| Activate someday/maybe | `activate()` | SomedayMaybeItem -> InboxItem (for re-clarification) |
+| Add someday/maybe item | `add_someday_maybe_item()` | Service: creates SomedayMaybeItem with title. **Implemented.** |
+| Delete someday/maybe item | `delete_someday_maybe_item()` | Service: verifies ownership, permanently removes. **Implemented.** |
+| Edit someday/maybe title | `update_someday_maybe_title()` | Service: verifies ownership, parses new title, persists. **Implemented.** |
+| Activate someday/maybe | `activate_someday_maybe_item()` | SomedayMaybeItem -> InboxItem (for re-clarification). **Implemented.** |
 | Resolve waiting for | `resolve_waiting_for_item()` | WaitingForItem -> Resolved (marked as received). **Implemented.** |
 | Add context | `add_context()` | Creates a new user-defined context |
 | Start weekly review | `start_review()` | Initiates the three-phase review flow |
@@ -279,3 +294,16 @@ implementation.*
 
 Both Active and Resolved variants can be deleted (`delete_waiting_for_item()`).
 The `update_waiting_for_item()` action applies to Active items.
+
+**SomedayMaybeItem Lifecycle:**
+```
+          add_someday_maybe_item()
+[nothing] ──────────────────────> SomedayMaybeItem
+                                       │
+                      activate()       │
+                                       v
+                                  InboxItem (for re-clarification)
+```
+
+SomedayMaybeItem can be deleted (`delete_someday_maybe_item()`).
+The `update_someday_maybe_title()` action applies to all items.

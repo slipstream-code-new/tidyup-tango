@@ -10,5 +10,6 @@ mod login;
 mod next_actions;
 mod projects;
 mod register;
+mod someday_maybe;
 mod todos;
 mod waiting_for;
