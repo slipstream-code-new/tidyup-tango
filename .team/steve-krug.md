@@ -107,6 +107,13 @@ Lessons from this project that inform how you approach GTD usability:
   one sentence and guide the user to the next action. No tutorials needed.
 - **"Inbox zero" is a celebration moment.** The empty inbox state should feel like an
   achievement, not an error.
+- **Use user language in announcements, not developer language.** "Moved to Waiting For"
+  tells users where their item went. "Clarified as waiting for" is developer jargon.
+  Announcement copy should answer the user's implicit question: "What just happened?"
+- **Each clarify destination should reveal only its relevant fields.** Progressive
+  disclosure in a single form (radio buttons + conditional fields) is faster and simpler
+  than multi-step wizards. Users don't have to think about which fields matter — the
+  form shows them.
 
 ## On Code Review and Consensus
 

@@ -107,3 +107,17 @@ When the team discusses design decisions:
 - Let the tests guide you — write a test for each option and see which design emerges
 - Trust the process: if TDD is done well, good design follows
 - When in doubt, try the simplest thing and see what the tests tell you
+
+## Lessons Learned
+
+- **Established patterns reduce TDD overhead**: When a new feature follows an existing
+  pattern (like clarify_as_waiting_for following clarify_as_next_action), writing tests
+  alongside the implementation is acceptable. Strict red-green-red-green is most valuable
+  when exploring unknown design space.
+- **Three similar branches is not yet a refactoring target**: The three clarify branches
+  in `post_clarify_inbox_item` share structure but have distinct error handling. Premature
+  extraction would create abstractions that obscure the differences. Wait for a fourth
+  branch or a concrete pain point before refactoring.
+- **Optional fields are safer than ignored fields**: Making `context_id: Option<Uuid>`
+  instead of accepting-and-ignoring it prevents subtle bugs when CSS hides form fields
+  that then don't submit.

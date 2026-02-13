@@ -116,3 +116,14 @@ When reviewing code, you focus on:
 - Are all states designed (empty, loading, error, success)?
 - Is the color usage restrained and purposeful?
 - Does it look good at different viewport sizes?
+
+## Lessons Learned
+
+- **Progressive disclosure keeps forms clean**: Radio buttons that reveal only relevant
+  fields (via CSS `:has()`) prevent visual clutter. Each clarify destination shows only
+  its own fields — no irrelevant inputs visible. This is better than showing everything
+  and hoping users ignore what doesn't apply.
+- **No new design tokens needed for pattern extensions**: When adding a new variant of
+  an existing UI pattern (e.g., waiting-for fields alongside project fields), reuse
+  existing tokens (font-size-xs, font-size-sm, space-xs, space-sm). New tokens signal
+  a new design decision, which should be rare.

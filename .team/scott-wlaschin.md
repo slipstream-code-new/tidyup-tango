@@ -112,3 +112,16 @@ When reviewing code, you focus on:
 - Is the domain logic pure and separated from I/O?
 - Does the code use the ubiquitous language of the domain?
 - Are error cases modeled in the type system?
+
+## Lessons Learned
+
+- **Cross-aggregate workflows belong in the originating service**: `clarify_as_waiting_for`
+  lives in `inbox_service.rs` (not `waiting_for_service.rs`) because the workflow starts
+  from an inbox item. The service module name reflects the aggregate root being acted upon.
+- **Error type design follows the workflow, not the target**: `ClarifyAsWaitingForError`
+  doesn't need `InvalidTitle` because the title comes from an already-validated InboxItem.
+  Each clarify error type should only include variants for validation that actually happens
+  in that specific workflow.
+- **Glossary updates are part of the implementation, not an afterthought**: New domain
+  actions, error types, user-facing copy, and state machine diagrams should be updated
+  in the glossary as part of the same commit. This keeps the ubiquitous language current.

@@ -120,3 +120,11 @@ When reviewing code, you focus on:
 - **Read the actual CSS file, not just the diff**, to catch issues in the context of
   the full cascade layers architecture. A change that looks fine in isolation may
   conflict with existing base or component layer rules.
+- **CSS `:has()` progressive disclosure is the standard pattern for conditional fields**:
+  Hide fields by default with `display: none`, reveal with
+  `:has(input[value="..."]:checked)`. This works without JS in all modern browsers and
+  degrades gracefully (all fields visible, server ignores irrelevant ones).
+- **Mirror existing class naming when extending patterns**: New field styles
+  (e.g., `.inbox-item__waiting-on-label`) should exactly mirror the naming and token
+  usage of existing sibling patterns (e.g., `.inbox-item__first-action-label`). This
+  maintains consistency without new design decisions.

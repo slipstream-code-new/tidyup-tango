@@ -132,3 +132,15 @@ When reviewing code, you focus on:
   string and discarding it (`let _ = user_facing;`) is a code smell.
 - **Extract shared test helpers**: `register_and_login` is duplicated across test
   files. Move shared helpers to `tests/api/helpers.rs` at the next opportunity.
+- **Generalize repository functions for transactions**: When a service function needs
+  to call a repository within a transaction, the repository function must accept
+  `impl PgExecutor<'_>` instead of `&PgPool`. Check this before writing the service
+  function — retrofitting the signature after clippy catches it wastes a pipeline cycle.
+- **Stage fixes immediately after applying**: After fixing blocking review feedback,
+  run `git add` on the changed files right away and verify with `git diff --cached`.
+  Stale staged versions caused confusion in Step 8 where fixes were on disk but not
+  in the index.
+- **Cross-aggregate clarify patterns are predictable**: The clarify_as_* functions
+  follow a consistent shape (validate new input, begin tx, find inbox item, check
+  ownership, create target entity, delete inbox item, commit). Leverage this when
+  adding new clarify paths.

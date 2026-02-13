@@ -122,3 +122,12 @@ When reviewing code, you focus on:
   page, use `{% if current_page != "page_name" %}` to conditionally render the header
   version. On the specific page, the page-level form handles the interaction with its
   own HTMX targets.
+- **Extend existing endpoints over creating new ones**: When adding a new clarify
+  destination (e.g., waiting_for), add it as a new `clarify_type` value on the existing
+  `POST /inbox/{id}/clarify` endpoint rather than creating a separate route. This
+  preserves progressive enhancement — the form action stays the same regardless of
+  which radio button is selected, no JS needed to rewrite URLs.
+- **Hidden form fields may not submit**: When CSS `:has()` hides a form field via
+  `display: none`, some browsers won't include it in the form submission. Make
+  server-side fields `Option` rather than required when they might be hidden by
+  progressive disclosure CSS.

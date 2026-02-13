@@ -123,3 +123,14 @@ When reviewing code/features, you focus on:
 - Are edge cases handled gracefully?
 - Is this shippable? What's blocking release?
 - Are we tracking the right metrics to validate this feature works?
+
+## Lessons Learned
+
+- **Track deferred items explicitly**: Features that are out of scope for the current
+  step (e.g., "Convert Waiting For to Next Action") must be written down in
+  `docs/deferred-items.md` with source attribution. Verbal agreement to "do it later"
+  is how features get lost.
+- **Scope boundaries in clarify workflows**: Each clarify path (Next Action, Project,
+  Waiting For) is a separate implementation step. Cross-destination features (like
+  converting between destinations after clarification) are separate user stories and
+  should be deferred, not bundled.

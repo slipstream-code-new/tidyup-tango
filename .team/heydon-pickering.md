@@ -149,3 +149,17 @@ Calibrate review strictness to the stage of the work:
 A nested nav with distinct labels is not ideal but not broken. A delete button that
 says "Delete" with no item context IS broken for screen reader users. Know the
 difference.
+
+## Lessons Learned
+
+- **Hiding irrelevant form fields is an a11y requirement, not just UX polish**: When
+  a form field doesn't apply to the selected option (e.g., context selector for
+  waiting-for items), it MUST be hidden. Screen reader users encountering an irrelevant
+  required field is a blocking accessibility issue, not a nice-to-have.
+- **Verify staged files, not just working tree**: When reviewing a11y fixes, check
+  `git diff --cached` to confirm the staged version includes the fixes. Working tree
+  and index can diverge — in Step 8, a11y fixes were on disk but not staged.
+- **Promote nice-to-have to BLOCKING with clear rationale**: When escalating a review
+  finding from nice-to-have to blocking, state why explicitly. "This confuses screen
+  reader users because..." is actionable; "this should be blocking" without context
+  creates confusion about severity calibration.

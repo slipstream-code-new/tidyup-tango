@@ -556,6 +556,11 @@ Every commit must pass (in order):
     participate. Questions: (a) Did we follow the pipeline? (b) Was the commit
     atomic? (c) Any process improvements? The project owner may offer suggestions as
     an outside observer, but all process decisions are the team's to make.
+    After the discussion, capture learnings:
+    - **Team-wide process changes**: update TEAM_AGREEMENTS.md
+    - **Individual expertise learnings**: each team member tells the Driver what to
+      add to their `.team/` profile's "Lessons Learned" section. Skip if no new
+      learnings — only capture genuine insights, not busywork.
 13. **Only then begin the next change.**
 
 Additional rules:
