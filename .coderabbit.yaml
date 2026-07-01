@@ -1,0 +1,9 @@
+reviews:
+  request_changes_workflow: true
+  path_filters:
+    - "!playwright-report/**"
+    - "!target/**"
+    - "!node_modules/**"
+    - "!Cargo.lock"
+    - "!package-lock.json"
+    - "!.sqlx/**"
