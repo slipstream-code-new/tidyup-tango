@@ -25,6 +25,10 @@ on:
 env:
   CARGO_TERM_COLOR: always
   DATABASE_URL: postgres://todo_list:todo_list@127.0.0.1:5432/todo_list
+  # lint has no postgres service (unlike test/e2e), so sqlx's compile-time
+  # query macros must use the committed .sqlx offline cache instead of
+  # connecting to a live database.
+  SQLX_OFFLINE: "true"
 
 jobs:
   lint:
